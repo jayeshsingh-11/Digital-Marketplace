@@ -382,7 +382,7 @@ const AdminDashboard = ({ user }: { user: User }) => {
                                                     <td className='px-6 py-4 text-sm text-gray-600'>{o.buyerEmail}</td>
                                                     <td className='px-6 py-4'>
                                                         <div className='flex flex-col gap-0.5'>
-                                                            {o.products.map((prod: any, i) => (
+                                                            {o.products.map((prod: any, i: number) => (
                                                                 <span key={i} className='text-sm text-gray-700'>
                                                                     {prod.name}
                                                                 </span>
