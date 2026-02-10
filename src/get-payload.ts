@@ -67,9 +67,11 @@ export const getPayloadClient = async ({
       email: {
         transport: transporter,
         fromAddress:
-          process.env.RESEND_API_KEY && !process.env.EMAIL_FROM
-            ? 'onboarding@resend.dev'
-            : process.env.EMAIL_FROM || 'jayeshsingh881@gmail.com',
+          process.env.SMTP_HOST
+            ? process.env.EMAIL_FROM || 'jayeshsingh881@gmail.com'
+            : process.env.RESEND_API_KEY && !process.env.EMAIL_FROM
+              ? 'onboarding@resend.dev'
+              : process.env.EMAIL_FROM || 'jayeshsingh881@gmail.com',
         fromName: 'DigitalHippo',
       },
       secret: process.env.PAYLOAD_SECRET,
