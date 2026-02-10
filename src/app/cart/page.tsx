@@ -53,7 +53,7 @@ const Page = () => {
             }
           }
 
-          const rzp1 = new Razorpay(options)
+          const rzp1 = new Razorpay(options as any)
           rzp1.open()
         }
       },
