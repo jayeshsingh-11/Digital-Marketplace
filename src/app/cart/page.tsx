@@ -9,7 +9,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import useRazorpay from 'react-razorpay'
+import { useRazorpay } from 'react-razorpay'
 
 const Page = () => {
   const { items, removeItem } = useCart()
