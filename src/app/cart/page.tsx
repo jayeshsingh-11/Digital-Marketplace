@@ -53,7 +53,8 @@ const Page = () => {
             }
           }
 
-          const rzp1 = new Razorpay(options as any)
+          // @ts-ignore
+          const rzp1 = new Razorpay(options)
           rzp1.open()
         }
       },
