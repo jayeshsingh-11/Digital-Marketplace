@@ -8,25 +8,35 @@ dotenv.config({
   path: path.resolve(__dirname, '../.env'),
 })
 
-const transporter = process.env.RESEND_API_KEY
+const transporter = process.env.SMTP_HOST
   ? nodemailer.createTransport({
-    host: 'smtp.resend.com',
-    secure: true,
-    port: 465,
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: Number(process.env.SMTP_PORT) === 465, // true for 465, false for other ports
     auth: {
-      user: 'resend',
-      pass: process.env.RESEND_API_KEY,
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
     },
   })
-  : nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    secure: true,
-    port: 465,
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASSWORD,
-    },
-  })
+  : process.env.RESEND_API_KEY
+    ? nodemailer.createTransport({
+      host: 'smtp.resend.com',
+      secure: true,
+      port: 465,
+      auth: {
+        user: 'resend',
+        pass: process.env.RESEND_API_KEY,
+      },
+    })
+    : nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      secure: true,
+      port: 465,
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD,
+      },
+    })
 
 let cached = (global as any).payload
 
