@@ -168,16 +168,16 @@ const AdminDashboard = ({ user }: { user: User }) => {
                                     key={tab.key}
                                     onClick={() => setActiveTab(tab.key)}
                                     className={`flex items-center gap-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.key
-                                            ? 'border-blue-600 text-blue-600 bg-blue-50/50'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                        ? 'border-blue-600 text-blue-600 bg-blue-50/50'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                         }`}>
                                     <tab.icon className='h-4 w-4' />
                                     {tab.label}
                                     {stats && (
                                         <span
                                             className={`ml-1 px-2 py-0.5 rounded-full text-xs font-medium ${activeTab === tab.key
-                                                    ? 'bg-blue-100 text-blue-700'
-                                                    : 'bg-gray-100 text-gray-600'
+                                                ? 'bg-blue-100 text-blue-700'
+                                                : 'bg-gray-100 text-gray-600'
                                                 }`}>
                                             {tab.key === 'users' && stats.totalUsers}
                                             {tab.key === 'products' && stats.totalProducts}
@@ -224,8 +224,8 @@ const AdminDashboard = ({ user }: { user: User }) => {
                                                     <td className='px-6 py-4'>
                                                         <span
                                                             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${u.role === 'admin'
-                                                                    ? 'bg-blue-100 text-blue-800'
-                                                                    : 'bg-gray-100 text-gray-700'
+                                                                ? 'bg-blue-100 text-blue-800'
+                                                                : 'bg-gray-100 text-gray-700'
                                                                 }`}>
                                                             {u.role}
                                                         </span>
@@ -234,8 +234,8 @@ const AdminDashboard = ({ user }: { user: User }) => {
                                                     <td className='px-6 py-4'>
                                                         <span
                                                             className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${u.verified
-                                                                    ? 'bg-green-100 text-green-800'
-                                                                    : 'bg-yellow-100 text-yellow-800'
+                                                                ? 'bg-green-100 text-green-800'
+                                                                : 'bg-yellow-100 text-yellow-800'
                                                                 }`}>
                                                             {u.verified ? 'Yes' : 'No'}
                                                         </span>
@@ -382,7 +382,7 @@ const AdminDashboard = ({ user }: { user: User }) => {
                                                     <td className='px-6 py-4 text-sm text-gray-600'>{o.buyerEmail}</td>
                                                     <td className='px-6 py-4'>
                                                         <div className='flex flex-col gap-0.5'>
-                                                            {o.products.map((prod, i) => (
+                                                            {o.products.map((prod: any, i) => (
                                                                 <span key={i} className='text-sm text-gray-700'>
                                                                     {prod.name}
                                                                 </span>
@@ -393,8 +393,8 @@ const AdminDashboard = ({ user }: { user: User }) => {
                                                     <td className='px-6 py-4'>
                                                         <span
                                                             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${o.isPaid
-                                                                    ? 'bg-green-100 text-green-800'
-                                                                    : 'bg-red-100 text-red-800'
+                                                                ? 'bg-green-100 text-green-800'
+                                                                : 'bg-red-100 text-red-800'
                                                                 }`}>
                                                             {o.isPaid ? 'Paid' : 'Unpaid'}
                                                         </span>
