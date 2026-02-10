@@ -58,8 +58,8 @@ const Page = () => {
         )
       },
       onSuccess: ({ sentToEmail }) => {
-        toast.success(`Verification email sent to ${sentToEmail}.`)
-        router.push('/verify-email?to=' + sentToEmail)
+        toast.success('Account created successfully! Please sign in.')
+        router.push('/sign-in')
       },
     })
 
