@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSideUser } from './lib/payload-utils'
+
 
 export async function middleware(req: NextRequest) {
   const { nextUrl, cookies } = req
-  const { user } = await getServerSideUser(cookies)
+  const isLoggedIn = cookies.has('payload-token')
 
   if (
-    user &&
+    isLoggedIn &&
     ['/sign-in', '/sign-up'].includes(nextUrl.pathname)
   ) {
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/`
+      new URL('/', req.url)
     )
   }
 
