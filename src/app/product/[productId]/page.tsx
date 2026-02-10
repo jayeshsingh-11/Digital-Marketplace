@@ -3,7 +3,7 @@ import ImageSlider from '@/components/ImageSlider'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import ProductReel from '@/components/ProductReel'
 import { getPayloadClient } from '@/get-payload'
-import { getServerSideUser } from '@/lib/payload-utils'
+import { getServerSideUserNode } from '@/lib/payload-utils-node'
 import { formatPrice } from '@/lib/utils'
 import { Check, Shield } from 'lucide-react'
 import Link from 'next/link'
@@ -29,7 +29,7 @@ const Page = async ({ params }: PageProps) => {
   let isLoggedIn = false
   try {
     const nextCookies = cookies()
-    const { user } = await getServerSideUser(nextCookies)
+    const { user } = await getServerSideUserNode(nextCookies)
     isLoggedIn = !!user
   } catch { }
 
@@ -49,7 +49,7 @@ const Page = async ({ params }: PageProps) => {
 
   const label = product.category
 
-  const validUrls = product.images
+  const validUrls = (product.images as any[])
     .map(({ image }) =>
       typeof image === 'string' ? image : image.url
     )

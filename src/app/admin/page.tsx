@@ -1,4 +1,4 @@
-import { getServerSideUser } from '@/lib/payload-utils'
+import { getServerSideUserNode } from '@/lib/payload-utils-node'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import AdminDashboard from '@/components/AdminDashboard'
@@ -8,7 +8,7 @@ const AdminPage = async () => {
 
     let user = null
     try {
-        const res = await getServerSideUser(nextCookies)
+        const res = await getServerSideUserNode(nextCookies)
         user = res.user
     } catch (err) {
         // If fetch fails (server not ready), redirect to home
