@@ -268,11 +268,11 @@ const SellerDashboard = ({ user }: { user: User }) => {
                             </div>
                             {productsData && (
                                 <Pagination
-                                    page={productsData.page}
-                                    totalPages={productsData.totalPages}
-                                    totalDocs={productsData.totalDocs}
-                                    hasPrev={productsData.hasPrevPage}
-                                    hasNext={productsData.hasNextPage}
+                                    page={productsData.page ?? 1}
+                                    totalPages={productsData.totalPages ?? 1}
+                                    totalDocs={productsData.totalDocs ?? 0}
+                                    hasPrev={productsData.hasPrevPage ?? false}
+                                    hasNext={productsData.hasNextPage ?? false}
                                     onPrev={() => setProductsPage((p) => p - 1)}
                                     onNext={() => setProductsPage((p) => p + 1)}
                                 />
@@ -343,11 +343,11 @@ const SellerDashboard = ({ user }: { user: User }) => {
                             </div>
                             {ordersData && (
                                 <Pagination
-                                    page={ordersData.page}
-                                    totalPages={ordersData.totalPages}
-                                    totalDocs={ordersData.totalDocs}
-                                    hasPrev={ordersData.hasPrevPage}
-                                    hasNext={ordersData.hasNextPage}
+                                    page={ordersData.page ?? 1}
+                                    totalPages={ordersData.totalPages ?? 1}
+                                    totalDocs={ordersData.totalDocs ?? 0}
+                                    hasPrev={ordersData.hasPrevPage ?? false}
+                                    hasNext={ordersData.hasNextPage ?? false}
                                     onPrev={() => setOrdersPage((p) => p - 1)}
                                     onNext={() => setOrdersPage((p) => p + 1)}
                                 />
