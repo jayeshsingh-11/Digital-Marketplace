@@ -25,8 +25,10 @@ const Page = () => {
 
   const { mutate: createCheckoutSession, isLoading } =
     trpc.payment.createSession.useMutation({
-      onSuccess: ({ orderId, amount, currency, key }) => {
+      onSuccess: ({ orderId, ...rest }) => {
         if (orderId && Razorpay) {
+          const { amount, currency, key } = rest as { amount: string; currency: string; key: string }
+
           const options = {
             key,
             amount,
