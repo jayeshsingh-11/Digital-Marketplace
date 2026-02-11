@@ -3,16 +3,11 @@ import path from 'path'
 import type { InitOptions } from 'payload/config'
 import payload, { Payload } from 'payload'
 import nodemailer from 'nodemailer'
+import config from './payload.config'
 
 dotenv.config({
   path: path.resolve(__dirname, '../.env'),
 })
-
-// Ensure Payload can find its config on Vercel (serverless)
-// Locally this is set via cross-env in the dev script
-if (!process.env.PAYLOAD_CONFIG_PATH) {
-  process.env.PAYLOAD_CONFIG_PATH = path.resolve(__dirname, './payload.config.ts')
-}
 
 // Using jsonTransport (no-op) since email verification is disabled
 // To re-enable real email, replace this with actual SMTP config
@@ -46,6 +41,7 @@ export const getPayloadClient = async ({
 
   if (!cached.promise) {
     cached.promise = payload.init({
+      config,
       email: {
         transport: transporter,
         fromAddress: process.env.EMAIL_FROM || 'noreply@digitalhippo.com',
