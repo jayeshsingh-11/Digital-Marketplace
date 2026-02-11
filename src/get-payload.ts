@@ -3,7 +3,6 @@ import path from 'path'
 import type { InitOptions } from 'payload/config'
 import payload, { Payload } from 'payload'
 import nodemailer from 'nodemailer'
-import config from './payload.config'
 
 dotenv.config({
   path: path.resolve(__dirname, '../.env'),
@@ -40,8 +39,18 @@ export const getPayloadClient = async ({
   }
 
   if (!cached.promise) {
+    let config: any = null
+
+    if (!process.env.NEXT_BUILD) {
+      // Only require config during runtime (Vercel Serverless)
+      // This fixes MODULE_NOT_FOUND.
+      // We skip this during build (NEXT_BUILD=true) to avoid SCSS errors.
+      /* eslint-disable @typescript-eslint/no-var-requires */
+      config = require('./payload.config').default
+    }
+
     cached.promise = payload.init({
-      config,
+      ...(config ? { config } : {}),
       email: {
         transport: transporter,
         fromAddress: process.env.EMAIL_FROM || 'noreply@digitalhippo.com',
