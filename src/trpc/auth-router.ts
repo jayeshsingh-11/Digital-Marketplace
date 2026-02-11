@@ -212,6 +212,7 @@ export const authRouter = router({
 
         return { success: true }
       } catch (err) {
+        console.error('GOOGLE SIGN IN ERROR:', err)
         throw new TRPCError({ code: 'UNAUTHORIZED' })
       }
     }),
