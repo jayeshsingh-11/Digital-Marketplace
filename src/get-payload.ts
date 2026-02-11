@@ -8,35 +8,11 @@ dotenv.config({
   path: path.resolve(__dirname, '../.env'),
 })
 
-const transporter = process.env.SMTP_HOST
-  ? nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: Number(process.env.SMTP_PORT) === 465, // true for 465, false for other ports
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  })
-  : process.env.RESEND_API_KEY
-    ? nodemailer.createTransport({
-      host: 'smtp.resend.com',
-      secure: true,
-      port: 465,
-      auth: {
-        user: 'resend',
-        pass: process.env.RESEND_API_KEY,
-      },
-    })
-    : nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      secure: true,
-      port: 465,
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD,
-      },
-    })
+// Using jsonTransport (no-op) since email verification is disabled
+// To re-enable real email, replace this with actual SMTP config
+const transporter = nodemailer.createTransport({
+  jsonTransport: true,
+})
 
 let cached = (global as any).payload
 
@@ -66,12 +42,7 @@ export const getPayloadClient = async ({
     cached.promise = payload.init({
       email: {
         transport: transporter,
-        fromAddress:
-          process.env.SMTP_HOST
-            ? process.env.EMAIL_FROM || 'jayeshsingh881@gmail.com'
-            : process.env.RESEND_API_KEY && !process.env.EMAIL_FROM
-              ? 'onboarding@resend.dev'
-              : process.env.EMAIL_FROM || 'jayeshsingh881@gmail.com',
+        fromAddress: process.env.EMAIL_FROM || 'noreply@digitalhippo.com',
         fromName: 'DigitalHippo',
       },
       secret: process.env.PAYLOAD_SECRET,
