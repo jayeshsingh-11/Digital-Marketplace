@@ -10,6 +10,8 @@ const GoogleAuthButton = () => {
     const searchParams = useSearchParams()
     const origin = searchParams.get('origin')
 
+    console.log('Google Client ID available:', !!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID)
+
     const { mutate: signInWithGoogle } = trpc.auth.signInWithGoogle.useMutation({
         onSuccess: () => {
             toast.success('Signed in successfully')

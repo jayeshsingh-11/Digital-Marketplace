@@ -67,6 +67,7 @@ const Page = () => {
     email,
     password,
   }: TAuthCredentialsValidator) => {
+    console.log('Submitting sign-up form:', { email })
     mutate({ email, password })
   }
 

@@ -1,0 +1,67 @@
+yarn run v1.22.22
+warning ..\..\..\package.json: No license field
+$ cross-env NODE_OPTIONS=--max-old-space-size=8192 PAYLOAD_CONFIG_PATH=src/payload.config.ts nodemon
+[33m[nodemon] 3.0.1[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): server.ts src\collections\**\*.ts src\trpc\index.ts[39m
+[33m[nodemon] watching extensions: js,ts[39m
+[32m[nodemon] starting `ts-node --project tsconfig.server.json src/server.ts -- -I`[39m
+[06:49:46] [32mINFO[39m (payload): [36mConnected to MongoDB server successfully![39m
+[06:49:46] [32mINFO[39m (payload): [36mStarting Payload...[39m
+[06:49:47] [32mINFO[39m (payload): [36mAdmin URL: http://localhost:3000/sell[39m
+warning ..\..\..\package.json: No license field
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+[06:50:07] [32mINFO[39m (payload): [36mNext.js started[39m
+[06:50:07] [32mINFO[39m (payload): [36mNext.js App URL: http://localhost:3000[39m
+webpack built 1ba84ba221a5f4f034eb in 39571ms
+webpack compiled [1m[32msuccessfully[39m[22m
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: No serializer registered for ConcatSource
+<w> while serializing webpack/lib/util/registerExternalSerializer.webpack-sources/ConcatSource -> Array { 2 items } -> ConcatSource
+ Γùï Compiling /src/middleware ...
+ Γ£ô Compiled /src/middleware in 1109ms (54 modules)
+ Γùï Compiling /page ...
+ ΓÜá 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,92 @@
+yarn run v1.22.22
+warning ..\..\..\package.json: No license field
+$ cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts nodemon
+[33m[nodemon] 3.0.1[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): server.ts src\collections\**\*.ts src\trpc\index.ts[39m
+[33m[nodemon] watching extensions: js,ts[39m
+[32m[nodemon] starting `ts-node --project tsconfig.server.json src/server.ts -- -I`[39m
+[06:42:05] [32mINFO[39m (payload): [36mConnected to MongoDB server successfully![39m
+[06:42:05] [32mINFO[39m (payload): [36mStarting Payload...[39m
+[06:42:07] [32mINFO[39m (payload): [36mAdmin URL: http://localhost:3000/sell[39m
+warning ..\..\..\package.json: No license field
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+[06:42:36] [32mINFO[39m (payload): [36mNext.js started[39m
+[06:42:36] [32mINFO[39m (payload): [36mNext.js App URL: http://localhost:3000[39m
+webpack built 1ba84ba221a5f4f034eb in 34877ms
+webpack compiled [1m[32msuccessfully[39m[22m
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: No serializer registered for ConcatSource
+<w> while serializing webpack/lib/util/registerExternalSerializer.webpack-sources/ConcatSource -> Array { 2 items } -> ConcatSource
+ Γùï Compiling /src/middleware ...
+ Γ£ô Compiled /src/middleware in 1755ms (54 modules)
+ Γùï Compiling /page ...
+ ΓÜá 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<--- Last few GCs --->
+
+[15316:000002D1CC9A1EB0]   277104 ms: Mark-Compact 2031.1 (2088.2) -> 2005.1 (2082.7) MB, 727.22 / 0.00 ms  (average mu = 0.558, current mu = 0.454) allocation failure; scavenge might not succeed
+[15316:000002D1CC9A1EB0]   277167 ms: Scavenge 2013.1 (2082.7) -> 2006.1 (2098.7) MB, 29.07 / 0.00 ms  (average mu = 0.558, current mu = 0.454) allocation failure; 
+
+
+<--- JS stacktrace --->
+
+FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 00007FF6557ABC9B node::SetCppgcReference+19867
+ 2: 00007FF65571AD18 v8::base::CPU::num_virtual_address_bits+92856
+ 3: 00007FF656194451 v8::Isolate::ReportExternalAllocationLimitReached+65
+ 4: 00007FF65617DBA8 v8::Function::Experimental_IsNopFunction+1336
+ 5: 00007FF655FDF590 v8::Platform::SystemClockTimeMillis+659328
+ 6: 00007FF655FDC618 v8::Platform::SystemClockTimeMillis+647176
+ 7: 00007FF655FF191A v8::Platform::SystemClockTimeMillis+733962
+ 8: 00007FF655FF2197 v8::Platform::SystemClockTimeMillis+736135
+ 9: 00007FF656000A8F v8::Platform::SystemClockTimeMillis+795775
+10: 00007FF655CC1175 v8::CodeEvent::GetFunctionName+116773
+11: 00007FF65623F38E v8::PropertyDescriptor::writable+650878
+12: 00007FF5D656F9EA 
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m

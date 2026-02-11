@@ -1,0 +1,127 @@
+yarn run v1.22.22
+warning ..\..\..\package.json: No license field
+$ next lint
+
+./src/app/(auth)/forgot-password/page.tsx
+40:23  Error: 'err' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/(auth)/reset-password/page.tsx
+48:23  Error: 'err' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/(auth)/sign-in/page.tsx
+24:10  Error: 'ZodError' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/(auth)/sign-up/page.tsx
+60:21  Error: 'sentToEmail' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/admin/page.tsx
+13:14  Error: 'err' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/cart/page.tsx
+39:42  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+56:11  Error: Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free.  @typescript-eslint/ban-ts-comment
+
+./src/app/layout.tsx
+4:15  Error: 'Metadata' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/page.tsx
+4:3  Error: 'Button' is defined but never used.  @typescript-eslint/no-unused-vars
+8:3  Error: 'ArrowDownToLine' is defined but never used.  @typescript-eslint/no-unused-vars
+10:3  Error: 'CheckCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+16:3  Error: 'TrendingUp' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/product/[productId]/page.tsx
+52:40  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+133:54  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/collections/Users.ts
+1:10  Error: 'PrimaryActionEmailHtml' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/AdminDashboard.tsx
+102:50  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+385:84  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/GoogleAuthButton.tsx
+9:11  Error: 'router' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+22:19  Error: 'err' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/SellerDashboard.tsx
+96:50  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+320:84  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/ui/input.tsx
+5:18  Error: An interface declaring no members is equivalent to its supertype.  @typescript-eslint/no-empty-object-type
+
+./src/components/ui/sheet.tsx
+17:3  Error: Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free.  @typescript-eslint/ban-ts-comment
+21:3  Error: Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free.  @typescript-eslint/ban-ts-comment
+
+./src/get-payload.ts
+17:25  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+20:23  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+42:17  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+49:16  Error: A `require()` style import is forbidden.  @typescript-eslint/no-require-imports
+
+./src/hooks/use-auth.ts
+29:14  Error: 'err' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/lib/payload-utils-node.ts
+5:10  Error: 'User' is defined but never used.  @typescript-eslint/no-unused-vars
+16:44  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+23:14  Error: 'err' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/lib/payload-utils.ts
+25:12  Error: 'err' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/server.ts
+9:10  Error: 'stripeWebhookHandler' is defined but never used.  @typescript-eslint/no-unused-vars
+35:9  Error: 'webhookMiddleware' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+65:7  Error: Include a description after the "@ts-expect-error" directive to explain why the @ts-expect-error is necessary. The description must be 3 characters or longer.  @typescript-eslint/ban-ts-comment
+
+./src/trpc/admin-router.ts
+5:10  Error: 'Product' is defined but never used.  @typescript-eslint/no-unused-vars
+5:19  Error: 'User' is defined but never used.  @typescript-eslint/no-unused-vars
+26:55  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+27:69  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+28:85  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+62:43  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+90:49  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+118:45  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+122:58  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+126:71  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/trpc/auth-router.ts
+81:37  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+119:16  Error: 'err' is defined but never used.  @typescript-eslint/no-unused-vars
+168:18  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+184:54  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+200:37  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+214:16  Error: 'err' is defined but never used.  @typescript-eslint/no-unused-vars
+231:16  Error: 'err' is defined but never used.  @typescript-eslint/no-unused-vars
+253:16  Error: 'err' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/trpc/payment-router.ts
+5:3  Error: 'publicProcedure' is defined but never used.  @typescript-eslint/no-unused-vars
+18:13  Error: 'productIds' is never reassigned. Use 'const' instead.  prefer-const
+68:38  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+69:37  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+70:39  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/trpc/seller-router.ts
+33:48  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+42:35  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+75:102  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+113:40  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+153:33  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+157:52  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+158:39  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+177:87  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+179:71  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+180:43  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/webhooks.ts
+2:10  Error: 'WebhookRequest' is defined but never used.  @typescript-eslint/no-unused-vars
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+error Command failed with exit code 1.
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.

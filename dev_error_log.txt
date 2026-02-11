@@ -1,0 +1,24 @@
+yarn run v1.22.22
+warning ..\..\..\package.json: No license field
+$ cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts nodemon
+[33m[nodemon] 3.0.1[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): server.ts src\collections\**\*.ts src\trpc\index.ts[39m
+[33m[nodemon] watching extensions: js,ts[39m
+[32m[nodemon] starting `ts-node --project tsconfig.server.json src/server.ts -- -I`[39m
+unhandledRejection C:\Users\91831\Downloads\digitalhippo-master2\digitalhippo-master\node_modules\payload\dist\admin\components\elements\Banner\index.scss:1
+@import '../../../scss/styles.scss';
+^
+
+SyntaxError: Invalid or unexpected token
+    at wrapSafe (node:internal/modules/cjs/loader:1464:18)
+    at Module._compile (node:internal/modules/cjs/loader:1495:20)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+    at Object.require.extensions.<computed> [as .js] (C:\Users\91831\AppData\Roaming\npm\node_modules\ts-node\src\index.ts:1608:43)
+    at Module.load (node:internal/modules/cjs/loader:1266:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:1091:12)
+    at Module.call (node:internal/modules/cjs/loader:1289:19)
+    at Module.mod.require (C:\Users\91831\Downloads\digitalhippo-master2\digitalhippo-master\node_modules\next\src\server\require-hook.ts:69:26)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (C:\Users\91831\Downloads\digitalhippo-master2\digitalhippo-master\node_modules\payload\dist\admin\components\elements\Banner\index.js:21:1)
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
