@@ -8,6 +8,12 @@ dotenv.config({
   path: path.resolve(__dirname, '../.env'),
 })
 
+// Ensure Payload can find its config on Vercel (serverless)
+// Locally this is set via cross-env in the dev script
+if (!process.env.PAYLOAD_CONFIG_PATH) {
+  process.env.PAYLOAD_CONFIG_PATH = path.resolve(__dirname, './payload.config.ts')
+}
+
 // Using jsonTransport (no-op) since email verification is disabled
 // To re-enable real email, replace this with actual SMTP config
 const transporter = nodemailer.createTransport({
