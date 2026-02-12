@@ -3,10 +3,10 @@ import path from 'path'
 import type { InitOptions } from 'payload/config'
 import payload, { Payload } from 'payload'
 import nodemailer from 'nodemailer'
-import config from './payload.config'
+import config from '../payload.config'
 
 dotenv.config({
-  path: path.resolve(__dirname, '../.env'),
+  path: path.resolve(process.cwd(), '.env'),
 })
 
 // Using jsonTransport (no-op) since email verification is disabled
@@ -47,7 +47,7 @@ export const getPayloadClient = async ({
       // This fixes MODULE_NOT_FOUND.
       // We skip this during build (NEXT_BUILD=true) to avoid SCSS errors.
       /* eslint-disable @typescript-eslint/no-var-requires */
-      config = require('./payload.config').default
+      config = require('../payload.config').default
     }
 
     cached.promise = payload.init({

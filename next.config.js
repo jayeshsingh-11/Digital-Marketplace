@@ -1,7 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 	env: {
-		PAYLOAD_CONFIG_PATH: "src/payload.config.ts"
+		PAYLOAD_CONFIG_PATH: "payload.config.ts"
+	},
+	experimental: {
+		serverComponentsExternalPackages: ['payload'],
 	},
 	images: {
 		remotePatterns: [
