@@ -180,7 +180,7 @@ export const paymentRouter = router({
                 products,
               }),
             })
-            console.log('Order confirmation email sent successfully. ID:', data?.id || 'No ID returned')
+            console.log('Order confirmation email sent successfully. ID:', (data as any)?.id || 'No ID returned')
           } catch (error) {
             console.error('Failed to send order email. Error details:', error)
           }
