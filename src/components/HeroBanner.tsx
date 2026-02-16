@@ -64,7 +64,7 @@ export function HeroBanner() {
                 </h1>
 
                 <p className='text-lg sm:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed drop-shadow-md'>
-                    Discover the world's best digital marketplace.
+                    Discover the world&apos;s best digital marketplace.
                     From stunning UI kits to robust code templates, find everything you need to build faster.
                 </p>
 
