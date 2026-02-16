@@ -230,7 +230,7 @@ const AdminDashboard = ({ user }: { user: User }) => {
                                                             {u.role}
                                                         </span>
                                                     </td>
-                                                    <td className='px-6 py-4 text-sm text-gray-600'>{u.productCount}</td>
+                                                    <td className='px-6 py-4 text-sm text-gray-600'>{(u as any).productCount}</td>
                                                     <td className='px-6 py-4'>
                                                         <span
                                                             className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${u.verified
