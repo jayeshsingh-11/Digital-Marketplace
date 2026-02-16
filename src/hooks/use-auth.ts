@@ -1,6 +1,7 @@
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useCart } from '@/hooks/use-cart'
+import { createClient } from '@/lib/supabase/client'
 
 export const useAuth = () => {
   const router = useRouter()
@@ -8,18 +9,10 @@ export const useAuth = () => {
 
   const signOut = async () => {
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL || ''}/api/users/logout`,
-        {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      )
+      const supabase = createClient()
+      const { error } = await supabase.auth.signOut()
 
-      if (!res.ok) throw new Error()
+      if (error) throw error
 
       clearCart()
       toast.success('Signed out successfully')

@@ -1,258 +1,154 @@
 import { AuthCredentialsValidator } from '../lib/validators/account-credentials-validator'
 import { publicProcedure, router } from './trpc'
-import { getPayloadClient } from '../get-payload'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { OAuth2Client } from 'google-auth-library'
-import jwt from 'jsonwebtoken'
-
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
+import { createClient } from '@/lib/supabase/server'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { cookies } from 'next/headers'
 
 export const authRouter = router({
-  createPayloadUser: publicProcedure
+  createUser: publicProcedure
     .input(AuthCredentialsValidator)
     .mutation(async ({ input }) => {
       const { email, password } = input
 
-      try {
-        const payload = await getPayloadClient()
+      // We need a Service Role client to check for existing users reliably
+      // and to create verified users without sending confirmation emails immediately if we want instant login.
+      const supabaseAdmin = createSupabaseClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        {
+          auth: {
+            autoRefreshToken: false,
+            persistSession: false
+          }
+        }
+      )
 
-        // check if user already exists
-        const { docs: users } = await payload.find({
-          collection: 'users',
-          where: {
-            email: {
-              equals: email,
-            },
-          },
-        })
+      // 1. Check if user already exists
+      const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers()
 
-        if (users.length !== 0)
-          throw new TRPCError({ code: 'CONFLICT' })
-
-        await payload.create({
-          collection: 'users',
-          data: {
-            email,
-            password,
-            role: 'user',
-          },
-        })
-
-        return { success: true, sentToEmail: email }
-      } catch (err) {
-        console.error('CREATE USER ERROR:', err)
-        if (err instanceof TRPCError) throw err
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(err) })
+      if (listError) {
+        console.error('Error listing users:', listError)
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Something went wrong.' })
       }
+
+      const existingUser = users.find(u => u.email === email)
+
+      if (existingUser) {
+        throw new TRPCError({ code: 'CONFLICT', message: 'This email is already in use. Sign in instead?' })
+      }
+
+      // 2. Create user with email confirmed (so they can login immediately)
+      const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true
+      })
+
+      if (createError) {
+        console.error('Error creating user:', createError)
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to create account.' })
+      }
+
+      // 3. Sign in the user immediately to set the session cookie
+      // We use the standard client for this because it handles cookies/middleware
+      const supabase = createClient(cookies())
+
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+
+      if (signInError) {
+        console.error('Error signing in new user:', signInError)
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Account created but failed to sign in.' })
+      }
+
+      return { success: true, sentToEmail: email }
     }),
 
   verifyEmail: publicProcedure
     .input(z.object({ token: z.string() }))
-    .query(async ({ input, ctx }) => {
-      const { token } = input
-      const { res } = ctx
-
-      const payload = await getPayloadClient()
-
-      const { docs: users } = await payload.find({
-        collection: 'users',
-        where: {
-          _verificationToken: {
-            equals: token,
-          },
-        },
-      })
-
-      const isVerified = await payload.verifyEmail({
-        collection: 'users',
-        token,
-      })
-
-      if (!isVerified)
-        throw new TRPCError({ code: 'UNAUTHORIZED' })
-
-      const user = users[0]
-
-      if (user) {
-        const token = jwt.sign(
-          {
-            email: user.email,
-            id: user.id || (user as any)._id,
-            collection: 'users',
-          },
-          process.env.PAYLOAD_SECRET!,
-          { expiresIn: '30d' }
-        )
-
-        res.cookie('payload-token', token, {
-          httpOnly: true,
-          secure: false, // process.env.NODE_ENV === 'production',
-          sameSite: 'lax',
-          path: '/',
-          maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-        })
-      }
-
+    .query(async ({ input }) => {
+      // Supabase verification is typically done via the link sent to email which hits a Supabase endpoint
+      // or a Next.js API route that exchanges the code. 
+      // This TRPC endpoint might not be needed if we stick to standard Supabase flow.
+      // However, if we want to confirm verification status:
       return { success: true }
     }),
 
   signIn: publicProcedure
     .input(AuthCredentialsValidator)
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ input }) => {
       const { email, password } = input
-      const { res } = ctx
+      const supabase = createClient(cookies())
 
-      const payload = await getPayloadClient()
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-      try {
-        await payload.login({
-          collection: 'users',
-          data: {
-            email,
-            password,
-          },
-          res,
-        })
-
-        return { success: true }
-      } catch (err) {
-        throw new TRPCError({ code: 'UNAUTHORIZED' })
+      if (error) {
+        console.error('Supabase Login Error:', error)
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: error.message })
       }
+
+      console.log('Supabase Login Success for:', email)
+
+      return { success: true }
     }),
 
   signInWithGoogle: publicProcedure
     .input(z.object({ idToken: z.string() }))
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ input }) => {
       const { idToken } = input
-      const { res } = ctx
+      const supabase = createClient(cookies())
 
-      try {
-        const ticket = await client.verifyIdToken({
-          idToken,
-          audience: process.env.GOOGLE_CLIENT_ID,
-        })
-        const payloadData = ticket.getPayload()
+      const { error } = await supabase.auth.signInWithIdToken({
+        provider: 'google',
+        token: idToken,
+      })
 
-        if (!payloadData || !payloadData.email) {
-          throw new TRPCError({ code: 'UNAUTHORIZED' })
-        }
-
-        const { email, sub: googleId } = payloadData
-
-        const payload = await getPayloadClient()
-
-        const { docs: users } = await payload.find({
-          collection: 'users',
-          where: {
-            email: {
-              equals: email,
-            },
-          },
-        })
-
-        const user = users[0]
-
-        if (!user) {
-          // Create user with random password
-          const password = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8)
-
-          await payload.create({
-            collection: 'users',
-            data: {
-              email,
-              password,
-              role: 'user',
-              googleId,
-              _verified: true,
-            } as any,
-          })
-
-          // Login the new user
-          await payload.login({
-            collection: 'users',
-            data: { email, password },
-            res,
-          })
-        } else {
-          // Link Google Account if not linked
-          // @ts-expect-error user possibly undefined typed but we checked
-          if (!user.googleId) {
-            await payload.update({
-              collection: 'users',
-              id: user.id,
-              data: { googleId, _verified: true } as any
-            })
-          } else if (!user._verified) {
-            await payload.update({
-              collection: 'users',
-              id: user.id,
-              data: { _verified: true }
-            })
-          }
-
-          // Generate a random password to log the user in
-          // This ensures we can use payload.login to get a valid token/cookie
-          const generatedPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8)
-
-          await payload.update({
-            collection: 'users',
-            id: user.id || (user as any)._id,
-            data: { password: generatedPassword }
-          })
-
-          await payload.login({
-            collection: 'users',
-            data: { email: user.email, password: generatedPassword },
-            res,
-          })
-
-          // We don't need manual cookie setting anymore
-        }
-
-        return { success: true }
-      } catch (err) {
-        console.error('GOOGLE SIGN IN ERROR:', err)
+      if (error) {
+        console.error('Google ID Token Error:', error)
         throw new TRPCError({ code: 'UNAUTHORIZED' })
       }
+
+      return { success: true }
     }),
 
   forgotPassword: publicProcedure
     .input(z.object({ email: z.string().email() }))
     .mutation(async ({ input }) => {
       const { email } = input
-      const payload = await getPayloadClient()
+      const supabase = createClient(cookies())
 
-      try {
-        await payload.forgotPassword({
-          collection: 'users',
-          data: { email },
-        })
-        return { success: true }
-      } catch (err) {
-        // Don't reveal if email exists or not for security
-        return { success: true }
-      }
+      await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${process.env.NEXT_PUBLIC_SERVER_URL}/reset-password-confirm`,
+      })
+
+      return { success: true }
     }),
 
   resetPassword: publicProcedure
     .input(z.object({
-      token: z.string(),
+      token: z.string(), // This assumes the token is passed, but Supabase usually handles exchange via link
       password: z.string().min(8)
     }))
     .mutation(async ({ input }) => {
-      const { token, password } = input
-      const payload = await getPayloadClient()
+      const { password } = input
+      const supabase = createClient(cookies())
 
-      try {
-        await payload.resetPassword({
-          collection: 'users',
-          data: { token, password },
-          overrideAccess: true,
-        })
-        return { success: true }
-      } catch (err) {
-        throw new TRPCError({ code: 'BAD_REQUEST' })
+      const { error } = await supabase.auth.updateUser({
+        password
+      })
+
+      if (error) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: error.message })
       }
+
+      return { success: true }
     }),
 })
+

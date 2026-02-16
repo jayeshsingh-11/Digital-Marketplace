@@ -2,13 +2,13 @@ import AddToCartButton from '@/components/AddToCartButton'
 import ImageSlider from '@/components/ImageSlider'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import ProductReel from '@/components/ProductReel'
-import { getPayloadClient } from '@/get-payload'
-import { getServerSideUserNode } from '@/lib/payload-utils-node'
+import { getServerSideUserNode } from '@/lib/auth-utils'
 import { formatPrice } from '@/lib/utils'
 import { Check, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { cookies } from 'next/headers'
+import { createClient } from '@/lib/supabase/server'
 
 interface PageProps {
   params: {
@@ -23,8 +23,7 @@ const BREADCRUMBS = [
 
 const Page = async ({ params }: PageProps) => {
   const { productId } = params
-
-  const payload = await getPayloadClient()
+  const supabase = createClient(cookies())
 
   let isLoggedIn = false
   try {
@@ -33,27 +32,29 @@ const Page = async ({ params }: PageProps) => {
     isLoggedIn = !!user
   } catch { }
 
-  const { docs: products } = await payload.find({
-    collection: 'products',
-    limit: 1,
-    where: {
-      id: {
-        equals: productId,
-      },
-    },
-  })
+  const { data: product, error } = await supabase
+    .from('products')
+    .select(`
+      *,
+      product_images (
+        media (*)
+      )
+    `)
+    .eq('id', productId)
+    .single()
 
-  const [product] = products
-
-  if (!product) return notFound()
+  if (error || !product) return notFound()
 
   const label = product.category
 
-  const validUrls = (product.images as any[])
-    .map(({ image }) =>
-      typeof image === 'string' ? image : image.url
-    )
+  const validUrls = (product.product_images || [])
+    .map((pi: any) => pi.media?.url)
     .filter(Boolean) as string[]
+
+  const productWithImages = {
+    ...product,
+    images: product.product_images?.map((pi: any) => ({ image: pi.media })) || []
+  }
 
   return (
     <MaxWidthWrapper className='bg-white'>
@@ -130,7 +131,7 @@ const Page = async ({ params }: PageProps) => {
           <div className='mt-10 lg:col-start-1 lg:row-start-2 lg:max-w-lg lg:self-start'>
             <div>
               <div className='mt-10'>
-                <AddToCartButton product={product as any} isLoggedIn={isLoggedIn} />
+                <AddToCartButton product={productWithImages as any} isLoggedIn={isLoggedIn} />
               </div>
               <div className='mt-6 text-center'>
                 <div className='group inline-flex text-sm text-medium'>

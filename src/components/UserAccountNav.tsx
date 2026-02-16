@@ -11,6 +11,8 @@ import {
 } from './ui/dropdown-menu'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/use-auth'
+import Image from 'next/image'
+import { User as UserIcon } from 'lucide-react'
 
 const UserAccountNav = ({ user }: { user: User }) => {
   const { signOut } = useAuth()
@@ -23,8 +25,22 @@ const UserAccountNav = ({ user }: { user: User }) => {
         <Button
           variant='ghost'
           size='sm'
-          className='relative'>
-          My account
+          className='relative h-8 w-8 rounded-full'>
+          {user.image_url ? (
+            <div className='relative aspect-square h-full w-full'>
+              <Image
+                fill
+                src={user.image_url}
+                alt='profile picture'
+                referrerPolicy='no-referrer'
+                className='rounded-full object-cover'
+              />
+            </div>
+          ) : (
+            <div className='flex h-full w-full items-center justify-center rounded-full bg-slate-100'>
+              <UserIcon className='h-4 w-4 text-slate-500' aria-hidden='true' />
+            </div>
+          )}
         </Button>
       </DropdownMenuTrigger>
 
@@ -34,7 +50,7 @@ const UserAccountNav = ({ user }: { user: User }) => {
         <div className='flex items-center justify-start gap-2 p-2'>
           <div className='flex flex-col space-y-0.5 leading-none'>
             <p className='font-medium text-sm text-black'>
-              {user.email}
+              {user.name || user.email}
             </p>
           </div>
         </div>
@@ -46,6 +62,10 @@ const UserAccountNav = ({ user }: { user: User }) => {
             <Link href='/admin'>Admin Dashboard</Link>
           </DropdownMenuItem>
         )}
+
+        <DropdownMenuItem asChild>
+          <Link href='/account'>Account Settings</Link>
+        </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
           <Link href='/seller'>Seller Dashboard</Link>

@@ -1,4 +1,4 @@
-import { getServerSideUserNode } from '@/lib/payload-utils-node'
+import { getServerSideUserNode } from '@/lib/auth-utils'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import AdminDashboard from '@/components/AdminDashboard'

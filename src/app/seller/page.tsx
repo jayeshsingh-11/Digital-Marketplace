@@ -1,9 +1,13 @@
-import { getServerSideUserNode } from '@/lib/payload-utils-node'
+import { getServerSideUserNode } from '@/lib/auth-utils'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import SellerDashboard from '@/components/SellerDashboard'
 
-const SellerPage = async () => {
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { Plus } from 'lucide-react'
+
+const Page = async () => {
     const nextCookies = cookies()
     const { user } = await getServerSideUserNode(nextCookies)
 
@@ -14,4 +18,4 @@ const SellerPage = async () => {
     return <SellerDashboard user={user} />
 }
 
-export default SellerPage
+export default Page

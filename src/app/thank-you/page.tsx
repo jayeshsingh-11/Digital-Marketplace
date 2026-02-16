@@ -1,12 +1,13 @@
-import { getServerSideUserNode } from '@/lib/payload-utils-node'
+import { getServerSideUserNode } from '@/lib/auth-utils'
 import Image from 'next/image'
 import { cookies } from 'next/headers'
-import { getPayloadClient } from '@/get-payload'
 import { notFound, redirect } from 'next/navigation'
 import { Product, ProductFile, User } from '@/payload-types'
 import { formatPrice } from '@/lib/utils'
 import Link from 'next/link'
 import PaymentStatus from '@/components/PaymentStatus'
+import { createClient } from '@/lib/supabase/server'
+import ClearCart from '@/components/ClearCart'
 
 interface PageProps {
   searchParams: {
@@ -21,36 +22,38 @@ const ThankYouPage = async ({
   const nextCookies = cookies()
 
   const { user } = await getServerSideUserNode(nextCookies)
-  const payload = await getPayloadClient()
+  const supabase = createClient(nextCookies)
 
-  const { docs: orders } = await payload.find({
-    collection: 'orders',
-    depth: 2,
-    where: {
-      id: {
-        equals: orderId,
-      },
-    },
-  })
-
-  const [order] = orders
+  const { data: order } = await supabase
+    .from('orders')
+    .select(`
+      *,
+      order_products (
+        product_id,
+        products (
+          *,
+          product_files (*),
+          product_images (
+            media (*)
+          )
+        )
+      )
+    `)
+    .eq('id', orderId)
+    .single()
 
   if (!order) return notFound()
 
-  const orderUserId =
-    typeof order.user === 'string'
-      ? order.user
-      : order.user.id
-
-  if (orderUserId !== user?.id) {
+  // Verify ownership
+  if (order.user_id !== user?.id) {
     return redirect(
       `/sign-in?origin=thank-you?orderId=${order.id}`
     )
   }
 
-  const products = order.products as Product[]
+  const products = order.order_products.map((op: any) => op.products)
 
-  const orderTotal = products.reduce((total, product) => {
+  const orderTotal = products.reduce((total: number, product: any) => {
     return total + product.price
   }, 0)
 
@@ -74,14 +77,14 @@ const ThankYouPage = async ({
             <h1 className='mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl'>
               Thanks for ordering
             </h1>
-            {order._isPaid ? (
+            {order.is_paid ? (
               <p className='mt-2 text-base text-muted-foreground'>
                 Your order was processed and your assets are
                 available to download below. We&apos;ve sent
                 your receipt and order details to{' '}
-                {typeof order.user !== 'string' ? (
+                {user ? (
                   <span className='font-medium text-gray-900'>
-                    {order.user.email}
+                    {user.email}
                   </span>
                 ) : null}
                 .
@@ -103,23 +106,20 @@ const ThankYouPage = async ({
               </div>
 
               <ul className='mt-6 divide-y divide-gray-200 border-t border-gray-200 text-sm font-medium text-muted-foreground'>
-                {(order.products as Product[]).map(
-                  (product) => {
+                {products.map(
+                  (product: any) => {
                     const label = product.category
 
-                    const downloadUrl = (
-                      product.product_files as ProductFile
-                    ).url as string
+                    const downloadUrl = product.product_files?.url as string
 
-                    const { image } = product.images[0]
+                    const image = product.product_images?.[0]?.media
 
                     return (
                       <li
                         key={product.id}
                         className='flex space-x-6 py-6'>
                         <div className='relative h-24 w-24'>
-                          {typeof image !== 'string' &&
-                            image.url ? (
+                          {image?.url ? (
                             <Image
                               fill
                               src={image.url}
@@ -140,7 +140,7 @@ const ThankYouPage = async ({
                             </p>
                           </div>
 
-                          {order._isPaid ? (
+                          {order.is_paid ? (
                             <a
                               href={downloadUrl}
                               download={product.name}
@@ -183,8 +183,8 @@ const ThankYouPage = async ({
               </div>
 
               <PaymentStatus
-                isPaid={order._isPaid}
-                orderEmail={(order.user as User).email}
+                isPaid={order.is_paid}
+                orderEmail={user?.email || ''}
                 orderId={order.id}
               />
 
@@ -199,7 +199,7 @@ const ThankYouPage = async ({
           </div>
         </div>
       </div>
-    </main>
+    </main >
   )
 }
 

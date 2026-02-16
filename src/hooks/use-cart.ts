@@ -4,6 +4,7 @@ import {
   createJSONStorage,
   persist,
 } from 'zustand/middleware'
+import { toast } from 'sonner'
 
 export type CartItem = {
   product: Product
@@ -22,6 +23,15 @@ export const useCart = create<CartState>()(
       items: [],
       addItem: (product) =>
         set((state) => {
+          const isItemInCart = state.items.find(
+            (item) => item.product.id === product.id
+          )
+
+          if (isItemInCart) {
+            toast.info('Item already in cart')
+            return { items: [...state.items] }
+          }
+
           return { items: [...state.items, { product }] }
         }),
       removeItem: (id) =>

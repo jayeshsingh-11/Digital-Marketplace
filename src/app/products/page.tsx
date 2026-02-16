@@ -16,14 +16,16 @@ const ProductsPage = ({
 }: ProductsPageProps) => {
   const sort = parse(searchParams.sort)
   const category = parse(searchParams.category)
+  const query = parse(searchParams.query)
 
   return (
     <MaxWidthWrapper>
       <ProductReel
-        title={category ?? 'Browse high-quality assets'}
+        title={query ? `Search results for "${query}"` : category ? category : 'Browse high-quality assets'}
         query={{
           category,
           limit: 40,
+          query,
           sort:
             sort === 'desc' || sort === 'asc'
               ? sort

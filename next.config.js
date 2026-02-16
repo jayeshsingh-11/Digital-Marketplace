@@ -1,11 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-	env: {
-		PAYLOAD_CONFIG_PATH: "payload.config.ts"
-	},
-	experimental: {
-		serverComponentsExternalPackages: ['payload'],
-	},
 	images: {
 		remotePatterns: [
 			{
@@ -15,6 +9,18 @@ const nextConfig = {
 			{
 				protocol: "https",
 				hostname: "digitalhippo-production.up.railway.app",
+			},
+			{
+				protocol: "https",
+				hostname: "lzpdjesglncgmltddisb.supabase.co",
+			},
+			{
+				protocol: "https",
+				hostname: "loremflickr.com",
+			},
+			{
+				protocol: "https",
+				hostname: "images.unsplash.com",
 			},
 		],
 	},

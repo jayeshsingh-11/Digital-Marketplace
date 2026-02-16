@@ -26,6 +26,8 @@ const PaymentStatus = ({
     }
   )
 
+  const isPaidStatus = data?.isPaid || isPaid
+
   useEffect(() => {
     if (data?.isPaid) router.refresh()
   }, [data?.isPaid, router])
@@ -44,7 +46,7 @@ const PaymentStatus = ({
           Order Status
         </p>
         <p>
-          {isPaid
+          {isPaidStatus
             ? 'Payment successful'
             : 'Pending payment'}
         </p>

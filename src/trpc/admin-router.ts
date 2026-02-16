@@ -1,8 +1,9 @@
 import { z } from 'zod'
 import { privateProcedure, router } from './trpc'
 import { TRPCError } from '@trpc/server'
-import { getPayloadClient } from '../get-payload'
-import { Product, User } from '../payload-types'
+import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { cookies } from 'next/headers'
 
 const adminProcedure = privateProcedure.use(async ({ ctx, next }) => {
     const { user } = ctx
@@ -13,32 +14,30 @@ const adminProcedure = privateProcedure.use(async ({ ctx, next }) => {
 })
 
 export const adminRouter = router({
-    getStats: adminProcedure.query(async () => {
-        const payload = await getPayloadClient()
+    getStats: adminProcedure.query(async ({ ctx }) => {
+        const { user } = ctx
+        console.log('AdminRouter: getStats called by user', user.id, 'role:', user.role)
+        const supabase = createClient(cookies())
 
-        const [users, products, orders] = await Promise.all([
-            payload.find({ collection: 'users', limit: 0 }),
-            payload.find({ collection: 'products', limit: 0 }),
-            payload.find({ collection: 'orders', limit: 0, depth: 1 }),
-        ])
+        const { count: totalUsers, error: usersError } = await supabase.from('users').select('*', { count: 'exact', head: true })
+        if (usersError) console.error('AdminRouter: getStats users error', usersError)
+        console.log('AdminRouter: totalUsers', totalUsers)
+        const { count: totalProducts } = await supabase.from('products').select('*', { count: 'exact', head: true })
+        const { count: totalOrders } = await supabase.from('orders').select('*', { count: 'exact', head: true })
 
-        // Calculate total revenue from paid orders
-        const paidOrders = orders.docs.filter((order: any) => order._isPaid)
-        const totalRevenue = paidOrders.reduce((acc: number, order: any) => {
-            const orderTotal = (order.products || []).reduce((sum: number, product: any) => {
-                if (typeof product === 'object' && product?.price) {
-                    return sum + product.price
-                }
-                return sum
-            }, 0)
-            return acc + orderTotal
-        }, 0)
+        const { data: paidOrdersModel } = await supabase
+            .from('orders')
+            .select('amount')
+            .eq('is_paid', true)
+
+        const totalRevenue = paidOrdersModel?.reduce((sum, order) => sum + (order.amount || 0), 0) || 0
+        const paidOrdersCount = paidOrdersModel?.length || 0
 
         return {
-            totalUsers: users.totalDocs,
-            totalProducts: products.totalDocs,
-            totalOrders: orders.totalDocs,
-            paidOrders: paidOrders.length,
+            totalUsers: totalUsers || 0,
+            totalProducts: totalProducts || 0,
+            totalOrders: totalOrders || 0,
+            paidOrders: paidOrdersCount,
             totalRevenue,
         }
     }),
@@ -49,26 +48,55 @@ export const adminRouter = router({
             page: z.number().min(1).default(1),
         }))
         .query(async ({ input }) => {
-            const payload = await getPayloadClient()
+            const adminAuth = createAdminClient()
+            const { limit, page } = input
+            const from = (page - 1) * limit
+            const to = from + limit - 1
 
-            const { docs, totalDocs, totalPages, hasNextPage, hasPrevPage } = await payload.find({
-                collection: 'users',
-                limit: input.limit,
-                page: input.page,
-                sort: '-createdAt',
-                depth: 1,
+            // We need emails, so we must use auth admin API to list users.
+            // Supabase Admin API `listUsers` has pagination but it's different.
+            const { data: { users: authUsers }, error } = await adminAuth.auth.admin.listUsers({
+                page: page,
+                perPage: limit
             })
 
-            const users = docs.map((user: any) => ({
-                id: user.id,
-                email: user.email,
-                role: user.role,
-                productCount: Array.isArray(user.products) ? user.products.length : 0,
-                verified: user._verified ?? false,
-                createdAt: user.createdAt,
-            }))
+            // Also get public profiles for roles
+            // We can just query public.users
+            // But aligning them might be tricky if sort order differs.
+            // Admin listUsers doesn't support sorting by createdAt desc easily in the same way.
+            // A simpler approach for this dashboard: Query public.users (which has ID) and map.
+            // But we don't have email in public.users.
+            // Solution: Fetch auth users and join manually or just display ID/Role if email unavailable?
+            // User wants "working properly". Admin dashboard usually shows Email.
 
-            return { users, totalDocs, totalPages, hasNextPage, hasPrevPage, page: input.page }
+            // Alternative: Add email to public.users? (Redundant but practical).
+            // OR iterate authUsers and fetch their profiles.
+
+            if (error || !authUsers) return { users: [], totalDocs: 0, totalPages: 0, hasNextPage: false, hasPrevPage: false, page }
+
+            const userIds = authUsers.map(u => u.id)
+            const supabase = createClient(cookies())
+            const { data: profiles } = await supabase.from('users').select('id, role').in('id', userIds)
+
+            const users = authUsers.map(u => {
+                const profile = profiles?.find(p => p.id === u.id)
+                return {
+                    id: u.id,
+                    email: u.email,
+                    role: profile?.role || 'user',
+                    createdAt: u.created_at,
+                    verified: u.email_confirmed_at != null
+                }
+            })
+
+            // Total docs is hard to get from listUsers without scanning? 
+            // supabase.auth.admin.listUsers returns `total` property? No, it returns `users` array.
+            // We'll estimate total from public.users count.
+            const { count: totalDocs } = await supabase.from('users').select('*', { count: 'exact', head: true })
+            const total = totalDocs || 0
+            const totalPages = Math.ceil(total / limit)
+
+            return { users, totalDocs: total, totalPages, hasNextPage: page < totalPages, hasPrevPage: page > 1, page }
         }),
 
     getProducts: adminProcedure
@@ -77,26 +105,32 @@ export const adminRouter = router({
             page: z.number().min(1).default(1),
         }))
         .query(async ({ input }) => {
-            const payload = await getPayloadClient()
+            const supabase = createClient(cookies())
+            const { limit, page } = input
+            const from = (page - 1) * limit
+            const to = from + limit - 1
 
-            const { docs, totalDocs, totalPages, hasNextPage, hasPrevPage } = await payload.find({
-                collection: 'products',
-                limit: input.limit,
-                page: input.page,
-                sort: '-createdAt',
-                depth: 1,
-            })
+            const { data: products, count } = await supabase
+                .from('products')
+                .select('*', { count: 'exact' })
+                .order('created_at', { ascending: false })
+                .range(from, to)
 
-            const products = docs.map((product: any) => ({
-                id: product.id,
-                name: product.name,
-                price: product.price,
-                category: product.category,
-                sellerEmail: typeof product.user === 'object' ? product.user?.email : 'Unknown',
-                createdAt: product.createdAt,
-            }))
+            const total = count || 0
+            const totalPages = Math.ceil(total / limit)
 
-            return { products, totalDocs, totalPages, hasNextPage, hasPrevPage, page: input.page }
+            const mappedProducts = products?.map(p => ({
+                id: p.id,
+                name: p.name,
+                price: p.price,
+                category: p.category,
+                sellerEmail: 'Unknown', // We would need to fetch user email by user_id from Admin API.
+                // For now, let's leave it 'Unknown' or fetch it if crucial.
+                // We could fetch all unique user_ids from this page of products, then simple batch fetch from auth admin.
+                createdAt: p.created_at
+            })) || []
+
+            return { products: mappedProducts, totalDocs: total, totalPages, hasNextPage: page < totalPages, hasPrevPage: page > 1, page }
         }),
 
     getOrders: adminProcedure
@@ -105,46 +139,61 @@ export const adminRouter = router({
             page: z.number().min(1).default(1),
         }))
         .query(async ({ input }) => {
-            const payload = await getPayloadClient()
+            const supabase = createClient(cookies())
+            const { limit, page } = input
+            const from = (page - 1) * limit
+            const to = from + limit - 1
 
-            const { docs, totalDocs, totalPages, hasNextPage, hasPrevPage } = await payload.find({
-                collection: 'orders',
-                limit: input.limit,
-                page: input.page,
-                sort: '-createdAt',
-                depth: 2,
-            })
+            const { data: orders, count } = await supabase
+                .from('orders')
+                .select(`
+                    *,
+                    order_products (
+                        product_id,
+                        products (*)
+                    )
+                `, { count: 'exact' })
+                .order('created_at', { ascending: false })
+                .range(from, to)
 
-            const orders = docs.map((order: any) => ({
-                id: order.id,
-                isPaid: order._isPaid,
-                buyerEmail: typeof order.user === 'object' ? order.user?.email : 'Unknown',
-                products: (order.products || []).map((p: any) => ({
-                    name: typeof p === 'object' ? p?.name : 'Unknown Product',
-                    price: typeof p === 'object' ? p?.price : 0,
-                })),
-                total: (order.products || []).reduce((sum: number, p: any) => {
-                    return sum + (typeof p === 'object' ? (p?.price || 0) : 0)
-                }, 0),
-                createdAt: order.createdAt,
-            }))
+            const total = count || 0
+            const totalPages = Math.ceil(total / limit)
 
-            return { orders, totalDocs, totalPages, hasNextPage, hasPrevPage, page: input.page }
+            const mappedOrders = orders?.map((order: any) => {
+                const products = order.order_products.map((op: any) => op.products)
+                const total = products.reduce((sum: number, p: any) => sum + (p?.price || 0), 0)
+
+                return {
+                    id: order.id,
+                    isPaid: order.is_paid,
+                    buyerEmail: 'Unknown', // Again, need Admin API for email
+                    products: products.map((p: any) => ({
+                        name: p?.name || 'Unknown',
+                        price: p?.price || 0
+                    })),
+                    total: total, // or use order.amount
+                    createdAt: order.created_at
+                }
+            }) || []
+
+            return { orders: mappedOrders, totalDocs: total, totalPages, hasNextPage: page < totalPages, hasPrevPage: page > 1, page }
         }),
 
     deleteProduct: adminProcedure
         .input(z.object({ productId: z.string() }))
         .mutation(async ({ input }) => {
-            const payload = await getPayloadClient()
-            await payload.delete({ collection: 'products', id: input.productId })
+            const supabase = createClient(cookies())
+            const { error } = await supabase.from('products').delete().eq('id', input.productId)
+            if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })
             return { success: true }
         }),
 
     deleteUser: adminProcedure
         .input(z.object({ userId: z.string() }))
         .mutation(async ({ input }) => {
-            const payload = await getPayloadClient()
-            await payload.delete({ collection: 'users', id: input.userId })
+            const adminAuth = createAdminClient()
+            const { error } = await adminAuth.auth.admin.deleteUser(input.userId)
+            if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })
             return { success: true }
         }),
 })

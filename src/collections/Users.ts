@@ -57,6 +57,14 @@ export const Users: CollectionConfig = {
       ],
     },
     {
+      name: 'name',
+      type: 'text',
+    },
+    {
+      name: 'image_url', // Using image_url to match DB, or 'image' if we map it? DB script used image_url.
+      type: 'text',
+    },
+    {
       name: 'googleId',
       type: 'text',
       admin: {

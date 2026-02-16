@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useRazorpay } from 'react-razorpay'
+import { toast } from 'sonner'
 
 const Page = () => {
   const { items, removeItem } = useCart()
@@ -17,7 +18,7 @@ const Page = () => {
   const router = useRouter()
   const { Razorpay } = useRazorpay()
 
-  const { mutate: verifyPayment } = trpc.payment.verifyPayment.useMutation({
+  const { mutate: verifyPayment, mutateAsync: verifyPaymentAsync } = trpc.payment.verifyPayment.useMutation({
     onSuccess: () => {
       // handled in handler
     }
@@ -27,7 +28,7 @@ const Page = () => {
     trpc.payment.createSession.useMutation({
       onSuccess: ({ orderId, ...rest }) => {
         if (orderId && Razorpay) {
-          const { amount, currency, key } = rest as { amount: number; currency: string; key: string }
+          const { amount, currency, key, dbOrderId } = rest as { amount: number; currency: string; key: string, dbOrderId: string }
 
           const options = {
             key,
@@ -36,13 +37,24 @@ const Page = () => {
             name: 'DigitalHippo',
             description: 'Digital Marketplace',
             order_id: orderId,
-            handler: function (response: any) {
-              verifyPayment({
-                orderId,
-                paymentId: response.razorpay_payment_id,
-                signature: response.razorpay_signature
-              })
-              router.push(`/thank-you?orderId=${orderId}`)
+            handler: async function (response: any) {
+              console.log('Razorpay Handler Triggered', response)
+              try {
+                console.log('Calling verifyPaymentAsync...')
+                const verifyRes = await verifyPaymentAsync({
+                  orderId: orderId, // Razorpay Order ID
+                  paymentId: response.razorpay_payment_id,
+                  signature: response.razorpay_signature,
+                  dbOrderId: dbOrderId // DB UUID
+                })
+                console.log('verifyPaymentAsync Success:', verifyRes)
+
+                console.log('Redirecting to Thank You page...')
+                router.push(`/thank-you?orderId=${dbOrderId}`)
+              } catch (err) {
+                console.error('Razorpay Handler Error:', err)
+                toast.error('Payment verification failed. Please contact support.')
+              }
             },
             prefill: {
               name: "User",
@@ -57,6 +69,15 @@ const Page = () => {
           const rzp1 = new Razorpay(options)
           rzp1.open()
         }
+      },
+      onError: (err) => {
+        if (err.data?.code === 'UNAUTHORIZED') {
+          toast.error('Please sign in to complete your purchase')
+          router.push('/sign-in?origin=cart')
+          return
+        }
+        toast.error('Something went wrong. Please try again.')
+        console.error('Checkout Error:', err)
       },
     })
 
@@ -121,7 +142,8 @@ const Page = () => {
                 items.map(({ product }) => {
                   const label = product.category
 
-                  const { image } = product.images[0]
+                  // @ts-ignore
+                  const image = product.images?.[0]?.image || product.product_images?.[0]?.media
 
                   return (
                     <li
@@ -129,7 +151,7 @@ const Page = () => {
                       className='flex py-6 sm:py-10'>
                       <div className='flex-shrink-0'>
                         <div className='relative h-24 w-24'>
-                          {typeof image !== 'string' &&
+                          {image && typeof image !== 'string' &&
                             image.url ? (
                             <Image
                               fill
@@ -244,10 +266,11 @@ const Page = () => {
 
             <div className='mt-6'>
               <Button
-                disabled={items.length === 0 || isLoading}
-                onClick={() =>
+                // disabled={items.length === 0 || isLoading}
+                onClick={() => {
+                  console.log('Checkout button clicked')
                   createCheckoutSession({ productIds })
-                }
+                }}
                 className='w-full'
                 size='lg'>
                 {isLoading ? (
@@ -255,6 +278,11 @@ const Page = () => {
                 ) : null}
                 Checkout
               </Button>
+              {isMounted ? (
+                <p className='text-xs text-muted-foreground mt-2'>
+                  Debug: Items: {items.length} | Loading: {String(isLoading)} | Mounted: {String(isMounted)}
+                </p>
+              ) : null}
             </div>
           </section>
         </div>

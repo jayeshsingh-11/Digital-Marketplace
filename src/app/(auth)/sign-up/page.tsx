@@ -37,7 +37,7 @@ const Page = () => {
   const [showPassword, setShowPassword] = useState(false)
 
   const { mutate, isLoading } =
-    trpc.auth.createPayloadUser.useMutation({
+    trpc.auth.createUser.useMutation({
       onError: (err) => {
         if (err.data?.code === 'CONFLICT') {
           toast.error(
@@ -54,12 +54,13 @@ const Page = () => {
         }
 
         toast.error(
-          'Something went wrong. Please try again.'
+          err.message || 'Something went wrong. Please try again.'
         )
       },
       onSuccess: ({ sentToEmail }) => {
-        toast.success('Account created successfully! Please sign in.')
-        router.push('/sign-in')
+        toast.success('Account created! Redirecting...')
+        router.refresh()
+        router.push('/')
       },
     })
 

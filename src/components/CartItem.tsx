@@ -5,7 +5,9 @@ import { ImageIcon, X } from 'lucide-react'
 import Image from 'next/image'
 
 const CartItem = ({ product }: { product: Product }) => {
-  const { image } = product.images[0]
+  // @ts-ignore
+  const image = product.images?.[0]?.image || product.product_images?.[0]?.media
+  console.log('CartItem product:', product.name, 'Images:', product.images, 'Selected Image:', image)
 
   const { removeItem } = useCart()
 
@@ -16,7 +18,7 @@ const CartItem = ({ product }: { product: Product }) => {
       <div className='flex items-start justify-between gap-4'>
         <div className='flex items-center space-x-4'>
           <div className='relative aspect-square h-16 w-16 min-w-fit overflow-hidden rounded'>
-            {typeof image !== 'string' && image.url ? (
+            {image && typeof image !== 'string' && image.url ? (
               <Image
                 src={image.url}
                 alt={product.name}

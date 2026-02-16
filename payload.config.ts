@@ -4,14 +4,14 @@ import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { slateEditor } from '@payloadcms/richtext-slate'
 import path from 'path'
 import { Users } from './src/collections/Users'
-import dotenv from 'dotenv'
 import { Products } from './src/collections/Products/Products'
 import { Media } from './src/collections/Media'
 import { ProductFiles } from './src/collections/ProductFile'
 import { Orders } from './src/collections/Orders'
+import dotenv from 'dotenv'
 
 dotenv.config({
-    path: path.resolve(process.cwd(), '.env'),
+    path: path.resolve(__dirname, '.env'),
 })
 
 export default buildConfig({
@@ -37,6 +37,6 @@ export default buildConfig({
         url: process.env.MONGODB_URL!,
     }),
     typescript: {
-        outputFile: path.resolve(__dirname, 'src/payload-types.ts'),
+        outputFile: path.resolve(__dirname, 'payload-types.ts'),
     },
 })

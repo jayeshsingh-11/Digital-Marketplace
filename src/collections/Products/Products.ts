@@ -144,12 +144,23 @@ export const Products: CollectionConfig = {
       required: true,
     },
     {
+      name: 'approved',
+      label: 'Product Status',
+      type: 'checkbox',
+      defaultValue: true,
+      access: {
+        create: ({ req }) => req.user.role === 'admin',
+        read: () => true,
+        update: ({ req }) => req.user.role === 'admin',
+      },
+    },
+    {
       name: 'product_files',
       label: 'Product file(s)',
       type: 'relationship',
       required: true,
       relationTo: 'product_files',
-      hasMany: false,
+      hasMany: true,
     },
 
     {

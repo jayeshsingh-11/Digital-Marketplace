@@ -13,12 +13,12 @@ export function formatPrice(
     notation?: Intl.NumberFormatOptions['notation']
   } = {}
 ) {
-  const { currency = 'USD', notation = 'compact' } = options
+  const { currency = 'INR', notation = 'compact' } = options
 
   const numericPrice =
     typeof price === 'string' ? parseFloat(price) : price
 
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency,
     notation,

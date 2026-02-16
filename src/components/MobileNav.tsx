@@ -65,35 +65,22 @@ const MobileNav = () => {
                 {PRODUCT_CATEGORIES.map((category) => (
                   <li
                     key={category.label}
-                    className='space-y-10 px-4 pb-8 pt-10'>
-                    <div className='border-b border-gray-200'>
-                      <div className='-mb-px flex'>
-                        <p className='border-transparent text-gray-900 flex-1 whitespace-nowrap border-b-2 py-4 text-base font-medium'>
-                          {category.label}
-                        </p>
+                    className='space-y-4 px-4 pb-4 pt-4 border-b border-gray-200'>
+                    <div className='flex items-center gap-4'>
+                      <div className='relative aspect-square h-12 w-12 overflow-hidden rounded-lg bg-gray-100'>
+                        <Image
+                          fill
+                          src={category.featured[0].imageSrc}
+                          alt='category image'
+                          className='object-cover object-center'
+                        />
                       </div>
-                    </div>
-
-                    <div className='grid grid-cols-2 gap-y-10 gap-x-4'>
-                      {category.featured.map((item) => (
-                        <div
-                          key={item.name}
-                          className='group relative text-sm'>
-                          <div className='relative aspect-square overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75'>
-                            <Image
-                              fill
-                              src={item.imageSrc}
-                              alt='product category image'
-                              className='object-cover object-center'
-                            />
-                          </div>
-                          <Link
-                            href={item.href}
-                            className='mt-6 block font-medium text-gray-900'>
-                            {item.name}
-                          </Link>
-                        </div>
-                      ))}
+                      <Link
+                        href={`/products?category=${category.value}`}
+                        onClick={() => setIsOpen(false)}
+                        className='block font-medium text-gray-900 flex-1 py-4'>
+                        {category.label}
+                      </Link>
                     </div>
                   </li>
                 ))}

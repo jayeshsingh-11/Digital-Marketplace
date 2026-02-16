@@ -4,10 +4,11 @@ import { Icons } from './Icons'
 import NavItems from './NavItems'
 import { buttonVariants } from './ui/button'
 import Cart from './Cart'
-import { getServerSideUserNode } from '@/lib/payload-utils-node'
+import { getServerSideUserNode } from '@/lib/auth-utils'
 import { cookies } from 'next/headers'
 import UserAccountNav from './UserAccountNav'
 import MobileNav from './MobileNav'
+import SearchBar from './SearchBar'
 
 const Navbar = async () => {
   const nextCookies = cookies()
@@ -31,7 +32,15 @@ const Navbar = async () => {
                 <NavItems />
               </div>
 
-              <div className='ml-auto flex items-center'>
+              <div className='ml-auto flex items-center gap-4'>
+                <div className='hidden lg:block w-full max-w-sm'>
+                  <SearchBar />
+                </div>
+                <div className="hidden lg:flex items-center">
+                  <Link href='/products' className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
+                    View All Products
+                  </Link>
+                </div>
                 <div className='hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6'>
                   {user ? null : (
                     <Link

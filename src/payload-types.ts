@@ -6,22 +6,13 @@
  * and re-run `payload generate:types` to regenerate this file.
  */
 
-export interface Config {
-  collections: {
-    users: User;
-    products: Product;
-    media: Media;
-    product_files: ProductFile;
-    orders: Order;
-    'payload-preferences': PayloadPreference;
-    'payload-migrations': PayloadMigration;
-  };
-  globals: {};
-}
+
 export interface User {
   id: string;
   products?: (string | Product)[] | null;
   product_files?: (string | ProductFile)[] | null;
+  name?: string | null; // Added for Profile features
+  image_url?: string | null; // Added for Profile features
   role: 'admin' | 'user';
   updatedAt: string;
   createdAt: string;
@@ -136,9 +127,4 @@ export interface PayloadMigration {
   batch?: number | null;
   updatedAt: string;
   createdAt: string;
-}
-
-
-declare module 'payload' {
-  export interface GeneratedTypes extends Config { }
 }
