@@ -47,11 +47,14 @@ export const appRouter = router({
           .limit(1)
           .single()
 
+        const media = imgData?.media
+        const imageUrl = Array.isArray(media)
+          ? (media[0] as any)?.url
+          : (media as any)?.url
+
         return {
           ...product,
-          image: Array.isArray(imgData?.media)
-            ? (imgData.media[0] as any)?.url
-            : (imgData?.media as any)?.url || null
+          image: imageUrl || null
         }
       }))
 
