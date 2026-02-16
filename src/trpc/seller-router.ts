@@ -303,7 +303,7 @@ export const sellerRouter = router({
 
             if (productError || !product) {
                 console.error('Product Creation Error:', JSON.stringify(productError, null, 2))
-                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to create product: ' + productError.message })
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to create product: ' + (productError?.message || 'Unknown Error') })
             }
 
             console.log('Product created:', product.id)
