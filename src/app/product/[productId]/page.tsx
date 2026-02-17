@@ -60,7 +60,7 @@ const Page = async ({ params }: PageProps) => {
   return (
     <MaxWidthWrapper className='bg-white'>
       <div className='bg-white'>
-        <div className='mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:max-w-7xl lg:px-8'>
+        <div className='mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:max-w-7xl lg:px-4'>
 
           {/* Header: Title & Breadcrumbs */}
           <div className='mb-6'>
