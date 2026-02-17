@@ -9,6 +9,7 @@ import { trpc } from '@/trpc/client'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useOnClickOutside } from '@/hooks/use-on-click-outside'
+import { PRODUCT_CATEGORIES } from '@/config'
 
 interface NavbarSearchProps {
     className?: string
@@ -39,10 +40,18 @@ const NavbarSearch = ({ className, mobile }: NavbarSearchProps) => {
 
     useOnClickOutside(commandRef, () => setIsOpen(false))
 
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+    const [categoryOpen, setCategoryOpen] = useState(false)
+
     const handleSearch = () => {
         setIsOpen(false)
-        if (!query.trim()) return
-        router.push(`/products?query=${encodeURIComponent(query)}`)
+        if (!query.trim() && !selectedCategory) return
+
+        const params = new URLSearchParams()
+        if (query.trim()) params.append('query', query)
+        if (selectedCategory) params.append('category', selectedCategory)
+
+        router.push(`/products?${params.toString()}`)
     }
 
     const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -95,17 +104,51 @@ const NavbarSearch = ({ className, mobile }: NavbarSearchProps) => {
                     </button>
                 )}
 
-                {/* Category stub */}
-                <div className='pr-4 pl-3 py-1 border-l border-gray-200 cursor-pointer hover:bg-gray-100 rounded-r-full flex items-center gap-2 transition-colors h-full'>
-                    <span className={cn('font-semibold text-gray-700 whitespace-nowrap', mobile ? 'text-[10px] uppercase font-bold' : 'text-xs')}>
-                        {mobile ? 'Categories' : 'All Categories'}
-                    </span>
-                    <ChevronDown className='w-3 h-3 text-gray-500' />
+                {/* Category Dropdown */}
+                <div className='relative h-full'>
+                    <div
+                        onClick={() => setCategoryOpen(!categoryOpen)}
+                        className='pr-4 pl-3 py-1 border-l border-gray-200 cursor-pointer hover:bg-gray-100 rounded-r-full flex items-center gap-2 transition-colors h-full select-none'
+                    >
+                        <span className={cn('font-semibold text-gray-700 whitespace-nowrap', mobile ? 'text-[10px] uppercase font-bold' : 'text-xs')}>
+                            {selectedCategory ? (
+                                PRODUCT_CATEGORIES.find(c => c.value === selectedCategory)?.label || 'All Categories'
+                            ) : (mobile ? 'Categories' : 'All Categories')}
+                        </span>
+                        <ChevronDown className={cn('w-3 h-3 text-gray-500 transition-transform', categoryOpen && 'rotate-180')} />
+                    </div>
+
+                    {categoryOpen && (
+                        <div className='absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-1 z-50 animate-in fade-in-0 zoom-in-95'>
+                            <button
+                                onClick={() => {
+                                    setSelectedCategory(null)
+                                    // Optional: Update URL directly or just state? Let's just update state for search context
+                                    setCategoryOpen(false)
+                                }}
+                                className='block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-black'
+                            >
+                                All Categories
+                            </button>
+                            {PRODUCT_CATEGORIES.map((cat) => (
+                                <button
+                                    key={cat.value}
+                                    onClick={() => {
+                                        setSelectedCategory(cat.value)
+                                        setCategoryOpen(false)
+                                    }}
+                                    className='block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-black'
+                                >
+                                    {cat.label}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
 
             {/* Live Search Results Dropdown */}
-            {isOpen && query.length > 0 && (
+            {isOpen && query.length > 0 && !categoryOpen && (
                 <div className='absolute top-full left-0 w-full bg-white rounded-xl shadow-xl border border-gray-100 mt-2 z-50 overflow-hidden animate-in fade-in-0 zoom-in-95'>
                     {isLoading ? (
                         <div className='p-4 flex items-center justify-center text-sm text-muted-foreground'>

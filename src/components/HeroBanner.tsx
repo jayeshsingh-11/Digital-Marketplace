@@ -2,16 +2,42 @@
 
 import { Button } from './ui/button'
 import { Input } from './ui/input'
-import { Search } from 'lucide-react'
+import { Loader2, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useDebounce } from '@/hooks/use-debounce'
+import { trpc } from '@/trpc/client'
+import { useOnClickOutside } from '@/hooks/use-on-click-outside'
+import Image from 'next/image'
+import { formatPrice } from '@/lib/utils'
 
 export function HeroBanner() {
     const router = useRouter()
     const [searchQuery, setSearchQuery] = useState('')
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
     const [iscategoryOpen, setIsCategoryOpen] = useState(false)
+    const [isOpen, setIsOpen] = useState(false)
+    const containerRef = useRef<HTMLDivElement>(null)
+
+    const debouncedQuery = useDebounce(searchQuery, 500)
+
+    const { data: searchResults, isLoading } = trpc.searchProducts.useQuery(
+        { query: debouncedQuery },
+        {
+            enabled: !!debouncedQuery && debouncedQuery.length > 0,
+        }
+    )
+
+    useOnClickOutside(containerRef, () => setIsOpen(false))
+
+    useEffect(() => {
+        if (debouncedQuery.length > 0) {
+            setIsOpen(true)
+        } else {
+            setIsOpen(false)
+        }
+    }, [debouncedQuery])
 
     const handleSearch = () => {
         let url = '/products?'
@@ -44,7 +70,7 @@ export function HeroBanner() {
 
             {/* Clean Search Bar - Hidden on Mobile */}
             <div className='w-full max-w-3xl mx-auto relative hidden md:flex items-center mb-12 z-20'>
-                <div className='relative w-full flex items-center bg-white border border-gray-200 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-300'>
+                <div ref={containerRef} className='relative w-full flex items-center bg-white border border-gray-200 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-300'>
 
                     {/* Category Dropdown */}
                     <div className="relative">
@@ -85,6 +111,9 @@ export function HeroBanner() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyDown={handleKeyDown}
+                        onFocus={() => {
+                            if (debouncedQuery.length > 0) setIsOpen(true)
+                        }}
                         className='flex-1 border-none bg-transparent text-gray-900 placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 h-14 text-base px-4 md:px-4 pl-10 md:pl-2'
                         placeholder='Search millions of creative assets...'
                     />
@@ -97,6 +126,64 @@ export function HeroBanner() {
                             Search
                         </Button>
                     </div>
+
+                    {/* Live Search Results Dropdown */}
+                    {isOpen && searchQuery.length > 0 && (
+                        <div className='absolute top-full left-0 w-full bg-white rounded-xl shadow-xl border border-gray-100 mt-2 z-50 overflow-hidden animate-in fade-in-0 zoom-in-95 text-left'>
+                            {isLoading ? (
+                                <div className='p-4 flex items-center justify-center text-sm text-muted-foreground'>
+                                    <Loader2 className='w-4 h-4 animate-spin mr-2' />
+                                    Searching...
+                                </div>
+                            ) : searchResults && searchResults.length > 0 ? (
+                                <div className='py-2'>
+                                    <div className='px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider'>
+                                        Products
+                                    </div>
+                                    {searchResults.map((product) => (
+                                        <Link
+                                            key={product.id}
+                                            href={`/product/${product.id}`}
+                                            onClick={() => setIsOpen(false)}
+                                            className='flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors'
+                                        >
+                                            <div className='relative w-10 h-10 rounded-md overflow-hidden bg-gray-100 flex-shrink-0'>
+                                                {product.image ? (
+                                                    <Image
+                                                        src={product.image}
+                                                        alt={product.name}
+                                                        fill
+                                                        className='object-cover'
+                                                    />
+                                                ) : (
+                                                    <div className='flex items-center justify-center w-full h-full text-gray-400'>
+                                                        <Search className='w-4 h-4' />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className='flex-1 min-w-0'>
+                                                <p className='text-sm font-medium text-gray-900 truncate'>{product.name}</p>
+                                                <p className='text-xs text-gray-500 capitalize'>{product.category}</p>
+                                            </div>
+                                            <div className='text-sm font-medium text-gray-900'>
+                                                {formatPrice(product.price)}
+                                            </div>
+                                        </Link>
+                                    ))}
+                                    <button
+                                        onClick={handleSearch}
+                                        className='w-full text-center py-3 text-sm font-medium text-blue-600 hover:bg-blue-50 border-t border-gray-100 transition-colors'
+                                    >
+                                        View all results for &quot;{searchQuery}&quot;
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className='p-4 text-center text-sm text-gray-500'>
+                                    No results found for &quot;{searchQuery}&quot;
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
 
