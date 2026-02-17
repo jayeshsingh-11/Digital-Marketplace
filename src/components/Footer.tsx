@@ -25,7 +25,7 @@ const Footer = () => {
           <div className='lg:col-span-1'>
             <Icons.logo className='h-8 w-auto mb-6' />
             <p className='text-sm text-gray-500 leading-relaxed mb-6'>
-              Accelerate your projects with millions of ready-to-use products.
+              Your launchpad for digital creativity.
             </p>
             <div className='flex space-x-4'>
               <Link href='#' className='text-gray-400 hover:text-gray-500'>
