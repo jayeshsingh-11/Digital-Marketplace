@@ -107,6 +107,18 @@ export default function Home() {
         </MaxWidthWrapper>
       </section>
 
+      {/* Popular Fonts */}
+      <section className='bg-white border-t border-gray-100'>
+        <MaxWidthWrapper>
+          <ProductReel
+            query={{ sort: 'desc', limit: 4, category: 'fonts' }}
+            href='/products?category=fonts'
+            title='Popular font products'
+            subtitle='Typography to make your designs stand out'
+          />
+        </MaxWidthWrapper>
+      </section>
+
       {/* Perks Section */}
       <section className='border-t border-gray-100 bg-gradient-to-b from-gray-50 to-white'>
         <MaxWidthWrapper className='py-24'>
