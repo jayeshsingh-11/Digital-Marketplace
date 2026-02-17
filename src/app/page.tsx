@@ -81,7 +81,7 @@ export default function Home() {
       </section>
 
       {/* Headline */}
-      <section className='bg-white pt-10 pb-4'>
+      <section className='bg-white pt-8 pb-4'>
         <MaxWidthWrapper className='text-center'>
           <h2 className='text-3xl md:text-5xl font-bold font-serif text-gray-900 tracking-tight font-playfair'>
             Bring your creative ideas to life.
@@ -90,7 +90,7 @@ export default function Home() {
       </section>
 
       {/* Featured Shops Banner */}
-      <section className='bg-white py-8'>
+      <section className='bg-white py-4 md:py-8'>
         <MaxWidthWrapper>
           <FeaturedBanner />
         </MaxWidthWrapper>

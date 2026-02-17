@@ -95,22 +95,14 @@ const Page = async ({ params }: PageProps) => {
           </div>
 
           <div className='lg:grid lg:grid-cols-12 lg:gap-x-12'>
-            {/* Left Column: Image Gallery - Increased width */}
+            {/* 1. Image Gallery */}
             <div className='lg:col-span-9'>
               <ProductImageGallery images={validUrls} />
-
-              {/* About Section (Description) - Moved here to be below images on mobile, logical reading flow */}
-              <div className='mt-16 border-t border-gray-200 pt-10'>
-                <h2 className='text-2xl font-bold text-gray-900 mb-6'>About</h2>
-                <div className='prose prose-blue max-w-none text-gray-600 leading-relaxed space-y-4 whitespace-pre-line'>
-                  {product.description}
-                </div>
-              </div>
             </div>
 
-            {/* Right Column: Buy Box */}
-            <div className='mt-8 lg:mt-0 lg:col-span-3'>
-              <div className='sticky top-20 p-6 bg-white border border-gray-200 rounded-xl shadow-sm'>
+            {/* 2. Buy Box - Placed here for Mobile Order (2nd) */}
+            <div className='mt-8 lg:mt-0 lg:col-span-3 lg:row-span-2'>
+              <div className='sticky top-24 p-6 bg-white border border-gray-200 rounded-xl shadow-sm'>
                 <div className='mb-6'>
                   <p className='text-3xl font-bold text-gray-900'>{formatPrice(product.price)}</p>
                 </div>
@@ -133,6 +125,14 @@ const Page = async ({ params }: PageProps) => {
                     <span>Instant Download</span>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* 3. About Section - Placed last for Mobile */}
+            <div className='mt-10 lg:mt-16 lg:col-span-9 border-t border-gray-200 pt-10'>
+              <h2 className='text-2xl font-bold text-gray-900 mb-6'>About</h2>
+              <div className='prose prose-blue max-w-none text-gray-600 leading-relaxed space-y-4 whitespace-pre-line'>
+                {product.description}
               </div>
             </div>
           </div>

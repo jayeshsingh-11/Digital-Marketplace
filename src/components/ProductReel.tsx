@@ -43,7 +43,7 @@ const ProductReel = (props: ProductReelProps) => {
   }
 
   return (
-    <section className='py-4 md:py-12'>
+    <section className='py-8 md:py-12'>
       <div className='md:flex md:items-center md:justify-between mb-4'>
         <div className='max-w-2xl px-4 lg:max-w-4xl lg:px-0'>
           {title ? (
