@@ -27,32 +27,7 @@ const Footer = () => {
             </div>
           </div>
 
-          <div>
-            <div className='relative flex items-center px-6 py-6 sm:py-8 lg:mt-0'>
-              <div className='absolute inset-0 overflow-hidden rounded-lg'>
-                <div
-                  aria-hidden='true'
-                  className='absolute bg-zinc-50 inset-0 bg-gradient-to-br bg-opacity-90'
-                />
-              </div>
-
-              <div className='text-center relative mx-auto max-w-sm'>
-                <h3 className='font-semibold text-gray-900'>
-                  Become a seller
-                </h3>
-                <p className='mt-2 text-sm text-muted-foreground'>
-                  If you&apos;d like to sell high-quality
-                  digital products, you can do so in
-                  minutes.{' '}
-                  <Link
-                    href='/sign-in?as=seller'
-                    className='whitespace-nowrap font-medium text-black hover:text-zinc-900'>
-                    Get started &rarr;
-                  </Link>
-                </p>
-              </div>
-            </div>
-          </div>
+          <div></div>
         </div>
 
         <div className='py-10 md:flex md:items-center md:justify-between'>

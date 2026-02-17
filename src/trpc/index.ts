@@ -105,12 +105,7 @@ export const appRouter = router({
           if (key === 'category') {
             dbQuery = dbQuery.eq('category', value)
           } else if (key === 'query') {
-            // Apply text search on name or description
-            // Note: ilike is case-insensitive. 
-            // We can search name for now.
             dbQuery = dbQuery.ilike('name', `%${value}%`)
-          } else if (key === 'ids' && Array.isArray(value)) {
-            dbQuery = dbQuery.in('id', value)
           }
         } else if (key === 'ids' && Array.isArray(value) && value.length > 0) {
           dbQuery = dbQuery.in('id', value)
