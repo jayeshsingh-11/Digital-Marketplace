@@ -2,11 +2,9 @@ import { LucideProps } from 'lucide-react'
 
 export const Icons = {
   logo: (props: LucideProps) => (
-    <svg {...props} viewBox='0 0 100 100' fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="8" />
-      <path d="M50 20C50 20 75 35 75 50C75 65 50 80 50 80" stroke="currentColor" strokeWidth="8" strokeLinecap="round" />
-      <path d="M50 20C50 20 25 35 25 50C25 65 50 80 50 80" stroke="currentColor" strokeWidth="8" strokeLinecap="round" />
-      <path d="M50 50L50 80" stroke="currentColor" strokeWidth="8" strokeLinecap="round" />
+    <svg {...props} viewBox='0 0 200 80' fill="none" xmlns="http://www.w3.org/2000/svg">
+      <text x="100" y="45" fontFamily="Brush Script MT, cursive" fontSize="40" fill="currentColor" textAnchor="middle" fontStyle="italic">Creative</text>
+      <text x="100" y="70" fontFamily="Arial, sans-serif" fontSize="14" fill="currentColor" textAnchor="middle" letterSpacing="0.4em" fontWeight="bold">CASCADE</text>
     </svg>
   ),
   mobileMenu: (props: LucideProps) => (
