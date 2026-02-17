@@ -61,13 +61,14 @@ const RecentlyViewed = () => {
 
             <div className='relative'>
                 <div className='mt-6 flex items-center w-full'>
-                    <div className='w-full grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-4 md:gap-y-10 lg:gap-x-8'>
+                    <div className='w-full flex overflow-x-auto pb-4 gap-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-4 md:gap-y-10 lg:gap-x-8 md:overflow-visible md:pb-0'>
                         {sortedProducts.map((product, i) => (
-                            <ProductListing
-                                key={`recent-product-${i}`}
-                                product={product}
-                                index={i}
-                            />
+                            <div key={`recent-product-${i}`} className='min-w-[160px] w-[160px] md:w-auto snap-center flex-shrink-0'>
+                                <ProductListing
+                                    product={product}
+                                    index={i}
+                                />
+                            </div>
                         ))}
                     </div>
                 </div>
