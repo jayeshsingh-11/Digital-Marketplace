@@ -163,7 +163,7 @@ const MobileNav = ({ user }: MobileNavProps) => {
                   <h3 className='text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4'>Account</h3>
                   <ul className='space-y-4'>
                     <li>
-                      <Link href='/sell' onClick={() => setIsOpen(false)} className='font-medium text-gray-900 hover:text-blue-600 block'>
+                      <Link href='/seller' onClick={() => setIsOpen(false)} className='font-medium text-gray-900 hover:text-blue-600 block'>
                         Seller Dashboard
                       </Link>
                     </li>

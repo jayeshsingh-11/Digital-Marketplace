@@ -264,7 +264,7 @@ const SellerDashboard = ({ user }: { user: User }) => {
                         {statCards.map((stat) => (
                             <div
                                 key={stat.label}
-                                className='bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow'
+                                className='bg-white rounded-xl border border-gray-200 p-4 md:p-6 shadow-sm hover:shadow-md transition-shadow'
                             >
                                 <div className='flex items-center justify-between mb-4'>
                                     <div className={`p-2.5 rounded-lg ${stat.iconBg}`}>
@@ -285,7 +285,6 @@ const SellerDashboard = ({ user }: { user: User }) => {
                                     <h3 className='text-2xl font-bold text-gray-900 mt-1'>
                                         {statsLoading ? <Loader2 className='h-6 w-6 animate-spin' /> : stat.value}
                                     </h3>
-                                    {/* <p className='text-xs text-gray-500 mt-1'>{stat.description}</p> */}
                                 </div>
                             </div>
                         ))}
@@ -303,20 +302,21 @@ const SellerDashboard = ({ user }: { user: User }) => {
                                 />
                             </div>
                             <div className='flex items-center gap-2 w-full sm:w-auto'>
-                                <button className='flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50'>
+                                <button className='flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex-1 justify-center sm:flex-none sm:justify-start'>
                                     <Filter className='h-4 w-4' />
                                     Filter
                                 </button>
-                                <button className='flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50'>
+                                <button className='flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex-1 justify-center sm:flex-none sm:justify-start'>
                                     Export
                                 </button>
                             </div>
                         </div>
 
-                        {/* Tables */}
+                        {/* Tables (Desktop) & Cards (Mobile) */}
                         {activeTab === 'products' && (
                             <>
-                                <div className='overflow-x-auto'>
+                                {/* Desktop Table */}
+                                <div className='hidden md:block overflow-x-auto'>
                                     <table className='w-full'>
                                         <thead>
                                             <tr className='bg-gray-50/50 border-b border-gray-200'>
@@ -393,6 +393,63 @@ const SellerDashboard = ({ user }: { user: User }) => {
                                         </tbody>
                                     </table>
                                 </div>
+
+                                {/* Mobile Cards */}
+                                <div className='md:hidden space-y-4 p-4 bg-gray-50'>
+                                    {productsLoading ? (
+                                        <div className='p-8 text-center'><Loader2 className='h-8 w-8 animate-spin mx-auto text-gray-400' /></div>
+                                    ) : productsData?.products.length === 0 ? (
+                                        <div className='p-8 text-center text-gray-500'>No products found.</div>
+                                    ) : (
+                                        productsData?.products.map((p) => (
+                                            <div key={p.id} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex gap-4'>
+                                                <div className='h-20 w-20 rounded-lg bg-gray-100 border border-gray-200 flex-shrink-0 overflow-hidden relative'>
+                                                    {p.imageUrl ? (
+                                                        // eslint-disable-next-line @next/next/no-img-element
+                                                        <img src={p.imageUrl} alt={p.name} className='h-full w-full object-cover' />
+                                                    ) : (
+                                                        <div className='h-full w-full flex items-center justify-center'>
+                                                            <Package className='h-5 w-5 text-gray-400' />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex-1 min-w-0 flex flex-col justify-between">
+                                                    <div>
+                                                        <div className="flex justify-between items-start">
+                                                            <div>
+                                                                <h3 className='text-base font-semibold text-gray-900 truncate pr-2'>{p.name}</h3>
+                                                                <p className='text-xs text-gray-500'>{p.category}</p>
+                                                            </div>
+                                                            <DropdownMenu>
+                                                                <DropdownMenuTrigger asChild>
+                                                                    <button className='p-1 -mr-2 text-gray-400 hover:text-gray-600'>
+                                                                        <MoreHorizontal className='h-5 w-5' />
+                                                                    </button>
+                                                                </DropdownMenuTrigger>
+                                                                <DropdownMenuContent align="end">
+                                                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                                    <DropdownMenuItem>Edit</DropdownMenuItem>
+                                                                    <DropdownMenuItem>Details</DropdownMenuItem>
+                                                                    <DropdownMenuSeparator />
+                                                                    <DropdownMenuItem className="text-red-600" onClick={() => deleteProduct({ id: p.id })}>
+                                                                        Delete
+                                                                    </DropdownMenuItem>
+                                                                </DropdownMenuContent>
+                                                            </DropdownMenu>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex justify-between items-end mt-2">
+                                                        <span className='font-bold text-gray-900'>{formatPrice(p.price)}</span>
+                                                        <span className='inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-100 text-green-800 border border-green-200'>
+                                                            Active
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+
                                 {productsData && productsData.totalDocs > 0 && (
                                     <Pagination
                                         page={productsData.page ?? 1}
@@ -409,7 +466,8 @@ const SellerDashboard = ({ user }: { user: User }) => {
 
                         {activeTab === 'orders' && (
                             <>
-                                <div className='overflow-x-auto'>
+                                {/* Desktop Table */}
+                                <div className='hidden md:block overflow-x-auto'>
                                     <table className='w-full'>
                                         <thead>
                                             <tr className='bg-gray-50/50 border-b border-gray-200'>
@@ -462,6 +520,46 @@ const SellerDashboard = ({ user }: { user: User }) => {
                                         </tbody>
                                     </table>
                                 </div>
+
+                                {/* Mobile Order Cards */}
+                                <div className='md:hidden space-y-4 p-4 bg-gray-50'>
+                                    {ordersLoading ? (
+                                        <div className='p-8 text-center'><Loader2 className='h-8 w-8 animate-spin mx-auto text-gray-400' /></div>
+                                    ) : ordersData?.orders.length === 0 ? (
+                                        <div className='p-8 text-center text-gray-500'>No orders found.</div>
+                                    ) : (
+                                        ordersData?.orders.map((o) => (
+                                            <div key={o.id} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm'>
+                                                <div className="flex justify-between items-start border-b border-gray-100 pb-3 mb-3">
+                                                    <div>
+                                                        <span className='font-mono text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded block w-fit mb-1'>#{o.id.slice(0, 8)}</span>
+                                                        <span className='text-xs text-gray-400'>{formatDate(o.createdAt)}</span>
+                                                    </div>
+                                                    <span className={cn(
+                                                        'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border',
+                                                        o.isPaid ? 'bg-green-100 text-green-800 border-green-200' : 'bg-yellow-100 text-yellow-800 border-yellow-200'
+                                                    )}>
+                                                        {o.isPaid ? 'Paid' : 'Pending'}
+                                                    </span>
+                                                </div>
+                                                <div className="space-y-2 mb-3">
+                                                    {o.products.map((prod: any, i: number) => (
+                                                        <div key={i} className='text-sm text-gray-900 font-medium truncate'>
+                                                            {prod.name}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                <div className="flex justify-between items-center pt-2">
+                                                    <span className='text-lg font-bold text-gray-900'>{formatPrice(o.total)}</span>
+                                                    <button className='text-sm font-medium text-indigo-600 hover:text-indigo-900'>
+                                                        View Order
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+
                                 {ordersData && ordersData.totalDocs > 0 && (
                                     <Pagination
                                         page={ordersData.page ?? 1}
