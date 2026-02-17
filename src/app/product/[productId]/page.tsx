@@ -1,6 +1,6 @@
 import AddToCartButton from '@/components/AddToCartButton'
 import ProductViewTracker from '@/components/ProductViewTracker'
-import ImageSlider from '@/components/ImageSlider'
+import ProductImageGallery from '@/components/ProductImageGallery'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import ProductReel from '@/components/ProductReel'
 import { getServerSideUserNode } from '@/lib/auth-utils'
@@ -60,10 +60,11 @@ const Page = async ({ params }: PageProps) => {
   return (
     <MaxWidthWrapper className='bg-white'>
       <div className='bg-white'>
-        <div className='mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:grid lg:max-w-7xl lg:grid-cols-2 lg:gap-x-8 lg:px-8'>
-          {/* Product Details */}
-          <div className='lg:max-w-lg lg:self-end'>
-            <ol className='flex items-center space-x-2'>
+        <div className='mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:max-w-7xl lg:px-8'>
+
+          {/* Header: Title & Breadcrumbs */}
+          <div className='mb-6'>
+            <ol className='flex items-center space-x-2 mb-4'>
               {BREADCRUMBS.map((breadcrumb, i) => (
                 <li key={breadcrumb.href}>
                   <div className='flex items-center text-sm'>
@@ -85,64 +86,68 @@ const Page = async ({ params }: PageProps) => {
                 </li>
               ))}
             </ol>
-
-            <div className='mt-4'>
-              <h1 className='text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl'>
-                {product.name}
-              </h1>
+            <h1 className='text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl'>
+              {product.name}
+            </h1>
+            <div className='mt-2 flex items-center text-sm text-muted-foreground'>
+              {label}
             </div>
+          </div>
 
-            <section className='mt-4'>
-              <div className='flex items-center'>
-                <p className='font-medium text-gray-900'>
-                  {formatPrice(product.price)}
-                </p>
+          <div className='lg:grid lg:grid-cols-12 lg:gap-x-12'>
+            {/* Left Column: Image Gallery */}
+            <div className='lg:col-span-8'>
+              <ProductImageGallery images={validUrls} />
 
-                <div className='ml-4 border-l text-muted-foreground border-gray-300 pl-4'>
-                  {label}
+              {/* About Section (Description) - Moved here to be below images on mobile, logical reading flow */}
+              <div className='mt-16 border-t border-gray-200 pt-10'>
+                <h2 className='text-2xl font-bold text-gray-900 mb-6'>About</h2>
+                <div className='prose prose-blue max-w-none text-gray-600 leading-relaxed space-y-4 whitespace-pre-line'>
+                  {product.description}
                 </div>
               </div>
-
-              <div className='mt-4 space-y-6'>
-                <p className='text-base text-muted-foreground'>
-                  {product.description}
-                </p>
-              </div>
-
-              <div className='mt-6 flex items-center'>
-                <Check
-                  aria-hidden='true'
-                  className='h-5 w-5 flex-shrink-0 text-green-500'
-                />
-                <p className='ml-2 text-sm text-muted-foreground'>
-                  Eligible for instant delivery
-                </p>
-              </div>
-            </section>
-          </div>
-
-          {/* Product images */}
-          <div className='mt-10 lg:col-start-2 lg:row-span-2 lg:mt-0 lg:self-center'>
-            <div className='aspect-square rounded-lg'>
-              <ImageSlider urls={validUrls} />
             </div>
-          </div>
 
-          {/* add to cart part */}
-          <div className='mt-10 lg:col-start-1 lg:row-start-2 lg:max-w-lg lg:self-start'>
-            <div>
-              <div className='mt-10'>
-                <AddToCartButton product={productWithImages as any} isLoggedIn={isLoggedIn} />
-              </div>
-              <div className='mt-6 text-center'>
-                <div className='group inline-flex text-sm text-medium'>
-                  <Shield
-                    aria-hidden='true'
-                    className='mr-2 h-5 w-5 flex-shrink-0 text-gray-400'
-                  />
-                  <span className='text-muted-foreground hover:text-gray-700'>
-                    30 Day Return Guarantee
-                  </span>
+            {/* Right Column: Buy Box */}
+            <div className='mt-8 lg:mt-0 lg:col-span-4'>
+              <div className='sticky top-20 p-6 bg-white border border-gray-200 rounded-xl shadow-sm'>
+                <div className='mb-6'>
+                  <p className='text-3xl font-bold text-gray-900'>{formatPrice(product.price)}</p>
+
+                  {/* Mock License Selection - Visual Only to match reference */}
+                  <div className='mt-6 space-y-3'>
+                    <div className='flex items-center justify-between p-3 border-2 border-green-600 rounded-lg bg-green-50/50 cursor-pointer'>
+                      <div className='flex items-center gap-3'>
+                        <div className='h-5 w-5 rounded-full border-2 border-green-600 flex items-center justify-center'>
+                          <div className='h-2.5 w-2.5 rounded-full bg-green-600' />
+                        </div>
+                        <span className='font-medium text-gray-900'>Commercial</span>
+                      </div>
+                      <span className='font-semibold text-gray-900'>{formatPrice(product.price)}</span>
+                    </div>
+                    <div className='flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-gray-300 cursor-pointer opacity-70'>
+                      <div className='flex items-center gap-3'>
+                        <div className='h-5 w-5 rounded-full border-2 border-gray-300' />
+                        <span className='font-medium text-gray-700'>Personal</span>
+                      </div>
+                      <span className='font-medium text-gray-500'>$18.00</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className='space-y-4'>
+                  <AddToCartButton product={productWithImages as any} isLoggedIn={isLoggedIn} />
+                </div>
+
+                <div className='mt-6 border-t border-gray-100 pt-6'>
+                  <div className='flex items-center justify-center gap-2 text-sm text-gray-500'>
+                    <Shield className='h-4 w-4 text-green-600' />
+                    <span>30-Day Money Back Guarantee</span>
+                  </div>
+                  <div className='mt-2 flex items-center justify-center gap-2 text-sm text-gray-500'>
+                    <Check className='h-4 w-4 text-green-600' />
+                    <span>Instant Download</span>
+                  </div>
                 </div>
               </div>
             </div>
