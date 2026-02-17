@@ -29,7 +29,7 @@ const FeaturedBanner = () => {
     }
 
     const validUrls = product.images
-        .map(({ image }) =>
+        .map(({ image }: { image: string | { url: string } }) =>
             typeof image === 'string' ? image : image.url
         )
         .filter(Boolean) as string[]
