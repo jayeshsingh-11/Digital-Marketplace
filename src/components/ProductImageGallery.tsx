@@ -45,7 +45,7 @@ const ProductImageGallery = ({ images }: ProductImageGalleryProps) => {
             </div>
 
             {/* Main Image */}
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-gray-100 border border-gray-200">
+            <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-gray-100 border border-gray-200">
                 <Image
                     src={selectedImage}
                     alt="Product main image"
