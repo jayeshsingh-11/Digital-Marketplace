@@ -1,3 +1,5 @@
+'use client'
+
 import { PRODUCT_CATEGORIES } from '@/config'
 import { Menu, X, LogOut, User as UserIcon } from 'lucide-react'
 import { Icons } from './Icons'
@@ -44,7 +46,7 @@ const MobileNav = ({ user }: MobileNavProps) => {
         type='button'
         onClick={() => setIsOpen(true)}
         className='lg:hidden relative -m-2 inline-flex items-center justify-center rounded-md p-2 text-black hover:text-gray-600'>
-        <Menu className='h-6 w-6' aria-hidden='true' />
+        <Icons.mobileMenu className='h-6 w-6' aria-hidden='true' />
       </button>
     )
 
