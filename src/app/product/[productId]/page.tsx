@@ -125,13 +125,6 @@ const Page = async ({ params }: PageProps) => {
                       </div>
                       <span className='font-semibold text-gray-900'>{formatPrice(product.price)}</span>
                     </div>
-                    <div className='flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-gray-300 cursor-pointer opacity-70'>
-                      <div className='flex items-center gap-3'>
-                        <div className='h-5 w-5 rounded-full border-2 border-gray-300' />
-                        <span className='font-medium text-gray-700'>Personal</span>
-                      </div>
-                      <span className='font-medium text-gray-500'>$18.00</span>
-                    </div>
                   </div>
                 </div>
 
