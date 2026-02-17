@@ -283,11 +283,6 @@ const Page = () => {
                 ) : null}
                 Checkout
               </Button>
-              {isMounted ? (
-                <p className='text-xs text-muted-foreground mt-2'>
-                  Debug: Items: {items.length} | Loading: {String(isLoading)} | Mounted: {String(isMounted)}
-                </p>
-              ) : null}
             </div>
           </section>
         </div>

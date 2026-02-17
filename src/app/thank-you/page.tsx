@@ -189,13 +189,15 @@ const ThankYouPage = async ({
                 orderId={order.id}
               />
 
-              <div className='mt-16 border-t border-gray-200 py-6 text-right'>
+              <div className='mt-16 border-t border-gray-200 py-6 text-center'>
                 <Link
                   href='/products'
                   className={buttonVariants({
-                    className: 'w-full lg:w-auto bg-black text-white hover:bg-zinc-800 transition-colors'
+                    variant: 'outline',
+                    className: 'w-full sm:w-auto min-w-[200px] border-gray-300 text-gray-900 hover:bg-gray-50 hover:text-gray-900 group'
                   })}>
-                  Continue shopping &rarr;
+                  Continue shopping
+                  <span className='ml-2 text-gray-400 group-hover:text-gray-600 transition-colors' aria-hidden='true'>&rarr;</span>
                 </Link>
               </div>
             </div>
