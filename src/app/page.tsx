@@ -73,7 +73,7 @@ export default function Home() {
         <MaxWidthWrapper>
           <ProductReel
             query={{ sort: 'desc', limit: 4 }}
-            href='/products?sort=recent'
+            href='/products?sort=desc'
             title='Brand new'
             subtitle='Check out the latest digital assets added to our marketplace'
             exploreLabel='Explore New Arrivals'
@@ -102,7 +102,7 @@ export default function Home() {
         <MaxWidthWrapper>
           <ProductReel
             query={{ sort: 'desc', limit: 4 }}
-            href='/products?sort=recent'
+            href='/products?sort=desc'
             title='Products from Featured Shops'
             subtitle='Hand-picked favorites from our top creators'
             exploreLabel='Explore Featured'
