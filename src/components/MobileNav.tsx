@@ -1,7 +1,8 @@
 'use client'
 
 import { PRODUCT_CATEGORIES } from '@/config'
-import { Menu, X } from 'lucide-react'
+import { X } from 'lucide-react'
+import { Icons } from './Icons'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -38,7 +39,7 @@ const MobileNav = () => {
         type='button'
         onClick={() => setIsOpen(true)}
         className='lg:hidden relative -m-2 inline-flex items-center justify-center rounded-md p-2 text-gray-400'>
-        <Menu className='h-6 w-6' aria-hidden='true' />
+        <Icons.mobileMenu className='h-5 w-5 md:h-6 md:w-6' aria-hidden='true' />
       </button>
     )
 

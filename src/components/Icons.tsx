@@ -74,4 +74,11 @@ export const Icons = {
       </g>
     </svg>
   ),
+  mobileMenu: (props: LucideProps) => (
+    <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 6c0 0 2.2-2 5-2s5 2 5 2 2.2 2 5 2 5-2 5-2" />
+      <path d="M4 12c0 0 2.2-2 5-2s5 2 5 2 2.2 2 5 2 5-2 5-2" />
+      <path d="M4 18c0 0 2.2-2 5-2s5 2 5 2 2.2 2 5 2 5-2 5-2" />
+    </svg>
+  ),
 }

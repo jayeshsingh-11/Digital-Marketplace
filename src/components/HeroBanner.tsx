@@ -32,18 +32,18 @@ export function HeroBanner() {
     const categories = ['Graphics', 'Fonts', 'Templates', 'Add-ons', 'Photos', 'Web Themes', '3D']
 
     return (
-        <div className='relative py-20 md:py-32 w-full flex flex-col items-center justify-center text-center px-4'>
+        <div className='relative py-6 md:py-32 w-full flex flex-col items-center justify-center text-center px-4'>
 
-            <h1 className='text-5xl md:text-7xl font-serif font-bold tracking-tight text-gray-900 mb-6 drop-shadow-sm font-playfair'>
+            <h1 className='text-3xl md:text-7xl font-serif font-bold tracking-tight text-gray-900 mb-4 md:mb-6 drop-shadow-sm font-playfair'>
                 Bring your creative ideas to life.
             </h1>
 
-            <p className='text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-10 font-light'>
+            <p className='text-sm md:text-xl text-gray-600 max-w-2xl mx-auto mb-6 md:mb-10 font-light'>
                 The world's most loved marketplace for design fonts, graphics, and more.
             </p>
 
-            {/* Clean Search Bar */}
-            <div className='w-full max-w-3xl mx-auto relative flex items-center mb-12 z-20'>
+            {/* Clean Search Bar - Hidden on Mobile */}
+            <div className='w-full max-w-3xl mx-auto relative hidden md:flex items-center mb-12 z-20'>
                 <div className='relative w-full flex items-center bg-white border border-gray-200 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-300'>
 
                     {/* Category Dropdown */}
@@ -103,7 +103,8 @@ export function HeroBanner() {
             {/* Category Pills */}
             <div className='flex flex-wrap justify-center gap-3'>
                 {categories.map((cat) => (
-                    <Link key={cat} href={`/products?category=${cat.toLowerCase()}`} className="px-5 py-2 rounded-full bg-white border border-gray-200 text-gray-600 text-sm font-medium hover:border-gray-900 hover:text-gray-900 transition-colors">
+                    <Link key={cat} href={`/products?category=${cat.toLowerCase()}`} className="px-3 py-1.5 md:px-5 md:py-2 rounded-full bg-white border border-gray-200 text-gray-600 text-[10px] md:text-sm font-medium hover:border-gray-900 hover:text-gray-900 transition-colors flex items-center gap-1.5 md:gap-2">
+                        <Search className="w-3 h-3 md:w-3.5 md:h-3.5" />
                         {cat}
                     </Link>
                 ))}
