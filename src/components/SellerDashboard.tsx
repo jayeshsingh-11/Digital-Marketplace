@@ -185,18 +185,18 @@ const SellerDashboard = ({ user }: { user: User }) => {
             {/* Main Content */}
             <main className='flex-1 md:ml-64 min-h-screen'>
                 <header className='bg-white border-b border-gray-200 sticky top-0 z-20'>
-                    <div className='px-8 py-4 flex items-center justify-between'>
+                    <div className='px-4 md:px-8 py-4 flex items-center justify-between'>
                         <div>
-                            <h1 className='text-2xl font-bold text-gray-900 tracking-tight'>
+                            <h1 className='text-xl md:text-2xl font-bold text-gray-900 tracking-tight'>
                                 {activeTab === 'products' && 'Products'}
                                 {activeTab === 'orders' && 'Orders'}
                                 {activeTab === 'analytics' && 'Analytics'}
                             </h1>
                         </div>
-                        <div className='flex items-center gap-4'>
+                        <div className='flex items-center gap-2 md:gap-4'>
                             <Link
                                 href='/'
-                                className={buttonVariants({ variant: 'ghost', size: 'sm' })}
+                                className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'hidden md:flex' })}
                             >
                                 <ArrowUpRight className='mr-2 h-4 w-4' />
                                 View Store
@@ -206,15 +206,61 @@ const SellerDashboard = ({ user }: { user: User }) => {
                                 className={buttonVariants({ variant: 'default', size: 'sm', className: 'bg-black hover:bg-gray-800' })}
                             >
                                 <Plus className='mr-2 h-4 w-4' />
-                                Create Product
+                                <span className="hidden md:inline">Create Product</span>
+                                <span className="md:hidden">Create</span>
                             </Link>
                         </div>
                     </div>
+
+                    {/* Mobile Tab Navigation */}
+                    <div className="md:hidden border-t border-gray-100 px-4 overflow-x-auto no-scrollbar flex items-center gap-2 py-2">
+                        <button
+                            onClick={() => setActiveTab('products')}
+                            className={cn(
+                                'flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-full whitespace-nowrap transition-colors border',
+                                activeTab === 'products'
+                                    ? 'bg-gray-900 text-white border-gray-900'
+                                    : 'bg-white text-gray-600 border-gray-200'
+                            )}
+                        >
+                            Products
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('orders')}
+                            className={cn(
+                                'flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-full whitespace-nowrap transition-colors border',
+                                activeTab === 'orders'
+                                    ? 'bg-gray-900 text-white border-gray-900'
+                                    : 'bg-white text-gray-600 border-gray-200'
+                            )}
+                        >
+                            Orders
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('analytics')}
+                            className={cn(
+                                'flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-full whitespace-nowrap transition-colors border',
+                                activeTab === 'analytics'
+                                    ? 'bg-gray-900 text-white border-gray-900'
+                                    : 'bg-white text-gray-600 border-gray-200'
+                            )}
+                        >
+                            Analytics
+                        </button>
+                        <Link
+                            href='/'
+                            className={cn(
+                                'flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-full whitespace-nowrap transition-colors border bg-white text-gray-600 border-gray-200'
+                            )}
+                        >
+                            Store
+                        </Link>
+                    </div>
                 </header>
 
-                <div className='p-8 space-y-8'>
+                <div className='p-4 md:p-8 space-y-6 md:space-y-8'>
                     {/* Stats Grid */}
-                    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6'>
+                    <div className='grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6'>
                         {statCards.map((stat) => (
                             <div
                                 key={stat.label}
