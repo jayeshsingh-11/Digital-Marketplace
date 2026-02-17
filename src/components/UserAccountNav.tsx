@@ -25,7 +25,7 @@ const UserAccountNav = ({ user }: { user: User }) => {
         <Button
           variant='ghost'
           size='sm'
-          className='relative h-8 w-8 rounded-full'>
+          className='relative h-10 w-10 rounded-full'>
           {user.image_url ? (
             <div className='relative aspect-square h-full w-full'>
               <Image
@@ -38,7 +38,7 @@ const UserAccountNav = ({ user }: { user: User }) => {
             </div>
           ) : (
             <div className='flex h-full w-full items-center justify-center rounded-full bg-slate-100'>
-              <UserIcon className='h-4 w-4 text-slate-500' aria-hidden='true' />
+              <UserIcon className='h-6 w-6 text-slate-500' aria-hidden='true' />
             </div>
           )}
         </Button>
