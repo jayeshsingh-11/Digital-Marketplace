@@ -24,7 +24,7 @@ const Navbar = async () => {
             {/* Left: Search Bar & Mobile Nav */}
             <div className='flex-1 flex justify-start items-center gap-4'>
               <div className='lg:hidden'>
-                <MobileNav />
+                <MobileNav user={user} />
               </div>
 
               {/* Search Bar - Categories on Right */}
