@@ -6,6 +6,7 @@ import { useCart } from '@/hooks/use-cart'
 import { Product } from '@/payload-types'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
 
 const AddToCartButton = ({
   product,
@@ -13,6 +14,7 @@ const AddToCartButton = ({
 }: {
   product: Product
   isLoggedIn?: boolean
+  className?: string
 }) => {
   const { addItem } = useCart()
   const [isSuccess, setIsSuccess] = useState<boolean>(false)
@@ -38,7 +40,7 @@ const AddToCartButton = ({
         setIsSuccess(true)
       }}
       size='lg'
-      className='w-full'>
+      className={cn('w-full', className)}>
       {isSuccess ? 'Added!' : 'Add to cart'}
     </Button>
   )

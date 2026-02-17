@@ -95,8 +95,8 @@ const Page = async ({ params }: PageProps) => {
           </div>
 
           <div className='lg:grid lg:grid-cols-12 lg:gap-x-12'>
-            {/* Left Column: Image Gallery */}
-            <div className='lg:col-span-8'>
+            {/* Left Column: Image Gallery - Increased width */}
+            <div className='lg:col-span-9'>
               <ProductImageGallery images={validUrls} />
 
               {/* About Section (Description) - Moved here to be below images on mobile, logical reading flow */}
@@ -109,27 +109,18 @@ const Page = async ({ params }: PageProps) => {
             </div>
 
             {/* Right Column: Buy Box */}
-            <div className='mt-8 lg:mt-0 lg:col-span-4'>
+            <div className='mt-8 lg:mt-0 lg:col-span-3'>
               <div className='sticky top-20 p-6 bg-white border border-gray-200 rounded-xl shadow-sm'>
                 <div className='mb-6'>
                   <p className='text-3xl font-bold text-gray-900'>{formatPrice(product.price)}</p>
-
-                  {/* Mock License Selection - Visual Only to match reference */}
-                  <div className='mt-6 space-y-3'>
-                    <div className='flex items-center justify-between p-3 border-2 border-green-600 rounded-lg bg-green-50/50 cursor-pointer'>
-                      <div className='flex items-center gap-3'>
-                        <div className='h-5 w-5 rounded-full border-2 border-green-600 flex items-center justify-center'>
-                          <div className='h-2.5 w-2.5 rounded-full bg-green-600' />
-                        </div>
-                        <span className='font-medium text-gray-900'>Commercial</span>
-                      </div>
-                      <span className='font-semibold text-gray-900'>{formatPrice(product.price)}</span>
-                    </div>
-                  </div>
                 </div>
 
                 <div className='space-y-4'>
-                  <AddToCartButton product={productWithImages as any} isLoggedIn={isLoggedIn} />
+                  <AddToCartButton
+                    product={productWithImages as any}
+                    isLoggedIn={isLoggedIn}
+                    className='w-full bg-black hover:bg-zinc-900 text-white'
+                  />
                 </div>
 
                 <div className='mt-6 border-t border-gray-100 pt-6'>
