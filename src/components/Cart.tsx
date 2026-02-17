@@ -133,7 +133,7 @@ const Cart = ({ user }: { user?: User | null }) => {
                   <Link
                     href='/cart'
                     className={buttonVariants({
-                      className: 'w-full bg-black text-white hover:bg-zinc-800 transition-colors',
+                      className: 'w-full bg-black !bg-black text-white hover:bg-zinc-900 transition-colors h-12 text-base',
                     })}>
                     Continue to Checkout
                   </Link>
