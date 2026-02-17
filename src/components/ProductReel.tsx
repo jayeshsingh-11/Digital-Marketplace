@@ -5,12 +5,14 @@ import { Product } from '@/payload-types'
 import { trpc } from '@/trpc/client'
 import Link from 'next/link'
 import ProductListing from './ProductListing'
+import { buttonVariants } from './ui/button'
 
 interface ProductReelProps {
   title: string
   subtitle?: string
   href?: string
   query: TQueryValidator
+  exploreLabel?: string
 }
 
 const FALLBACK_LIMIT = 4
@@ -81,6 +83,20 @@ const ProductReel = (props: ProductReelProps) => {
           </div>
         </div>
       </div>
+
+      {href ? (
+        <div className='mt-10 flex justify-center'>
+          <Link
+            href={href}
+            className={buttonVariants({
+              variant: 'outline',
+              className: 'w-full sm:w-auto min-w-[200px] border-gray-300 text-gray-900 hover:bg-gray-50 hover:text-gray-900 group'
+            })}>
+            {props.exploreLabel || 'Shop the collection'}
+            <span className='ml-2 text-gray-400 group-hover:text-gray-600 transition-colors' aria-hidden='true'>&rarr;</span>
+          </Link>
+        </div>
+      ) : null}
     </section>
   )
 }

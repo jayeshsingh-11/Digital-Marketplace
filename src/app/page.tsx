@@ -76,6 +76,7 @@ export default function Home() {
             href='/products?sort=recent'
             title='Brand new'
             subtitle='Check out the latest digital assets added to our marketplace'
+            exploreLabel='Explore New Arrivals'
           />
         </MaxWidthWrapper>
       </section>
@@ -104,6 +105,7 @@ export default function Home() {
             href='/products?sort=recent'
             title='Products from Featured Shops'
             subtitle='Hand-picked favorites from our top creators'
+            exploreLabel='Explore Featured'
           />
         </MaxWidthWrapper>
       </section>
@@ -116,6 +118,7 @@ export default function Home() {
             href='/products?category=fonts'
             title='Popular font products'
             subtitle='Typography to make your designs stand out'
+            exploreLabel='Explore Fonts'
           />
         </MaxWidthWrapper>
       </section>
