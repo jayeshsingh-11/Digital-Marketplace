@@ -223,7 +223,7 @@ const Page = () => {
             </ul>
           </div>
 
-          <section className='mt-16 rounded-lg bg-gray-50 px-4 py-6 sm:p-6 lg:col-span-5 lg:mt-0 lg:p-8'>
+          <section className='mt-16 rounded-xl bg-gray-50 px-4 py-6 sm:p-6 lg:col-span-5 lg:mt-0 lg:p-8 border border-gray-100 shadow-sm'>
             <h2 className='text-lg font-medium text-gray-900'>
               Order summary
             </h2>
@@ -276,7 +276,7 @@ const Page = () => {
                   console.log('Checkout button clicked')
                   createCheckoutSession({ productIds })
                 }}
-                className='w-full'
+                className='w-full bg-black hover:bg-zinc-900 text-white transition-colors'
                 size='lg'>
                 {isLoading ? (
                   <Loader2 className='w-4 h-4 animate-spin mr-1.5' />
