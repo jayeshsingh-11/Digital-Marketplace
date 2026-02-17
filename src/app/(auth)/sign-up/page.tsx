@@ -172,7 +172,7 @@ const Page = () => {
 
             <div className="mt-6 text-center space-y-4 pt-6 border-t border-gray-100">
               <p className="text-sm text-muted-foreground font-medium italic">
-                "Creativity takes courage."
+                &quot;Creativity takes courage.&quot;
               </p>
               <Link
                 href='/sign-in'

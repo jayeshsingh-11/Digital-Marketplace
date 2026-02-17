@@ -39,7 +39,7 @@ export function HeroBanner() {
             </h1>
 
             <p className='text-sm md:text-xl text-gray-600 max-w-2xl mx-auto mb-6 md:mb-10 font-light'>
-                The world's most loved marketplace for design fonts, graphics, and more.
+                The world&apos;s most loved marketplace for design fonts, graphics, and more.
             </p>
 
             {/* Clean Search Bar - Hidden on Mobile */}
