@@ -3,10 +3,10 @@ import { cn } from '@/lib/utils'
 const Logo = ({ className }: { className?: string }) => {
     return (
         <div className={cn("flex flex-col items-center justify-center leading-none select-none", className)}>
-            <span className="font-cursive text-2xl md:text-4xl font-black tracking-tight text-gray-900 leading-none">
+            <span className="font-cursive text-2xl md:text-4xl font-black tracking-tight text-black leading-none">
                 Creative
             </span>
-            <span className="font-sans text-[0.4rem] md:text-[0.6rem] tracking-[0.35em] font-normal uppercase text-gray-900 mt-0.5 md:mt-1">
+            <span className="font-sans text-[0.4rem] md:text-[0.6rem] tracking-[0.35em] font-normal uppercase text-black mt-0.5 md:mt-1">
                 Cascade
             </span>
         </div>

@@ -71,7 +71,7 @@ const Navbar = async () => {
                       </Link>
                     </div>
                     <div className='lg:hidden'>
-                      <Link href='/sign-in' className='p-2 -m-2 text-gray-400 hover:text-gray-500'>
+                      <Link href='/sign-in' className='p-2 -m-2 text-black hover:text-gray-700'>
                         <User className='h-5 w-5 md:h-6 md:w-6' aria-hidden='true' />
                       </Link>
                     </div>
