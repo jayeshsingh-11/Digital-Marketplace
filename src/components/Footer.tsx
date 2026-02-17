@@ -20,9 +20,9 @@ const Footer = () => {
   return (
     <footer className='bg-white flex-grow-0 pt-16 pb-8 border-t border-gray-200'>
       <MaxWidthWrapper>
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12'>
+        <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12'>
           {/* Brand Column */}
-          <div className='lg:col-span-1'>
+          <div className='col-span-2 lg:col-span-1'>
             <Icons.logo className='h-20 w-auto mb-6' />
             <p className='text-sm text-gray-500 leading-relaxed mb-6'>
               Your launchpad for digital creativity.
