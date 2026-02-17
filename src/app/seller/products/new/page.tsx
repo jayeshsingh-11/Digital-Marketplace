@@ -215,13 +215,11 @@ const Page = () => {
     }
 
     return (
-        <div className='min-h-screen bg-gray-50/50 py-12'>
-            <div className='max-w-4xl mx-auto px-4'>
-                <div className='flex items-center justify-between mb-8'>
-                    <div>
-                        <h1 className='text-3xl font-bold text-gray-900 tracking-tight'>Create New Product</h1>
-                        <p className='text-gray-500 mt-2'>Add details, images, and files for your digital product.</p>
-                    </div>
+        <div className='min-h-screen bg-gray-50/50 py-8 md:py-12'>
+            <div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8'>
+                <div className='mb-8'>
+                    <h1 className='text-2xl md:text-3xl font-bold text-gray-900 tracking-tight'>Create New Product</h1>
+                    <p className='text-gray-500 mt-2 text-sm md:text-base'>Add details, images, and files for your digital product.</p>
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)} className='space-y-8'>
@@ -229,30 +227,33 @@ const Page = () => {
                         {/* Left Column: Product Details */}
                         <div className='lg:col-span-2 space-y-8'>
                             {/* Basic Info Card */}
-                            <div className='bg-white rounded-xl border border-gray-200 p-6 shadow-sm'>
-                                <h3 className='text-lg font-semibold text-gray-900 mb-4'>Product Details</h3>
-                                <div className='space-y-4'>
+                            <div className='bg-white rounded-xl border border-gray-100 p-6 md:p-8 shadow-sm'>
+                                <h3 className='text-lg font-semibold text-gray-900 mb-6'>Product Details</h3>
+                                <div className='space-y-6'>
                                     <div className='grid gap-2'>
-                                        <Label htmlFor='name'>Name</Label>
-                                        <Input {...register('name')} placeholder='e.g. Ultimate UI Kit' />
+                                        <Label htmlFor='name' className="text-base">Name</Label>
+                                        <Input {...register('name')} placeholder='e.g. Ultimate UI Kit' className="h-11" />
                                         {errors.name && <p className='text-sm text-red-500'>{errors.name.message}</p>}
                                     </div>
 
                                     <div className='grid gap-2'>
-                                        <Label htmlFor='description'>Description</Label>
-                                        <Textarea {...register('description')} placeholder='Describe your product features...' className='min-h-[150px]' />
+                                        <Label htmlFor='description' className="text-base">Description</Label>
+                                        <Textarea {...register('description')} placeholder='Describe your product features...' className='min-h-[150px] resize-none p-4' />
                                         {errors.description && <p className='text-sm text-red-500'>{errors.description.message}</p>}
                                     </div>
                                 </div>
                             </div>
 
                             {/* Images Card */}
-                            <div className='bg-white rounded-xl border border-gray-200 p-6 shadow-sm'>
-                                <h3 className='text-lg font-semibold text-gray-900 mb-4'>Product Images (Max 10)</h3>
+                            <div className='bg-white rounded-xl border border-gray-100 p-6 md:p-8 shadow-sm'>
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className='text-lg font-semibold text-gray-900'>Product Images</h3>
+                                    <span className="text-sm text-muted-foreground">{imageFiles.length} / 10</span>
+                                </div>
 
-                                <div className='grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4'>
+                                <div className='grid grid-cols-3 sm:grid-cols-4 gap-4 mb-4'>
                                     {imagePreviews.map((src, index) => (
-                                        <div key={index} className='relative aspect-square rounded-lg overflow-hidden border border-gray-200 group'>
+                                        <div key={index} className='relative aspect-square rounded-lg overflow-hidden border border-gray-200 group bg-gray-50'>
                                             {/* eslint-disable-next-line @next/next/no-img-element */}
                                             <img src={src} alt={`Preview ${index}`} className='w-full h-full object-cover' />
 
@@ -260,7 +261,7 @@ const Page = () => {
                                                 <button
                                                     type='button'
                                                     onClick={() => openCropper(index)}
-                                                    className='p-1.5 bg-white/90 rounded-full hover:bg-white text-gray-700'
+                                                    className='p-1.5 bg-white/90 rounded-full hover:bg-white text-gray-700 shadow-sm'
                                                     title="Crop Image"
                                                 >
                                                     <Crop className='h-4 w-4' />
@@ -268,7 +269,7 @@ const Page = () => {
                                                 <button
                                                     type='button'
                                                     onClick={() => removeImage(index)}
-                                                    className='p-1.5 bg-white/90 rounded-full hover:bg-white text-red-600'
+                                                    className='p-1.5 bg-white/90 rounded-full hover:bg-white text-red-600 shadow-sm'
                                                     title="Remove Image"
                                                 >
                                                     <X className='h-4 w-4' />
@@ -276,15 +277,15 @@ const Page = () => {
                                             </div>
 
                                             {index === 0 && (
-                                                <span className='absolute top-1 left-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded'>Cover</span>
+                                                <span className='absolute top-2 left-2 bg-black/70 backdrop-blur-sm text-white text-[10px] uppercase font-bold px-2 py-1 rounded'>Cover</span>
                                             )}
                                         </div>
                                     ))}
 
                                     {imageFiles.length < 10 && (
-                                        <label className='aspect-square rounded-lg border-2 border-dashed border-gray-300 hover:border-indigo-500 hover:bg-indigo-50/50 flex flex-col items-center justify-center cursor-pointer transition-colors'>
-                                            <div className='p-3 bg-indigo-50 rounded-full mb-2'>
-                                                <ImageIcon className='h-5 w-5 text-indigo-500' />
+                                        <label className='aspect-square rounded-lg border-2 border-dashed border-gray-200 hover:border-black/20 hover:bg-gray-50 flex flex-col items-center justify-center cursor-pointer transition-all'>
+                                            <div className='p-3 bg-gray-100 rounded-full mb-2 group-hover:scale-110 transition-transform'>
+                                                <ImageIcon className='h-5 w-5 text-gray-400' />
                                             </div>
                                             <span className='text-xs font-medium text-gray-600'>Add Image</span>
                                             <input
@@ -297,33 +298,33 @@ const Page = () => {
                                         </label>
                                     )}
                                 </div>
-                                <p className='text-xs text-gray-500'>First image will be used as the cover. Click on an image to crop.</p>
+                                <p className='text-xs text-gray-500'>First image will be the cover. Tap an image to edit.</p>
                             </div>
 
                             {/* Files Card */}
-                            <div className='bg-white rounded-xl border border-gray-200 p-6 shadow-sm'>
-                                <h3 className='text-lg font-semibold text-gray-900 mb-4'>Product Files</h3>
+                            <div className='bg-white rounded-xl border border-gray-100 p-6 md:p-8 shadow-sm'>
+                                <h3 className='text-lg font-semibold text-gray-900 mb-6'>Product Files</h3>
 
                                 <div className='space-y-4'>
-                                    <div className='border-2 border-dashed border-gray-300 rounded-lg p-8 hover:border-indigo-500 hover:bg-indigo-50/50 transition-colors text-center relative group'>
-                                        <div className='mx-auto h-12 w-12 bg-indigo-50 rounded-full flex items-center justify-center mb-3'>
-                                            <Upload className='h-6 w-6 text-indigo-600' />
+                                    <div className='border-2 border-dashed border-gray-200 rounded-xl p-8 hover:border-black/20 hover:bg-gray-50 transition-all text-center relative group'>
+                                        <div className='mx-auto h-12 w-12 bg-gray-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform'>
+                                            <Upload className='h-6 w-6 text-gray-600' />
                                         </div>
                                         <p className='text-sm font-medium text-gray-900'>
-                                            <span className='hover:underline cursor-pointer'>Click to upload files</span>
+                                            <span className='hover:underline cursor-pointer'>Upload files</span>
                                             {' '}or{' '}
                                             <span
-                                                className='hover:underline cursor-pointer text-indigo-600'
+                                                className='hover:underline cursor-pointer text-gray-600'
                                                 onClick={(e) => {
                                                     e.preventDefault();
                                                     e.stopPropagation();
                                                     document.getElementById('folder-upload')?.click();
                                                 }}
                                             >
-                                                upload a folder
+                                                folder
                                             </span>
                                         </p>
-                                        <p className='text-xs text-gray-500 mt-1'>Support for single files, folders, and ZIP archives</p>
+                                        <p className='text-xs text-gray-500 mt-2'>Supports ZIP, PDF, and more</p>
 
                                         {/* Standard File Input */}
                                         <input
@@ -347,11 +348,13 @@ const Page = () => {
                                     </div>
 
                                     {productFiles.length > 0 && (
-                                        <div className='space-y-2'>
+                                        <div className='space-y-3'>
                                             {productFiles.map((file, index) => (
-                                                <div key={index} className='flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200'>
+                                                <div key={index} className='flex items-center justify-between p-3 bg-white rounded-lg border border-gray-100 shadow-sm'>
                                                     <div className='flex items-center gap-3 overflow-hidden'>
-                                                        <FileText className='h-5 w-5 text-gray-400 flex-shrink-0' />
+                                                        <div className="h-10 w-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                            <FileText className='h-5 w-5' />
+                                                        </div>
                                                         <div className='min-w-0'>
                                                             <p className='text-sm font-medium text-gray-900 truncate'>{file.name}</p>
                                                             <p className='text-xs text-gray-500'>{(file.size / 1024 / 1024).toFixed(2)} MB</p>
@@ -360,7 +363,7 @@ const Page = () => {
                                                     <button
                                                         type='button'
                                                         onClick={() => removeProductFile(index)}
-                                                        className='p-1.5 text-gray-400 hover:text-red-500 transition-colors'
+                                                        className='p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors'
                                                     >
                                                         <X className='h-4 w-4' />
                                                     </button>
@@ -374,44 +377,50 @@ const Page = () => {
 
                         {/* Right Column: Settings & Actions */}
                         <div className='space-y-8'>
-                            <div className='bg-white rounded-xl border border-gray-200 p-6 shadow-sm'>
-                                <h3 className='text-lg font-semibold text-gray-900 mb-4'>Pricing & Category</h3>
-                                <div className='space-y-4'>
+                            <div className='bg-white rounded-xl border border-gray-100 p-6 md:p-8 shadow-sm'>
+                                <h3 className='text-lg font-semibold text-gray-900 mb-6'>Pricing & Category</h3>
+                                <div className='space-y-6'>
                                     <div className='grid gap-2'>
-                                        <Label htmlFor='price'>Price (INR)</Label>
+                                        <Label htmlFor='price' className="text-base">Price (INR)</Label>
                                         <div className='relative'>
-                                            <span className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-500'>₹</span>
-                                            <Input {...register('price')} type='number' min='0' step='0.01' placeholder='0.00' className='pl-8' />
+                                            <span className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium'>₹</span>
+                                            <Input {...register('price')} type='number' min='0' step='0.01' placeholder='0.00' className='pl-8 h-11' />
                                         </div>
                                         {errors.price && <p className='text-sm text-red-500'>{errors.price.message}</p>}
                                     </div>
 
                                     <div className='grid gap-2'>
-                                        <Label htmlFor='category'>Category</Label>
+                                        <Label htmlFor='category' className="text-base">Category</Label>
 
                                         {!showCustomCategory ? (
-                                            <select
-                                                className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
-                                                onChange={handleCategoryChange}
-                                                defaultValue={selectedCategory && !PRODUCT_CATEGORIES.find(c => c.value === selectedCategory) ? 'custom' : selectedCategory}
-                                            >
-                                                <option value=''>Select category</option>
-                                                {PRODUCT_CATEGORIES.map((cat) => (
-                                                    <option key={cat.value} value={cat.value}>{cat.label}</option>
-                                                ))}
-                                                <option value='custom'>Other (Write your own)</option>
-                                            </select>
+                                            <div className="relative">
+                                                <select
+                                                    className='flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 appearance-none'
+                                                    onChange={handleCategoryChange}
+                                                    defaultValue={selectedCategory && !PRODUCT_CATEGORIES.find(c => c.value === selectedCategory) ? 'custom' : selectedCategory}
+                                                >
+                                                    <option value=''>Select category</option>
+                                                    {PRODUCT_CATEGORIES.map((cat) => (
+                                                        <option key={cat.value} value={cat.value}>{cat.label}</option>
+                                                    ))}
+                                                    <option value='custom'>Other (Write your own)</option>
+                                                </select>
+                                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+                                                </div>
+                                            </div>
                                         ) : (
                                             <div className='flex gap-2 items-center'>
                                                 <Input
                                                     {...register('category')}
                                                     placeholder='Enter custom category'
                                                     autoFocus
+                                                    className="h-11"
                                                 />
                                                 <Button
                                                     type='button'
                                                     variant='ghost'
-                                                    size='sm'
+                                                    size='icon'
                                                     onClick={clearCustomCategory}
                                                     title='Back to list'
                                                 >
@@ -428,9 +437,9 @@ const Page = () => {
                                 </div>
                             </div>
 
-                            <div className='flex flex-col gap-3'>
+                            <div className='flex flex-col gap-3 sticky bottom-4 md:static'>
                                 <Button
-                                    className='w-full'
+                                    className='w-full bg-black hover:bg-zinc-900 text-white shadow-lg md:shadow-none h-12 text-base'
                                     size='lg'
                                     disabled={isUploading || isCreating}
                                 >
@@ -439,8 +448,8 @@ const Page = () => {
                                 </Button>
                                 <Button
                                     type='button'
-                                    variant='outline'
-                                    className='w-full'
+                                    variant='ghost'
+                                    className='w-full text-gray-500 hover:text-gray-900'
                                     onClick={() => router.back()}
                                 >
                                     Cancel
