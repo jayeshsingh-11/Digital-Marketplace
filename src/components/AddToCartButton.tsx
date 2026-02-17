@@ -8,13 +8,14 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
-product,
+const AddToCartButton = ({
+  product,
   isLoggedIn = false,
   className,
 }: {
   product: Product
-  isLoggedIn ?: boolean
-  className ?: string
+  isLoggedIn?: boolean
+  className?: string
 }) => {
   const { addItem } = useCart()
   const [isSuccess, setIsSuccess] = useState<boolean>(false)
