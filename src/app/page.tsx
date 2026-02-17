@@ -1,5 +1,6 @@
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import ProductReel from '@/components/ProductReel'
+import FeaturedBanner from '@/components/FeaturedBanner'
 import { HeroBanner } from '@/components/HeroBanner'
 import {
   Button,
@@ -74,6 +75,25 @@ export default function Home() {
             href='/products?sort=recent'
             title='Brand new'
             subtitle='Check out the latest digital assets added to our marketplace'
+          />
+        </MaxWidthWrapper>
+      </section>
+
+      {/* Featured Shops Banner */}
+      <section className='bg-white py-8'>
+        <MaxWidthWrapper>
+          <FeaturedBanner />
+        </MaxWidthWrapper>
+      </section>
+
+      {/* Featured Shops Products */}
+      <section className='bg-white border-t border-gray-100'>
+        <MaxWidthWrapper>
+          <ProductReel
+            query={{ sort: 'desc', limit: 4 }}
+            href='/products?sort=recent'
+            title='Products from Featured Shops'
+            subtitle='Hand-picked favorites from our top creators'
           />
         </MaxWidthWrapper>
       </section>
