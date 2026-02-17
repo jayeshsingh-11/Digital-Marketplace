@@ -8,6 +8,7 @@ import UserAccountNav from './UserAccountNav'
 import MobileNav from './MobileNav'
 import Logo from './Logo'
 import { ChevronDown, Search, User } from 'lucide-react'
+import NavbarSearch from './NavbarSearch'
 
 const Navbar = async () => {
   const nextCookies = cookies()
@@ -27,34 +28,24 @@ const Navbar = async () => {
               </div>
 
               {/* Search Bar - Categories on Right */}
-              <div className='hidden lg:flex w-full max-w-md relative flex items-center border border-gray-200 rounded-full bg-gray-50 hover:bg-white transition-all group focus-within:border-gray-300 focus-within:ring-2 focus-within:ring-gray-100 shadow-sm h-10'>
-
-                {/* Search Icon (Left) */}
-                <div className='pl-3 flex items-center pointer-events-none'>
-                  <Search className='w-4 h-4 text-gray-400' />
-                </div>
-
-                {/* Input */}
-                <input
-                  type='text'
-                  placeholder='Search...'
-                  className='flex-1 w-full bg-transparent border-none text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0 px-3 text-sm'
-                />
-
-                {/* Category Dropdown (Right Side) */}
-                <div className='pr-4 pl-3 py-1 border-l border-gray-200 cursor-pointer hover:bg-gray-100 rounded-r-full flex items-center gap-2 transition-colors h-full'>
-                  <span className='text-xs font-semibold text-gray-700 whitespace-nowrap'>All Categories</span>
-                  <ChevronDown className='w-3 h-3 text-gray-500' />
-                </div>
-
+              <div className='hidden lg:flex w-full max-w-md'>
+                <NavbarSearch />
               </div>
             </div>
 
             {/* Center: Logo */}
             <div className='absolute left-1/2 transform -translate-x-1/2'>
-              <Link href='/'>
-                <Logo />
-              </Link>
+              <div className='hidden lg:block'> {/* Hide on mobile if it overlaps, or keep if spacing allows. Usually logo in center is fine. */}
+                <Link href='/'>
+                  <Logo />
+                </Link>
+              </div>
+              {/* Mobile Logo logic often simpler, but let's stick to existing layout */}
+              <div className='lg:hidden'>
+                <Link href='/'>
+                  <Logo />
+                </Link>
+              </div>
             </div>
 
             {/* Right: Auth & Cart */}
@@ -115,20 +106,7 @@ const Navbar = async () => {
 
           {/* Mobile Search Bar (Visible only on mobile) */}
           <div className='lg:hidden w-full'>
-            <div className='w-full relative flex items-center border border-gray-200 rounded-full bg-gray-50 hover:bg-white transition-all group focus-within:border-gray-300 focus-within:ring-2 focus-within:ring-gray-100 shadow-sm h-9'>
-              <div className='pl-3 flex items-center pointer-events-none'>
-                <Search className='w-4 h-4 text-gray-400' />
-              </div>
-              <input
-                type='text'
-                placeholder='Search...'
-                className='flex-1 w-full bg-transparent border-none text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0 px-3 text-sm'
-              />
-              <div className='pr-4 pl-3 py-1 border-l border-gray-200 cursor-pointer hover:bg-gray-100 rounded-r-full flex items-center gap-2 transition-colors h-full'>
-                <span className='text-[10px] uppercase font-bold text-gray-700 whitespace-nowrap'>Categories</span>
-                <ChevronDown className='w-3 h-3 text-gray-500' />
-              </div>
-            </div>
+            <NavbarSearch mobile />
           </div>
         </div>
       </header>
