@@ -23,7 +23,7 @@ const Footer = () => {
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12'>
           {/* Brand Column */}
           <div className='lg:col-span-1'>
-            <Icons.logo className='h-8 w-auto mb-6' />
+            <Icons.logo className='h-20 w-auto mb-6' />
             <p className='text-sm text-gray-500 leading-relaxed mb-6'>
               Your launchpad for digital creativity.
             </p>
