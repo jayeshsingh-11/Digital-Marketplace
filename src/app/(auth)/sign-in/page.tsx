@@ -1,6 +1,7 @@
 'use client'
 
 import { Icons } from '@/components/Icons'
+import Logo from '@/components/Logo'
 import {
   Button,
   buttonVariants,
@@ -22,6 +23,7 @@ import {
 import { trpc } from '@/trpc/client'
 import { toast } from 'sonner'
 import { ZodError } from 'zod'
+import AuthIllustration from '@/components/AuthIllustration'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 const Page = () => {
@@ -81,31 +83,36 @@ const Page = () => {
   }
 
   return (
-    <>
-      <div className='container relative flex pt-20 flex-col items-center justify-center lg:px-0'>
-        <div className='mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]'>
-          <div className='flex flex-col items-center space-y-2 text-center'>
-            <Icons.logo className='h-20 w-20' />
-            <h1 className='text-2xl font-semibold tracking-tight'>
-              Sign in to your {isSeller ? 'seller' : ''}{' '}
-              account
+    <div className="flex min-h-screen w-full bg-white">
+      {/* Left Side: Creative Image */}
+      <AuthIllustration
+        title="Welcome back to Creative Cascade."
+        subtitle="Your marketplace for high-quality design."
+        imageSrc="/auth.png"
+      />
+
+      {/* Right Side: Form */}
+      <div className="flex w-full lg:w-1/2 flex-col items-center justify-center px-4 sm:px-12 relative">
+        <div className="absolute top-8 right-8 md:top-12 md:right-12">
+          <Link href='/' className="text-sm font-medium text-gray-500 hover:text-black">
+            Back to home
+          </Link>
+        </div>
+
+        <div className='mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[400px]'>
+          <div className='flex flex-col space-y-2 text-center items-center'>
+            <Logo className='mb-4' />
+            <h1 className='text-2xl font-semibold tracking-tight text-gray-900'>
+              Log in to Creative Cascade
             </h1>
 
-            <Link
-              className={buttonVariants({
-                variant: 'link',
-                className: 'gap-1.5',
-              })}
-              href='/sign-up'>
-              Don&apos;t have an account?
-              <ArrowRight className='h-4 w-4' />
-            </Link>
+            {/* Removed top sign-up link */}
           </div>
 
           <div className='grid gap-6'>
             <form onSubmit={handleSubmit(onSubmit)}>
-              <div className='grid gap-2'>
-                <div className='grid gap-1 py-2'>
+              <div className='grid gap-4'>
+                <div className='grid gap-2'>
                   <Label htmlFor='email'>Email</Label>
                   <Input
                     {...register('email')}
@@ -122,8 +129,16 @@ const Page = () => {
                   )}
                 </div>
 
-                <div className='grid gap-1 py-2'>
-                  <Label htmlFor='password'>Password</Label>
+                <div className='grid gap-2'>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor='password'>Password</Label>
+                    <Link
+                      href='/forgot-password'
+                      className='text-sm text-blue-600 hover:underline'
+                    >
+                      Forgot?
+                    </Link>
+                  </div>
                   <div className='relative'>
                     <Input
                       {...register('password')}
@@ -147,15 +162,9 @@ const Page = () => {
                       {errors.password.message}
                     </p>
                   )}
-                  <Link
-                    href='/forgot-password'
-                    className='text-sm text-blue-600 hover:underline ml-auto mt-1'
-                  >
-                    Forgot password?
-                  </Link>
                 </div>
 
-                <Button disabled={isLoading}>
+                <Button disabled={isLoading} className="w-full bg-gray-900 hover:bg-gray-800 h-11">
                   {isLoading && (
                     <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                   )}
@@ -169,35 +178,52 @@ const Page = () => {
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  or
+                <span className="bg-white px-2 text-muted-foreground">
+                  or continue with
                 </span>
               </div>
             </div>
 
             <GoogleAuthButton />
 
-
+            <div className="mt-6 text-center space-y-4 pt-6 border-t border-gray-100">
+              <p className="text-sm text-muted-foreground font-medium italic">
+                "Everything you can imagine is real."
+              </p>
+              <Link
+                href='/sign-up'
+                className={buttonVariants({
+                  variant: 'ghost',
+                  className: 'w-full group text-base hover:bg-transparent hover:text-blue-600 transition-colors'
+                })}>
+                New user? <span className="font-bold ml-1 underline group-hover:no-underline">Create an account</span>
+                <ArrowRight className='ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform' />
+              </Link>
+            </div>
 
             {isSeller ? (
               <Button
                 onClick={continueAsBuyer}
-                variant='secondary'
-                disabled={isLoading}>
+                variant='outline'
+                disabled={isLoading}
+                className="w-full"
+              >
                 Continue as customer
               </Button>
             ) : (
               <Button
                 onClick={continueAsSeller}
-                variant='secondary'
-                disabled={isLoading}>
+                variant='outline'
+                disabled={isLoading}
+                className="w-full"
+              >
                 Continue as seller
               </Button>
             )}
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 

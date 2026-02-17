@@ -1,6 +1,6 @@
 'use client'
 
-import { ShoppingCart } from 'lucide-react'
+import { ShoppingBag } from 'lucide-react'
 import {
   Sheet,
   SheetContent,
@@ -19,6 +19,7 @@ import { ScrollArea } from './ui/scroll-area'
 import CartItem from './CartItem'
 import { useEffect, useState } from 'react'
 import { User } from '@/payload-types'
+import Logo from './Logo'
 
 const Cart = ({ user }: { user?: User | null }) => {
   const { items, clearCart } = useCart()
@@ -46,7 +47,7 @@ const Cart = ({ user }: { user?: User | null }) => {
   return (
     <Sheet>
       <SheetTrigger className='group -m-2 flex items-center p-2'>
-        <ShoppingCart
+        <ShoppingBag
           aria-hidden='true'
           className='h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500'
         />
@@ -65,13 +66,17 @@ const Cart = ({ user }: { user?: User | null }) => {
               aria-hidden='true'
               className='relative mb-4 h-60 w-60 text-muted-foreground'>
               <Image
-                src='/hippo-empty-cart.png'
+                src='/empty-cart-fixed.png'
                 fill
                 alt='empty shopping cart'
+                className='mix-blend-multiply'
               />
             </div>
+            <div className='mb-4'>
+              <Logo />
+            </div>
             <div className='text-xl font-semibold'>
-              Sign in to use your cart
+              Your cart is empty
             </div>
             <SheetTrigger asChild>
               <Link
@@ -137,10 +142,14 @@ const Cart = ({ user }: { user?: User | null }) => {
               aria-hidden='true'
               className='relative mb-4 h-60 w-60 text-muted-foreground'>
               <Image
-                src='/hippo-empty-cart.png'
+                src='/empty-cart-fixed.png'
                 fill
-                alt='empty shopping cart hippo'
+                alt='empty shopping cart'
+                className='mix-blend-multiply'
               />
+            </div>
+            <div className='mb-4'>
+              <Logo />
             </div>
             <div className='text-xl font-semibold'>
               Your cart is empty

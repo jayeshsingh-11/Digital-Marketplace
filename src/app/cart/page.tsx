@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useRazorpay } from 'react-razorpay'
 import { toast } from 'sonner'
+import Logo from '@/components/Logo'
 
 const Page = () => {
   const { items, removeItem } = useCart()
@@ -34,7 +35,7 @@ const Page = () => {
             key,
             amount,
             currency,
-            name: 'DigitalHippo',
+            name: 'Creative Cascade',
             description: 'Digital Marketplace',
             order_id: orderId,
             handler: async function (response: any) {
@@ -118,11 +119,15 @@ const Page = () => {
                   aria-hidden='true'
                   className='relative mb-4 h-40 w-40 text-muted-foreground'>
                   <Image
-                    src='/hippo-empty-cart.png'
+                    src='/empty-cart-fixed.png'
                     fill
                     loading='eager'
                     alt='empty shopping cart hippo'
+                    className='mix-blend-multiply'
                   />
+                </div>
+                <div className='mb-4'>
+                  <Logo />
                 </div>
                 <h3 className='font-semibold text-2xl'>
                   Your cart is empty

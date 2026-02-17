@@ -170,7 +170,7 @@ export const paymentRouter = router({
         if (email) {
           try {
             const data = await resend.emails.send({
-              from: 'DigitalHippo <onboarding@resend.dev>',
+              from: 'Creative Cascade <onboarding@resend.dev>',
               to: [email],
               subject: 'Thanks for your order! This includes your download links',
               html: ReceiptEmailHtml({

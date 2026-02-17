@@ -104,7 +104,7 @@ export const ReceiptEmail = ({
               <Section key={product.id}>
                 <Column style={{ width: '64px' }}>
                   {typeof image !== 'string' &&
-                  image.url ? (
+                    image.url ? (
                     <Img
                       src={image.url}
                       width='64'
@@ -122,9 +122,9 @@ export const ReceiptEmail = ({
                     <Text style={productDescription}>
                       {product.description.length > 50
                         ? product.description?.slice(
-                            0,
-                            50
-                          ) + '...'
+                          0,
+                          50
+                        ) + '...'
                         : product.description}
                     </Text>
                   ) : null}
@@ -188,7 +188,7 @@ export const ReceiptEmail = ({
             <Link href='#'>Privacy Policy </Link>
           </Text>
           <Text style={footerCopyright}>
-            Copyright © 2023 DigitalHippo Inc. <br />{' '}
+            Copyright © 2023 Creative Cascade Inc. <br />{' '}
             <Link href='#'>All rights reserved</Link>
           </Text>
         </Container>

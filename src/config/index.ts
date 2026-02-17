@@ -1,221 +1,148 @@
 export const PRODUCT_CATEGORIES = [
-  // 1. UI & Design Assets
   {
-    label: 'UI & Design Assets',
-    value: 'ui_kits' as const,
+    label: 'Graphics & Illustrations',
+    value: 'graphics' as const,
     featured: [
       {
-        name: 'Editor picks',
-        href: `/products?category=ui_kits`,
-        imageSrc: '/nav/ui-kits/mixed.jpg',
+        name: 'Icons',
+        href: `/products?category=graphics`,
+        imageSrc: '/nav/icons/picks.jpg',
       },
       {
-        name: 'New Arrivals',
-        href: '/products?category=ui_kits&sort=desc',
+        name: 'Illustrations',
+        href: '/products?category=graphics&sort=desc',
         imageSrc: '/nav/ui-kits/blue.jpg',
       },
       {
-        name: 'Bestsellers',
-        href: '/products?category=ui_kits',
+        name: 'Patterns',
+        href: '/products?category=graphics',
         imageSrc: '/nav/ui-kits/purple.jpg',
       },
     ],
   },
-  // 2. Website & App Templates
   {
-    label: 'Website & App Templates',
+    label: 'Fonts',
+    value: 'fonts' as const,
+    featured: [
+      {
+        name: 'Serif',
+        href: `/products?category=fonts`,
+        imageSrc: 'https://loremflickr.com/600/300/typography?lock=1',
+      },
+      {
+        name: 'Sans Serif',
+        href: '/products?category=fonts&sort=desc',
+        imageSrc: 'https://loremflickr.com/600/300/font?lock=2',
+      },
+      {
+        name: 'Display',
+        href: '/products?category=fonts',
+        imageSrc: 'https://loremflickr.com/600/300/letters?lock=3',
+      },
+    ],
+  },
+  {
+    label: 'Templates',
     value: 'templates' as const,
     featured: [
       {
-        name: 'Trending Templates',
+        name: 'Social Media',
         href: `/products?category=templates`,
-        imageSrc: 'https://loremflickr.com/600/300/website,app?lock=1',
-      },
-      {
-        name: 'Launch Your MVP',
-        href: '/products?category=templates&sort=desc',
-        imageSrc: 'https://loremflickr.com/600/300/startup?lock=2',
-      },
-      {
-        name: 'Top Sellers',
-        href: '/products?category=templates',
-        imageSrc: 'https://loremflickr.com/600/300/coding?lock=3',
-      },
-    ],
-  },
-  // 3. Icons & Graphics
-  {
-    label: 'Icons & Graphics',
-    value: 'icons' as const,
-    featured: [
-      {
-        name: 'Must-have Icons',
-        href: `/products?category=icons`,
-        imageSrc: '/nav/icons/picks.jpg',
-      },
-      {
-        name: 'Fresh Icon Sets',
-        href: '/products?category=icons&sort=desc',
-        imageSrc: '/nav/icons/new.jpg',
-      },
-      {
-        name: 'Global Hits',
-        href: '/products?category=icons',
-        imageSrc: '/nav/icons/bestsellers.jpg',
-      },
-    ],
-  },
-  // 4. Code & Development
-  {
-    label: 'Code & Development',
-    value: 'development' as const,
-    featured: [
-      {
-        name: 'Starter Kits',
-        href: `/products?category=development`,
-        imageSrc: 'https://loremflickr.com/600/300/code,programming?lock=4',
-      },
-      {
-        name: 'Libraries & Tools',
-        href: '/products?category=development&sort=desc',
-        imageSrc: 'https://loremflickr.com/600/300/developer?lock=5',
-      },
-      {
-        name: 'Scripts',
-        href: '/products?category=development',
-        imageSrc: 'https://loremflickr.com/600/300/software?lock=6',
-      },
-    ],
-  },
-  // 5. Audio & Music
-  {
-    label: 'Audio & Music',
-    value: 'audio' as const,
-    featured: [
-      {
-        name: 'Sound Effects',
-        href: `/products?category=audio`,
-        imageSrc: 'https://loremflickr.com/600/300/sound,wave?lock=7',
-      },
-      {
-        name: 'Royalty Free Music',
-        href: '/products?category=audio&sort=desc',
-        imageSrc: 'https://loremflickr.com/600/300/music,studio?lock=8',
-      },
-      {
-        name: 'Instrumentals',
-        href: '/products?category=audio',
-        imageSrc: 'https://loremflickr.com/600/300/instrument?lock=9',
-      },
-    ],
-  },
-  // 6. E-Books & Learning
-  {
-    label: 'E-Books & Learning',
-    value: 'education' as const,
-    featured: [
-      {
-        name: 'Design Guides',
-        href: `/products?category=education`,
-        imageSrc: 'https://loremflickr.com/600/300/book,design?lock=10',
-      },
-      {
-        name: 'Programming',
-        href: '/products?category=education&sort=desc',
-        imageSrc: 'https://loremflickr.com/600/300/learning,code?lock=11',
-      },
-      {
-        name: 'Marketing',
-        href: '/products?category=education',
-        imageSrc: 'https://loremflickr.com/600/300/marketing?lock=12',
-      },
-    ],
-  },
-  // 7. Business & Productivity
-  {
-    label: 'Business & Productivity',
-    value: 'business' as const,
-    featured: [
-      {
-        name: 'Document Templates',
-        href: `/products?category=business`,
-        imageSrc: 'https://loremflickr.com/600/300/document,paper?lock=13',
+        imageSrc: 'https://loremflickr.com/600/300/instagram?lock=4',
       },
       {
         name: 'Presentations',
-        href: '/products?category=business&sort=desc',
-        imageSrc: 'https://loremflickr.com/600/300/presentation?lock=14',
+        href: '/products?category=templates&sort=desc',
+        imageSrc: 'https://loremflickr.com/600/300/presentation?lock=5',
       },
       {
-        name: 'Spreadsheets',
-        href: '/products?category=business',
-        imageSrc: 'https://loremflickr.com/600/300/chart,graph?lock=15',
-      },
-    ],
-  },
-  // 8. Video & Motion Assets
-  {
-    label: 'Video & Motion Assets',
-    value: 'video' as const,
-    featured: [
-      {
-        name: 'Transitions',
-        href: `/products?category=video`,
-        imageSrc: 'https://loremflickr.com/600/300/video,editing?lock=16',
-      },
-      {
-        name: 'Stock Footage',
-        href: '/products?category=video&sort=desc',
-        imageSrc: 'https://loremflickr.com/600/300/film,camera?lock=17',
-      },
-      {
-        name: 'Motion Graphics',
-        href: '/products?category=video',
-        imageSrc: 'https://loremflickr.com/600/300/motion,graphic?lock=18',
+        name: 'Mockups',
+        href: '/products?category=templates',
+        imageSrc: 'https://loremflickr.com/600/300/mockup?lock=6',
       },
     ],
   },
-  // 9. 3D & Game Assets
   {
-    label: '3D & Game Assets',
-    value: '3d_game' as const,
+    label: 'Add-ons',
+    value: 'addons' as const,
     featured: [
       {
-        name: '3D Models',
-        href: `/products?category=3d_game`,
-        imageSrc: 'https://loremflickr.com/600/300/3d,render?lock=19',
+        name: 'Procreate Brushes',
+        href: `/products?category=addons`,
+        imageSrc: 'https://loremflickr.com/600/300/drawing?lock=7',
       },
       {
-        name: 'Game Sprites',
-        href: '/products?category=3d_game&sort=desc',
-        imageSrc: 'https://loremflickr.com/600/300/game,pixel?lock=20',
+        name: 'Photoshop Actions',
+        href: '/products?category=addons&sort=desc',
+        imageSrc: 'https://loremflickr.com/600/300/photoshop?lock=8',
       },
       {
-        name: 'Environments',
-        href: '/products?category=3d_game',
-        imageSrc: 'https://loremflickr.com/600/300/virtual,world?lock=21',
+        name: 'Lightroom Presets',
+        href: '/products?category=addons',
+        imageSrc: 'https://loremflickr.com/600/300/photo,edit?lock=9',
       },
     ],
   },
-  // 10. AI & Prompt Packs
   {
-    label: 'AI & Prompt Packs',
-    value: 'ai_prompts' as const,
+    label: 'Photos',
+    value: 'photos' as const,
     featured: [
       {
-        name: 'Midjourney Prompts',
-        href: `/products?category=ai_prompts`,
-        imageSrc: 'https://loremflickr.com/600/300/ai,robot?lock=22',
+        name: 'People',
+        href: `/products?category=photos`,
+        imageSrc: 'https://loremflickr.com/600/300/people?lock=10',
       },
       {
-        name: 'ChatGPT Prompts',
-        href: '/products?category=ai_prompts&sort=desc',
-        imageSrc: 'https://loremflickr.com/600/300/artificial,intelligence?lock=23',
+        name: 'Nature',
+        href: '/products?category=photos&sort=desc',
+        imageSrc: 'https://loremflickr.com/600/300/nature?lock=11',
       },
       {
-        name: 'Generative Art',
-        href: '/products?category=ai_prompts',
-        imageSrc: 'https://loremflickr.com/600/300/generative,art?lock=24',
+        name: 'Business',
+        href: '/products?category=photos',
+        imageSrc: 'https://loremflickr.com/600/300/business?lock=12',
+      },
+    ],
+  },
+  {
+    label: 'Web Themes',
+    value: 'web_themes' as const,
+    featured: [
+      {
+        name: 'Shopify',
+        href: `/products?category=web_themes`,
+        imageSrc: 'https://loremflickr.com/600/300/website?lock=13',
+      },
+      {
+        name: 'Wordpress',
+        href: '/products?category=web_themes&sort=desc',
+        imageSrc: 'https://loremflickr.com/600/300/wordpress?lock=14',
+      },
+      {
+        name: 'Framer',
+        href: '/products?category=web_themes',
+        imageSrc: 'https://loremflickr.com/600/300/interface?lock=15',
+      },
+    ],
+  },
+  {
+    label: '3D',
+    value: '3d' as const,
+    featured: [
+      {
+        name: 'Characters',
+        href: `/products?category=3d`,
+        imageSrc: 'https://loremflickr.com/600/300/3d,character?lock=16',
+      },
+      {
+        name: 'Objects',
+        href: '/products?category=3d&sort=desc',
+        imageSrc: 'https://loremflickr.com/600/300/3d,object?lock=17',
+      },
+      {
+        name: 'Textures',
+        href: '/products?category=3d',
+        imageSrc: 'https://loremflickr.com/600/300/texture?lock=18',
       },
     ],
   },

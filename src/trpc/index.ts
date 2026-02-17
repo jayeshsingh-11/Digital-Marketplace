@@ -69,8 +69,9 @@ export const appRouter = router({
         query: z.object({
           category: z.string().optional(),
           sort: z.enum(['asc', 'desc']).optional(),
-          limit: z.number().optional()
-        }).optional(), // Make query object looser to accept arbitrary filters like 'name' if backend supports it
+          limit: z.number().optional(),
+          query: z.string().optional(), // Added search query
+        }).optional(),
       })
     )
     .query(async ({ input }) => {
@@ -102,8 +103,12 @@ export const appRouter = router({
         if (value && typeof value === 'string') {
           if (key === 'category') {
             dbQuery = dbQuery.eq('category', value)
+          } else if (key === 'query') {
+            // Apply text search on name or description
+            // Note: ilike is case-insensitive. 
+            // We can search name for now.
+            dbQuery = dbQuery.ilike('name', `%${value}%`)
           }
-          // Add other mappings as needed
         }
       })
 
@@ -121,9 +126,6 @@ export const appRouter = router({
       }
 
       // Map the data to match expected frontend structure if needed
-      // Payload returns `images: [{ image: ... }]`. 
-      // Our query returns `product_images: [{ media: ... }]`.
-      // We might need to transform this to match the `Product` type interface
       const items = data.map((item: any) => ({
         ...item,
         images: item.product_images?.map((pi: any) => ({ image: pi.media })) || [],

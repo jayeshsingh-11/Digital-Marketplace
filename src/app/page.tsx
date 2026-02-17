@@ -62,7 +62,7 @@ export default function Home() {
   return (
     <>
       {/* Hero Section */}
-      <section className='relative bg-white'>
+      <section className='relative'>
         <HeroBanner />
       </section>
 
