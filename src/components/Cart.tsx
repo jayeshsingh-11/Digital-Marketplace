@@ -20,6 +20,7 @@ import CartItem from './CartItem'
 import { useEffect, useState } from 'react'
 import { User } from '@/payload-types'
 import Logo from './Logo'
+import { useMediaQuery } from '@/hooks/use-media-query'
 
 const Cart = ({ user }: { user?: User | null }) => {
   const { items, clearCart } = useCart()
@@ -43,6 +44,7 @@ const Cart = ({ user }: { user?: User | null }) => {
   )
 
   const fee = 1
+  const isDesktop = useMediaQuery("(min-width: 640px)")
 
   return (
     <Sheet>
@@ -55,7 +57,10 @@ const Cart = ({ user }: { user?: User | null }) => {
           {isMounted ? itemCount : 0}
         </span>
       </SheetTrigger>
-      <SheetContent className='flex w-full flex-col pr-0 sm:max-w-lg'>
+      <SheetContent
+        side={isDesktop ? 'right' : 'bottom'}
+        className={!isDesktop ? 'h-[85vh] rounded-t-[20px] px-6' : 'pr-0 sm:max-w-lg'}
+      >
         <SheetHeader className='space-y-2.5 pr-6'>
           <SheetTitle>Cart ({itemCount})</SheetTitle>
         </SheetHeader>
