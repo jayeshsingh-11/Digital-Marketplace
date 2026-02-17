@@ -71,6 +71,7 @@ export const appRouter = router({
           sort: z.enum(['asc', 'desc']).optional(),
           limit: z.number().optional(),
           query: z.string().optional(), // Added search query
+          ids: z.array(z.string()).optional(),
         }).optional(),
       })
     )
@@ -108,7 +109,11 @@ export const appRouter = router({
             // Note: ilike is case-insensitive. 
             // We can search name for now.
             dbQuery = dbQuery.ilike('name', `%${value}%`)
+          } else if (key === 'ids' && Array.isArray(value)) {
+            dbQuery = dbQuery.in('id', value)
           }
+        } else if (key === 'ids' && Array.isArray(value) && value.length > 0) {
+          dbQuery = dbQuery.in('id', value)
         }
       })
 

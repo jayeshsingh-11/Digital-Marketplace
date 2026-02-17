@@ -1,6 +1,7 @@
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import ProductReel from '@/components/ProductReel'
 import FeaturedBanner from '@/components/FeaturedBanner'
+import RecentlyViewed from '@/components/RecentlyViewed'
 import { HeroBanner } from '@/components/HeroBanner'
 import {
   Button,
@@ -116,6 +117,13 @@ export default function Home() {
             title='Popular font products'
             subtitle='Typography to make your designs stand out'
           />
+        </MaxWidthWrapper>
+      </section>
+
+      {/* Recently Viewed */}
+      <section className='bg-white border-t border-gray-100'>
+        <MaxWidthWrapper>
+          <RecentlyViewed />
         </MaxWidthWrapper>
       </section>
 

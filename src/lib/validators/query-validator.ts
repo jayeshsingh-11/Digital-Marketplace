@@ -5,6 +5,7 @@ export const QueryValidator = z.object({
   sort: z.enum(['asc', 'desc']).optional(),
   limit: z.number().optional(),
   query: z.string().optional(),
+  ids: z.array(z.string()).optional(),
 })
 
 export type TQueryValidator = z.infer<typeof QueryValidator>

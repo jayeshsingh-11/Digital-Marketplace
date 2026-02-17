@@ -1,4 +1,5 @@
 import AddToCartButton from '@/components/AddToCartButton'
+import ProductViewTracker from '@/components/ProductViewTracker'
 import ImageSlider from '@/components/ImageSlider'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import ProductReel from '@/components/ProductReel'
@@ -155,6 +156,8 @@ const Page = async ({ params }: PageProps) => {
         title={`Similar ${label}`}
         subtitle={`Browse similar high-quality ${label} just like '${product.name}'`}
       />
+
+      <ProductViewTracker productId={product.id} />
     </MaxWidthWrapper>
   )
 }
