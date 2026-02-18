@@ -28,6 +28,12 @@ type TResetPasswordValidator = z.infer<typeof ResetPasswordValidator>
 const Page = () => {
     const router = useRouter()
     const searchParams = useSearchParams()
+    // Log URL details to debug flow type (Implicit vs PKCE)
+    useEffect(() => {
+        console.log('Reset Page: URL Hash:', window.location.hash)
+        console.log('Reset Page: Search Params:', Object.fromEntries(searchParams.entries()))
+    }, [searchParams])
+
     // Supabase auth helpers handle the hash fragment automatically to set the session
     const supabase = createClient()
     const [isSessionCheckComplete, setIsSessionCheckComplete] = useState(false)
@@ -56,11 +62,20 @@ const Page = () => {
     }, [supabase.auth])
 
     const onSubmit = async ({ password }: TResetPasswordValidator) => {
+        const { data: { session } } = await supabase.auth.getSession()
+        console.log('Reset Password: Current Session:', session)
+
+        if (!session) {
+            toast.error('Session expired or invalid. Please request a new reset link.')
+            return
+        }
+
         const { error } = await supabase.auth.updateUser({
             password,
         })
 
         if (error) {
+            console.error('Reset Password Error:', error)
             toast.error('Failed to reset password. Please try again.')
             return
         }
