@@ -1,6 +1,6 @@
 'use client'
 
-import { Home, LayoutGrid, Store, User } from 'lucide-react'
+import { Home, LayoutGrid, ShoppingCart, Store, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
@@ -34,7 +34,7 @@ const MobileBottomNav = () => {
         }
     }, [])
 
-    // Don't show on auth pages or admin routes if needed
+    // Don't show on auth pages
     if (pathname?.startsWith('/sign-in') || pathname?.startsWith('/sign-up')) {
         return null
     }
@@ -60,6 +60,11 @@ const MobileBottomNav = () => {
             icon: Store,
             href: '/seller',
         },
+        {
+            label: 'Cart',
+            icon: ShoppingCart,
+            href: '/cart',
+        },
     ]
 
     return (
@@ -68,34 +73,50 @@ const MobileBottomNav = () => {
                 'fixed bottom-0 left-0 z-50 w-full bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] transition-transform duration-300 ease-in-out md:hidden rounded-t-[20px]',
                 isVisible ? 'translate-y-0' : 'translate-y-full'
             )}
-            style={{ height: '65px' }}
+            style={{ height: '70px' }}
         >
-            <div className='grid h-full grid-cols-4 mx-auto'>
+            <div className='grid h-full grid-cols-5 mx-auto'>
                 {navItems.map((item) => {
                     const isActive = pathname === item.href
                     return (
                         <Link
                             key={item.href}
                             href={item.href}
-                            className={cn(
-                                'inline-flex flex-col items-center justify-center px-5 group hover:bg-gray-50 transition-colors h-full',
-                                isActive && 'bg-blue-50/50'
-                            )}
+                            className='relative inline-flex flex-col items-center justify-center h-full w-full'
                         >
-                            <item.icon
-                                className={cn(
-                                    'w-6 h-6 mb-1 transition-colors duration-200',
-                                    isActive ? 'text-blue-600' : 'text-gray-500 group-hover:text-gray-700'
-                                )}
-                            />
+                            {/* Active Background Pill Animation */}
                             <span
                                 className={cn(
-                                    'text-[10px] transition-colors duration-200',
-                                    isActive ? 'text-blue-600 font-bold' : 'text-gray-500 font-medium group-hover:text-gray-700'
+                                    'absolute inset-0 m-auto h-12 w-12 rounded-2xl transition-all duration-300 ease-out z-[-1]',
+                                    isActive
+                                        ? 'bg-gray-100 scale-100 opacity-100'
+                                        : 'scale-0 opacity-0'
                                 )}
-                            >
-                                {item.label}
-                            </span>
+                            />
+
+                            <div className={cn(
+                                'flex flex-col items-center justify-center transition-transform duration-300',
+                                isActive && 'scale-105 -translate-y-0.5'
+                            )}>
+                                <item.icon
+                                    className={cn(
+                                        'w-6 h-6 mb-1 transition-all duration-300',
+                                        isActive
+                                            ? 'text-black fill-black/5 stroke-[2.5px]'
+                                            : 'text-gray-500 stroke-[2px]'
+                                    )}
+                                />
+                                <span
+                                    className={cn(
+                                        'text-[10px] transition-all duration-300',
+                                        isActive
+                                            ? 'text-black font-extrabold tracking-wide'
+                                            : 'text-gray-500 font-medium'
+                                    )}
+                                >
+                                    {item.label}
+                                </span>
+                            </div>
                         </Link>
                     )
                 })}
