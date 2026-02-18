@@ -198,7 +198,7 @@ function OrdersSection() {
 
                             {/* Products */}
                             <div className='space-y-3'>
-                                {order.products.map((product, idx) => (
+                                {order.products.map((product: any, idx: number) => (
                                     <div key={idx} className='flex items-center gap-4'>
                                         <div className='relative h-16 w-16 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0'>
                                             {product.imageUrl ? (
