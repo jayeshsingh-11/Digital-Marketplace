@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createClient } from '@/lib/supabase/client'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Eye, EyeOff } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -31,6 +31,8 @@ const Page = () => {
     // Supabase auth helpers handle the hash fragment automatically to set the session
     const supabase = createClient()
     const [isSessionCheckComplete, setIsSessionCheckComplete] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
     const {
         register,
@@ -93,14 +95,32 @@ const Page = () => {
                         <div className='grid gap-4'>
                             <div className='grid gap-2'>
                                 <Label htmlFor='password'>New Password</Label>
-                                <Input
-                                    {...register('password')}
-                                    type='password'
-                                    className={cn({
-                                        'focus-visible:ring-red-500': errors.password,
-                                    })}
-                                    placeholder='Password'
-                                />
+                                <div className='relative'>
+                                    <Input
+                                        {...register('password')}
+                                        type={showPassword ? 'text' : 'password'}
+                                        className={cn('pr-10', {
+                                            'focus-visible:ring-red-500': errors.password,
+                                        })}
+                                        placeholder='Password'
+                                    />
+                                    <Button
+                                        type='button'
+                                        variant='ghost'
+                                        size='sm'
+                                        className='absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent'
+                                        onClick={() => setShowPassword((prev) => !prev)}
+                                    >
+                                        {showPassword ? (
+                                            <EyeOff className='h-4 w-4 text-muted-foreground' />
+                                        ) : (
+                                            <Eye className='h-4 w-4 text-muted-foreground' />
+                                        )}
+                                        <span className='sr-only'>
+                                            {showPassword ? 'Hide password' : 'Show password'}
+                                        </span>
+                                    </Button>
+                                </div>
                                 {errors?.password && (
                                     <p className='text-sm text-red-500'>
                                         {errors.password.message}
@@ -110,14 +130,32 @@ const Page = () => {
 
                             <div className='grid gap-2'>
                                 <Label htmlFor='confirmPassword'>Confirm Password</Label>
-                                <Input
-                                    {...register('confirmPassword')}
-                                    type='password'
-                                    className={cn({
-                                        'focus-visible:ring-red-500': errors.confirmPassword,
-                                    })}
-                                    placeholder='Confirm Password'
-                                />
+                                <div className='relative'>
+                                    <Input
+                                        {...register('confirmPassword')}
+                                        type={showConfirmPassword ? 'text' : 'password'}
+                                        className={cn('pr-10', {
+                                            'focus-visible:ring-red-500': errors.confirmPassword,
+                                        })}
+                                        placeholder='Confirm Password'
+                                    />
+                                    <Button
+                                        type='button'
+                                        variant='ghost'
+                                        size='sm'
+                                        className='absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent'
+                                        onClick={() => setShowConfirmPassword((prev) => !prev)}
+                                    >
+                                        {showConfirmPassword ? (
+                                            <EyeOff className='h-4 w-4 text-muted-foreground' />
+                                        ) : (
+                                            <Eye className='h-4 w-4 text-muted-foreground' />
+                                        )}
+                                        <span className='sr-only'>
+                                            {showConfirmPassword ? 'Hide password' : 'Show password'}
+                                        </span>
+                                    </Button>
+                                </div>
                                 {errors?.confirmPassword && (
                                     <p className='text-sm text-red-500'>
                                         {errors.confirmPassword.message}

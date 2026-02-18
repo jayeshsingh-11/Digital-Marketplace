@@ -12,6 +12,7 @@ const Footer = () => {
     '/sign-up',
     '/sign-in',
     '/forgot-password',
+    '/reset-password-confirm',
   ]
 
   if (pathname.startsWith('/admin') || pathsToHide.includes(pathname)) {
