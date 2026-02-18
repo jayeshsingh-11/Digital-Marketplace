@@ -141,7 +141,7 @@ export const authRouter = router({
         type: 'recovery',
         email,
         options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_SERVER_URL}/reset-password-confirm`,
+          redirectTo: `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/callback?next=/reset-password-confirm`,
         }
       })
 
