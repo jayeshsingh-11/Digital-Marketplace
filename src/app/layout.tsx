@@ -7,6 +7,7 @@ import { Inter, Playfair_Display, Dancing_Script } from 'next/font/google'
 import { Toaster } from 'sonner'
 import './globals.css'
 import Footer from '@/components/Footer'
+import MobileBottomNav from '@/components/MobileBottomNav'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' })
@@ -37,6 +38,7 @@ export default function RootLayout({
               {children}
             </div>
             <Footer />
+            <MobileBottomNav />
           </Providers>
         </main>
 
