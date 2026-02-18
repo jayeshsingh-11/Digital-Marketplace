@@ -8,7 +8,7 @@ const GoogleAuthButton = () => {
         const { error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/callback`,
+                redirectTo: `${process.env.NEXT_PUBLIC_SERVER_URL}/`,
             }
         })
 

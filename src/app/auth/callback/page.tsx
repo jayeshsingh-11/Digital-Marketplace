@@ -111,17 +111,12 @@ const AuthCallback = () => {
                 }
             })
 
-            // 5. Failsafe timeout
-            const timeoutId = setTimeout(async () => {
-                console.warn('Auth Callback: Timeout reached.')
-                const { data } = await supabase.auth.getSession()
-                if (data.session) {
-                    router.push(next)
-                } else {
-                    setStatus('Authentication failed. Redirecting to sign in...')
-                    setTimeout(() => router.push('/sign-in'), 2000)
-                }
-            }, 10000)
+            // 5. Failsafe timeout - do a hard navigation which will pick up any session
+            //    that was set during the wait (even if our checks missed it)
+            const timeoutId = setTimeout(() => {
+                console.warn('Auth Callback: Timeout reached, doing hard navigation to', next)
+                window.location.href = next
+            }, 5000)
 
             return () => {
                 subscription.unsubscribe()
