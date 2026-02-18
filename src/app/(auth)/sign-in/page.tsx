@@ -54,19 +54,17 @@ const Page = () => {
       onSuccess: async () => {
         toast.success('Signed in successfully')
 
-        router.refresh()
-
         if (origin) {
-          router.push(`/${origin}`)
+          window.location.href = `/${origin}`
           return
         }
 
         if (isSeller) {
-          router.push('/seller')
+          window.location.href = '/seller'
           return
         }
 
-        router.push('/')
+        window.location.href = '/'
       },
       onError: (err) => {
         if (err.data?.code === 'UNAUTHORIZED') {

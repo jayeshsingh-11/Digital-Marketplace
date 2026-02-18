@@ -61,8 +61,7 @@ const Page = () => {
       },
       onSuccess: ({ sentToEmail }) => {
         toast.success('Account created! Redirecting...')
-        router.refresh()
-        router.push('/')
+        window.location.href = '/'
       },
     })
 
