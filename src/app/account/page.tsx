@@ -40,8 +40,23 @@ export default function AccountPage() {
     const [activeSection, setActiveSection] = useState<Section>('orders')
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
+    // Lifted state for real-time sidebar updates
+    const [name, setName] = useState('')
+    const [bio, setBio] = useState('')
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+
     const { data: profile, isLoading: profileLoading } = trpc.profile.getProfile.useQuery()
     const { signOut } = useAuth()
+
+    // Sync state with fetched profile data
+    useEffect(() => {
+        if (profile) {
+            setName(profile.name || '')
+            setBio(profile.bio || '')
+            setAvatarUrl(profile.imageUrl || null)
+        }
+    }, [profile])
+
 
     if (profileLoading) {
         return (
@@ -76,9 +91,9 @@ export default function AccountPage() {
                     {/* Profile Card */}
                     <div className='flex items-center gap-4 mb-8'>
                         <div className='relative h-16 w-16 rounded-full overflow-hidden bg-gray-100 border-2 border-gray-200 flex-shrink-0'>
-                            {profile?.imageUrl ? (
+                            {avatarUrl ? (
                                 <Image
-                                    src={profile.imageUrl}
+                                    src={avatarUrl}
                                     alt='Profile'
                                     fill
                                     className='object-cover'
@@ -92,14 +107,14 @@ export default function AccountPage() {
                         </div>
                         <div className='min-w-0'>
                             <p className='font-semibold text-gray-900 truncate text-base'>
-                                {profile?.name || 'User'}
+                                {name || profile?.name || 'User'}
                             </p>
                             <p className='text-sm text-gray-500 truncate'>
                                 {profile?.email || ''}
                             </p>
-                            {profile?.bio && (
+                            {bio && (
                                 <p className='text-xs text-gray-400 mt-0.5 line-clamp-2'>
-                                    {profile.bio}
+                                    {bio}
                                 </p>
                             )}
                         </div>
@@ -146,7 +161,17 @@ export default function AccountPage() {
                     {activeSection === 'orders' && <OrdersSection />}
                     {activeSection === 'settings' && <SettingsSection />}
                     {activeSection === 'support' && <SupportSection />}
-                    {activeSection === 'profile' && <ProfileSection />}
+                    {activeSection === 'profile' &&
+                        <ProfileSection
+                            name={name}
+                            setName={setName}
+                            bio={bio}
+                            setBio={setBio}
+                            avatarUrl={avatarUrl}
+                            setAvatarUrl={setAvatarUrl}
+                            email={profile?.email || ''}
+                        />
+                    }
                 </main>
             </div>
         </div>
@@ -245,23 +270,26 @@ function OrdersSection() {
 }
 
 // ─── Profile Section ────────────────────────────────────────────
-function ProfileSection() {
-    const { data: profile, isLoading } = trpc.profile.getProfile.useQuery()
+interface ProfileSectionProps {
+    name: string
+    setName: (name: string) => void
+    bio: string
+    setBio: (bio: string) => void
+    avatarUrl: string | null
+    setAvatarUrl: (url: string | null) => void
+    email: string
+}
+
+function ProfileSection({
+    name, setName,
+    bio, setBio,
+    avatarUrl, setAvatarUrl,
+    email
+}: ProfileSectionProps) {
     const utils = trpc.useContext()
-    const [name, setName] = useState('')
-    const [bio, setBio] = useState('')
-    const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
     const [uploading, setUploading] = useState(false)
     const [showDeleteModal, setShowDeleteModal] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
-
-    useEffect(() => {
-        if (profile) {
-            setName(profile.name || '')
-            setBio(profile.bio || '')
-            setAvatarUrl(profile.imageUrl || null)
-        }
-    }, [profile])
 
     const { mutate: updateProfile, isLoading: isSaving } = trpc.profile.updateProfile.useMutation({
         onSuccess: () => {
@@ -305,10 +333,6 @@ function ProfileSection() {
             bio: bio || undefined,
             imageUrl: avatarUrl || undefined,
         })
-    }
-
-    if (isLoading) {
-        return <div className='flex justify-center py-16'><Loader2 className='h-8 w-8 animate-spin text-gray-400' /></div>
     }
 
     return (
@@ -371,7 +395,7 @@ function ProfileSection() {
                             <Mail className='absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
                             <input
                                 type='email'
-                                value={profile?.email || ''}
+                                value={email}
                                 disabled
                                 className='w-full pl-11 pr-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-gray-500 text-sm cursor-not-allowed'
                             />
