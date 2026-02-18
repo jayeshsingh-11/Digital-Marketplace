@@ -9,10 +9,11 @@ const AuthCallback = () => {
     const router = useRouter()
     const searchParams = useSearchParams()
     const next = searchParams.get('next') || '/'
-    const supabase = createClient()
     const [status, setStatus] = useState('Verifying login...')
 
     useEffect(() => {
+        const supabase = createClient()
+
         const handleAuth = async () => {
             console.log('Auth Callback: Checking session...')
 
@@ -50,7 +51,7 @@ const AuthCallback = () => {
                 supabase.auth.getSession().then(({ data }) => {
                     if (data.session) router.push(next)
                 })
-            }, 5000)
+            }, 10000)
 
             return () => {
                 subscription.unsubscribe()
@@ -59,7 +60,7 @@ const AuthCallback = () => {
         }
 
         handleAuth()
-    }, [router, supabase, next])
+    }, [router, next])
 
     return (
         <div className='flex flex-col items-center justify-center min-h-screen gap-4'>
