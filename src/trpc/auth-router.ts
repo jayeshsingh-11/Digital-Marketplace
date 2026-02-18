@@ -5,6 +5,8 @@ import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
+import { resend } from '@/lib/resend'
+import { ResetPasswordEmailHtml } from '@/components/emails/ResetPasswordEmail'
 
 export const authRouter = router({
   createUser: publicProcedure
@@ -122,11 +124,48 @@ export const authRouter = router({
     .input(z.object({ email: z.string().email() }))
     .mutation(async ({ input }) => {
       const { email } = input
-      const supabase = createClient(cookies())
 
-      await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${process.env.NEXT_PUBLIC_SERVER_URL}/reset-password-confirm`,
+      const supabaseAdmin = createSupabaseClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        {
+          auth: {
+            autoRefreshToken: false,
+            persistSession: false
+          }
+        }
+      )
+
+      const { data, error } = await supabaseAdmin.auth.admin.generateLink({
+        type: 'recovery',
+        email,
+        options: {
+          redirectTo: `${process.env.NEXT_PUBLIC_SERVER_URL}/reset-password-confirm`,
+        }
       })
+
+      if (error) {
+        console.error('Error generating reset link:', error)
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to generate reset link.' })
+      }
+
+      const { properties } = data
+      const resetLink = properties.action_link
+
+      try {
+        await resend.emails.send({
+          from: 'Creative Cascade <onboarding@resend.dev>',
+          to: email,
+          subject: 'Reset your password',
+          html: ResetPasswordEmailHtml({
+            resetPasswordLink: resetLink,
+            userFirstname: email.split('@')[0] // Fallback name
+          })
+        })
+      } catch (err) {
+        console.error('Error sending email:', err)
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to send email.' })
+      }
 
       return { success: true }
     }),

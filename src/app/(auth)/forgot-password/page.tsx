@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { trpc } from '@/trpc/client'
@@ -26,6 +27,7 @@ const Page = () => {
     const {
         register,
         handleSubmit,
+        getValues,
         formState: { errors },
     } = useForm<TForgotPasswordValidator>({
         resolver: zodResolver(ForgotPasswordValidator),
@@ -49,19 +51,29 @@ const Page = () => {
     if (emailSent) {
         return (
             <div className='container relative flex pt-20 flex-col items-center justify-center lg:px-0'>
-                <div className='mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]'>
+                <div className='mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[450px]'>
                     <div className='flex flex-col items-center space-y-2 text-center'>
-                        <Icons.logo className='h-20 w-20' />
-                        <h1 className='text-2xl font-semibold tracking-tight'>
-                            Check your email
+                        <div className="relative mb-4 h-60 w-full">
+                            <Image
+                                src='/hippo-email-sent.png'
+                                fill
+                                alt='Check your email'
+                                className='object-contain mix-blend-multiply'
+                            />
+                        </div>
+                        <h1 className='text-3xl font-bold tracking-tight text-gray-900'>
+                            Check your inbox!
                         </h1>
-                        <p className='text-muted-foreground'>
-                            We&apos;ve sent you a password reset link. Please check your inbox.
+                        <p className='text-muted-foreground text-lg'>
+                            We&apos;ve sent a magic link to <span className="font-semibold text-gray-900">{getValues('email')}</span>.
+                        </p>
+                        <p className="text-sm text-gray-500 max-w-xs mx-auto">
+                            Didn&apos;t receive it? Check your spam folder or try again in a few minutes. The creative kingdom awaits!
                         </p>
                         <Link
                             className={buttonVariants({
                                 variant: 'link',
-                                className: 'gap-1.5',
+                                className: 'gap-1.5 mt-4 text-gray-900',
                             })}
                             href='/sign-in'>
                             Back to sign in
@@ -78,26 +90,26 @@ const Page = () => {
             <div className='container relative flex pt-20 flex-col items-center justify-center lg:px-0'>
                 <div className='mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]'>
                     <div className='flex flex-col items-center space-y-2 text-center'>
-                        <Icons.logo className='h-20 w-20' />
-                        <h1 className='text-2xl font-semibold tracking-tight'>
-                            Forgot your password?
+                        <Icons.logo className='h-20 w-20 mb-2' />
+                        <h1 className='text-2xl font-bold tracking-tight text-gray-900'>
+                            Forgot password?
                         </h1>
-                        <p className='text-muted-foreground'>
+                        <p className='text-sm text-muted-foreground'>
                             Enter your email and we&apos;ll send you a reset link.
                         </p>
                     </div>
 
                     <div className='grid gap-6'>
                         <form onSubmit={handleSubmit(onSubmit)}>
-                            <div className='grid gap-2'>
-                                <div className='grid gap-1 py-2'>
-                                    <Label htmlFor='email'>Email</Label>
+                            <div className='grid gap-4'>
+                                <div className='grid gap-2'>
+                                    <Label htmlFor='email' className='sr-only'>Email</Label>
                                     <Input
                                         {...register('email')}
                                         className={cn({
                                             'focus-visible:ring-red-500': errors.email,
                                         })}
-                                        placeholder='you@example.com'
+                                        placeholder='name@example.com'
                                     />
                                     {errors?.email && (
                                         <p className='text-sm text-red-500'>
@@ -106,7 +118,7 @@ const Page = () => {
                                     )}
                                 </div>
 
-                                <Button disabled={isLoading}>
+                                <Button disabled={isLoading} className='bg-black hover:bg-gray-800 text-white w-full'>
                                     {isLoading && (
                                         <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                                     )}
@@ -115,10 +127,21 @@ const Page = () => {
                             </div>
                         </form>
 
+                        <div className="relative">
+                            <div className="absolute inset-0 flex items-center">
+                                <span className="w-full border-t" />
+                            </div>
+                            <div className="relative flex justify-center text-xs uppercase">
+                                <span className="bg-white px-2 text-muted-foreground">
+                                    Or
+                                </span>
+                            </div>
+                        </div>
+
                         <Link
                             className={buttonVariants({
                                 variant: 'link',
-                                className: 'gap-1.5',
+                                className: 'gap-1.5 w-full text-center',
                             })}
                             href='/sign-in'>
                             Back to sign in
