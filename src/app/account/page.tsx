@@ -297,21 +297,21 @@ const AccountPage = () => {
                                 </div>
 
                                 <div className='space-y-4'>
-                                    {order.order_products.map((item: any, i: number) => (
+                                    {order.products.map((item: any, i: number) => (
                                         <div key={i} className="flex items-center gap-4">
                                             <div className="relative h-16 w-16 rounded-lg overflow-hidden bg-gray-100 border border-gray-200 shrink-0">
-                                                {item.product.images?.[0]?.image.url ? (
-                                                    <Image src={item.product.images[0].image.url} fill className="object-cover" alt={item.product.name} />
+                                                {item.imageUrl ? (
+                                                    <Image src={item.imageUrl} fill className="object-cover" alt={item.name} />
                                                 ) : (
                                                     <div className="flex h-full w-full items-center justify-center text-gray-400"><ShoppingBag className="h-6 w-6" /></div>
                                                 )}
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <h4 className="font-medium text-gray-900 truncate">{item.product.name}</h4>
-                                                <p className="text-sm text-gray-500">{formatPrice(item.product.price)}</p>
+                                                <h4 className="font-medium text-gray-900 truncate">{item.name}</h4>
+                                                <p className="text-sm text-gray-500">{formatPrice(item.price)}</p>
                                             </div>
                                             <Button variant="outline" size="sm" asChild>
-                                                <Link href={`/product/${item.product.id}`}>View</Link>
+                                                <Link href={`/product/${item.id}`}>View</Link>
                                             </Button>
                                         </div>
                                     ))}
