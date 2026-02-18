@@ -12,7 +12,7 @@ export const sendBrevoEmail = async ({
     subject,
     htmlContent,
     to,
-    sender = { email: 'creativecascade@email.com', name: 'Creative Cascade' },
+    sender = { email: process.env.GMAIL_USER || 'creativecascade@email.com', name: 'Creative Cascade' },
 }: BrevoEmailProps) => {
     const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
