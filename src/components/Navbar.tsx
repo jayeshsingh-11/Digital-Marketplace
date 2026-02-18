@@ -78,7 +78,7 @@ const Navbar = async () => {
                   </>
                 )}
 
-                <div className='ml-2 flow-root'>
+                <div className='ml-2 flow-root hidden lg:block'>
                   <Cart user={user} />
                 </div>
               </div>

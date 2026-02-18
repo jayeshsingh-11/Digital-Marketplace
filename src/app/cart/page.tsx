@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { useCart } from '@/hooks/use-cart'
 import { cn, formatPrice } from '@/lib/utils'
 import { trpc } from '@/trpc/client'
@@ -97,10 +97,10 @@ const Page = () => {
   const fee = 1
 
   return (
-    <div className='bg-white'>
+    <div className='bg-white min-h-screen'>
       <div className='mx-auto max-w-2xl px-4 pb-24 pt-16 sm:px-6 lg:max-w-7xl lg:px-8'>
-        <h1 className='text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl'>
-          Shopping Cart
+        <h1 className='text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl font-serif'>
+          Shopping Bag
         </h1>
 
         <div className='mt-12 lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-12 xl:gap-x-16'>
@@ -110,7 +110,7 @@ const Page = () => {
                 isMounted && items.length === 0,
             })}>
             <h2 className='sr-only'>
-              Items in your shopping cart
+              Items in your shopping bag
             </h2>
 
             {isMounted && items.length === 0 ? (
@@ -122,19 +122,25 @@ const Page = () => {
                     src='/empty-cart-fixed.png'
                     fill
                     loading='eager'
-                    alt='empty shopping cart hippo'
-                    className='mix-blend-multiply'
+                    alt='empty shopping cart'
+                    className='mix-blend-multiply opacity-50 grayscale'
                   />
                 </div>
-                <div className='mb-4'>
-                  <Logo />
-                </div>
-                <h3 className='font-semibold text-2xl'>
-                  Your cart is empty
+                <h3 className='font-semibold text-2xl text-gray-900'>
+                  Your bag is empty
                 </h3>
-                <p className='text-muted-foreground text-center'>
-                  Whoops! Nothing to show here yet.
+                <p className='text-muted-foreground text-center max-w-sm mx-auto mt-2'>
+                  Looks like you haven&apos;t added anything to your cart yet.
                 </p>
+                <Link
+                  href='/products'
+                  className={buttonVariants({
+                    variant: 'link',
+                    size: 'sm',
+                    className: 'text-sm text-blue-600 hover:text-blue-500 mt-4',
+                  })}>
+                  Start Shopping &rarr;
+                </Link>
               </div>
             ) : null}
 
@@ -151,18 +157,15 @@ const Page = () => {
                   const image = product.images?.[0]?.image || product.product_images?.[0]?.media
 
                   return (
-                    <li
-                      key={product.id}
-                      className='flex py-6 sm:py-10'>
+                    <li key={product.id} className='flex py-6 sm:py-10 group'>
                       <div className='flex-shrink-0'>
-                        <div className='relative h-24 w-24'>
-                          {image && typeof image !== 'string' &&
-                            image.url ? (
+                        <div className='relative h-24 w-24 sm:h-32 sm:w-32 rounded-xl overflow-hidden bg-gray-100 border border-gray-100'>
+                          {image && typeof image !== 'string' && image.url ? (
                             <Image
                               fill
                               src={image.url}
                               alt='product image'
-                              className='h-full w-full rounded-md object-cover object-center sm:h-48 sm:w-48'
+                              className='h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-300'
                             />
                           ) : null}
                         </div>
@@ -175,19 +178,19 @@ const Page = () => {
                               <h3 className='text-sm'>
                                 <Link
                                   href={`/product/${product.id}`}
-                                  className='font-medium text-gray-700 hover:text-gray-800'>
+                                  className='font-medium text-gray-900 hover:text-blue-600 transition-colors text-lg'>
                                   {product.name}
                                 </Link>
                               </h3>
                             </div>
 
                             <div className='mt-1 flex text-sm'>
-                              <p className='text-muted-foreground'>
-                                Category: {label}
+                              <p className='text-muted-foreground capitalize'>
+                                {label}
                               </p>
                             </div>
 
-                            <p className='mt-1 text-sm font-medium text-gray-900'>
+                            <p className='mt-2 text-sm font-medium text-gray-900'>
                               {formatPrice(product.price)}
                             </p>
                           </div>
@@ -196,25 +199,19 @@ const Page = () => {
                             <div className='absolute right-0 top-0'>
                               <Button
                                 aria-label='remove product'
-                                onClick={() =>
-                                  removeItem(product.id)
-                                }
-                                variant='ghost'>
-                                <X
-                                  className='h-5 w-5'
-                                  aria-hidden='true'
-                                />
+                                onClick={() => removeItem(product.id)}
+                                variant='ghost'
+                                className='h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full'
+                              >
+                                <X className='h-4 w-4' aria-hidden='true' />
                               </Button>
                             </div>
                           </div>
                         </div>
 
-                        <p className='mt-4 flex space-x-2 text-sm text-gray-700'>
-                          <Check className='h-5 w-5 flex-shrink-0 text-green-500' />
-
-                          <span>
-                            Eligible for instant delivery
-                          </span>
+                        <p className='mt-4 flex items-center space-x-2 text-sm text-gray-500'>
+                          <Check className='h-4 w-4 flex-shrink-0 text-emerald-500' />
+                          <span>Instant Delivery</span>
                         </p>
                       </div>
                     </li>
@@ -223,16 +220,14 @@ const Page = () => {
             </ul>
           </div>
 
-          <section className='mt-16 rounded-xl bg-gray-50 px-4 py-6 sm:p-6 lg:col-span-5 lg:mt-0 lg:p-8 border border-gray-100 shadow-sm'>
-            <h2 className='text-lg font-medium text-gray-900'>
+          <section className='mt-16 rounded-2xl bg-gray-50 px-4 py-6 sm:p-6 lg:col-span-5 lg:mt-0 lg:p-8 border border-gray-100 shadow-sm sticky top-24'>
+            <h2 className='text-lg font-medium text-gray-900 mb-6'>
               Order summary
             </h2>
 
-            <div className='mt-6 space-y-4'>
+            <div className='space-y-4'>
               <div className='flex items-center justify-between'>
-                <p className='text-sm text-gray-600'>
-                  Subtotal
-                </p>
+                <p className='text-sm text-gray-600'>Subtotal</p>
                 <p className='text-sm font-medium text-gray-900'>
                   {isMounted ? (
                     formatPrice(cartTotal)
@@ -244,7 +239,7 @@ const Page = () => {
 
               <div className='flex items-center justify-between border-t border-gray-200 pt-4'>
                 <div className='flex items-center text-sm text-muted-foreground'>
-                  <span>Flat Transaction Fee</span>
+                  <span>Transaction Fee</span>
                 </div>
                 <div className='text-sm font-medium text-gray-900'>
                   {isMounted ? (
@@ -256,10 +251,8 @@ const Page = () => {
               </div>
 
               <div className='flex items-center justify-between border-t border-gray-200 pt-4'>
-                <div className='text-base font-medium text-gray-900'>
-                  Order Total
-                </div>
-                <div className='text-base font-medium text-gray-900'>
+                <div className='text-base font-medium text-gray-900'>Order Total</div>
+                <div className='text-base font-bold text-gray-900'>
                   {isMounted ? (
                     formatPrice(cartTotal + fee)
                   ) : (
@@ -269,20 +262,29 @@ const Page = () => {
               </div>
             </div>
 
-            <div className='mt-6'>
+            <div className='mt-8'>
               <Button
-                // disabled={items.length === 0 || isLoading}
-                onClick={() => {
-                  console.log('Checkout button clicked')
-                  createCheckoutSession({ productIds })
-                }}
-                className='w-full bg-black hover:bg-zinc-900 text-white transition-colors'
+                disabled={items.length === 0 || isLoading}
+                onClick={() => createCheckoutSession({ productIds })}
+                className='w-full bg-black hover:bg-gray-900 text-white transition-all shadow-md hover:shadow-lg h-12 rounded-xl text-base'
                 size='lg'>
                 {isLoading ? (
-                  <Loader2 className='w-4 h-4 animate-spin mr-1.5' />
+                  <Loader2 className='w-4 h-4 animate-spin mr-2' />
                 ) : null}
                 Checkout
               </Button>
+            </div>
+
+            <div className='mt-6 flex justify-center text-center text-sm text-gray-500'>
+              <p>
+                or{' '}
+                <Link
+                  href='/products'
+                  className='font-medium text-blue-600 hover:text-blue-500 transition-colors'>
+                  Continue Shopping
+                  <span aria-hidden='true'> &rarr;</span>
+                </Link>
+              </p>
             </div>
           </section>
         </div>
