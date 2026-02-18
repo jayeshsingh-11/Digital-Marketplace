@@ -69,6 +69,50 @@ const NavbarSearch = ({ className, mobile }: NavbarSearchProps) => {
         }
     }, [debouncedQuery])
 
+    // Typewriter effect logic
+    const [placeholder, setPlaceholder] = useState('Search...')
+
+    useEffect(() => {
+        const terms = PRODUCT_CATEGORIES.map(c => `Search ${c.label}...`)
+        let currentTermIndex = 0
+        let currentCharIndex = 0
+        let isDeleting = false
+
+        const type = () => {
+            const currentTerm = terms[currentTermIndex]
+
+            if (isDeleting) {
+                setPlaceholder(currentTerm.substring(0, currentCharIndex - 1))
+                currentCharIndex--
+            } else {
+                setPlaceholder(currentTerm.substring(0, currentCharIndex + 1))
+                currentCharIndex++
+            }
+
+            let typeSpeed = 100
+
+            if (isDeleting) {
+                typeSpeed /= 2
+            }
+
+            if (!isDeleting && currentCharIndex === currentTerm.length) {
+                // Word complete
+                isDeleting = true
+                typeSpeed = 2000 // Pause at end
+            } else if (isDeleting && currentCharIndex === 0) {
+                isDeleting = false
+                currentTermIndex = (currentTermIndex + 1) % terms.length
+                typeSpeed = 500
+            }
+
+            timer = setTimeout(type, typeSpeed)
+        }
+
+        let timer = setTimeout(type, 1000)
+
+        return () => clearTimeout(timer)
+    }, []) // Run once on mount
+
     return (
         <div ref={commandRef} className={cn('w-full relative', className)}>
             <div className={cn('relative flex items-center border border-gray-200 rounded-full bg-gray-50 hover:bg-white transition-all group focus-within:border-gray-300 focus-within:ring-2 focus-within:ring-gray-100 shadow-sm', mobile ? 'h-9' : 'h-10')}>
@@ -87,7 +131,7 @@ const NavbarSearch = ({ className, mobile }: NavbarSearchProps) => {
                     onFocus={() => {
                         if (debouncedQuery.length > 0) setIsOpen(true)
                     }}
-                    placeholder='Search...'
+                    placeholder={placeholder}
                     className='flex-1 w-full bg-transparent border-none text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0 px-3 text-sm'
                 />
 
