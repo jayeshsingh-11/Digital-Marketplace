@@ -71,10 +71,15 @@ const AccountPage = () => {
     const [isUploading, setIsUploading] = useState(false)
 
     // Data Fetching
-    const { data: user, isLoading: isUserLoading } = trpc.auth.getUser.useQuery()
-    // We need profile data separate or from user? 
-    // trpc.profile.getProfile gives name, imageUrl, bio.
-    const { data: profile, isLoading: isProfileLoading, refetch: refetchProfile } = trpc.profile.getProfile.useQuery()
+    // profile contains 'email', 'name', 'imageUrl', 'bio'
+    const { data: profile, isLoading: isProfileLoading, refetch: refetchProfile, error: profileError } = trpc.profile.getProfile.useQuery(undefined, {
+        retry: false,
+        onError: (err) => {
+            if (err.data?.code === 'UNAUTHORIZED') {
+                router.push('/sign-in')
+            }
+        }
+    })
 
     // Mutations
     const { mutate: updateProfile, isLoading: isSaving } = trpc.profile.updateProfile.useMutation({
@@ -144,12 +149,12 @@ const AccountPage = () => {
     }
 
     // Handle Loading
-    if (isUserLoading || isProfileLoading) {
+    if (isProfileLoading) {
         return <AccountPageSkeleton />
     }
 
-    if (!user) {
-        router.push('/sign-in')
+    if (!profile) {
+        // Handled by onError redirect, but safe return
         return null
     }
 
@@ -169,7 +174,7 @@ const AccountPage = () => {
                 </div>
             </div>
             <h2 className='text-xl font-bold text-gray-900'>{profile?.name || 'User'}</h2>
-            <p className='text-sm text-gray-500 mb-2'>{user.email}</p>
+            <p className='text-sm text-gray-500 mb-2'>{profile?.email}</p>
             {profile?.bio && (
                 <p className='text-sm text-gray-600 max-w-xs mx-auto line-clamp-2'>
                     {profile.bio}
@@ -362,7 +367,7 @@ const AccountPage = () => {
 
                     <div className="grid gap-2">
                         <Label htmlFor="email">Email</Label>
-                        <Input value={user.email} disabled className="bg-gray-50 text-gray-500" />
+                        <Input value={profile?.email || ''} disabled className="bg-gray-50 text-gray-500" />
                         <p className="text-xs text-gray-400">Email cannot be changed.</p>
                     </div>
 
