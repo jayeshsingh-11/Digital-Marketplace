@@ -289,7 +289,7 @@ const AccountPage = () => {
                                     </div>
                                     <div>
                                         <p className='text-xs text-gray-500 uppercase tracking-wide font-medium'>Total Amount</p>
-                                        <p className='font-bold text-gray-900'>{formatPrice(order.total)}</p>
+                                        <p className='font-bold text-gray-900'>{formatPrice(order.amount)}</p>
                                     </div>
                                     <div className='inline-flex px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium'>
                                         Paid
