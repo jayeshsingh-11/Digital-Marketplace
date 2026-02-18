@@ -15,7 +15,7 @@ const Footer = () => {
     '/reset-password-confirm',
   ]
 
-  if (pathname.startsWith('/admin') || pathsToHide.includes(pathname)) {
+  if (pathname.startsWith('/admin') || pathname.startsWith('/seller') || pathname === '/account' || pathsToHide.includes(pathname)) {
     return null
   }
 
