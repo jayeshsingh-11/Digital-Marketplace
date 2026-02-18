@@ -203,14 +203,14 @@ const AccountPage = () => {
             className={cn(
                 'w-full flex items-center justify-between p-4 rounded-xl transition-all duration-200 group',
                 activeTab === id
-                    ? 'bg-blue-50 text-blue-700 shadow-sm ring-1 ring-blue-100'
+                    ? 'bg-zinc-100 text-zinc-900 shadow-sm ring-1 ring-gray-200'
                     : 'hover:bg-gray-50 text-gray-600'
             )}
         >
             <div className='flex items-center gap-4'>
                 <div className={cn(
                     'p-2 rounded-lg transition-colors',
-                    activeTab === id ? 'bg-blue-100/50 text-blue-600' : 'bg-gray-100 text-gray-500 group-hover:text-gray-700'
+                    activeTab === id ? 'bg-white text-zinc-900 shadow-sm' : 'bg-gray-100 text-gray-500 group-hover:text-gray-700'
                 )}>
                     <Icon className='h-5 w-5' />
                 </div>
@@ -218,7 +218,7 @@ const AccountPage = () => {
             </div>
             <ChevronRight className={cn(
                 'h-5 w-5 text-gray-400 transition-transform',
-                activeTab === id ? 'text-blue-400' : 'group-hover:translate-x-1'
+                activeTab === id ? 'text-zinc-900' : 'group-hover:translate-x-1'
             )} />
         </button>
     )
@@ -361,7 +361,7 @@ const AccountPage = () => {
                 <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
                     <div className="grid gap-2">
                         <Label htmlFor="name">Full Name</Label>
-                        <Input {...form.register('name')} id="name" placeholder="John Doe" />
+                        <Input {...form.register('name')} id="name" placeholder="John Doe" className="focus-visible:ring-black" />
                         {form.formState.errors.name && <p className="text-sm text-red-500">{form.formState.errors.name.message}</p>}
                     </div>
 
@@ -373,11 +373,11 @@ const AccountPage = () => {
 
                     <div className="grid gap-2">
                         <Label htmlFor="bio">Bio</Label>
-                        <Textarea {...form.register('bio')} id="bio" placeholder="Tell us a bit about yourself..." className="resize-none min-h-[100px]" />
+                        <Textarea {...form.register('bio')} id="bio" placeholder="Tell us a bit about yourself..." className="resize-none min-h-[100px] focus-visible:ring-black" />
                     </div>
 
                     <div className="flex justify-end pt-4">
-                        <Button type="submit" disabled={isSaving}>
+                        <Button type="submit" disabled={isSaving} className='bg-black hover:bg-zinc-800 text-white'>
                             {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Save Changes
                         </Button>
@@ -393,7 +393,7 @@ const AccountPage = () => {
                     </div>
                     <Dialog>
                         <DialogTrigger asChild>
-                            <Button variant="destructive" className="bg-red-600 hover:bg-red-700 border-red-600">Delete</Button>
+                            <Button variant="ghost" className="bg-red-50 text-red-600 hover:bg-red-100 border border-red-100">Delete</Button>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
@@ -471,7 +471,7 @@ const AccountPage = () => {
                             </div>
                             <button
                                 onClick={signOut}
-                                className='w-full flex items-center justify-center gap-2 p-4 rounded-xl bg-red-600 text-white font-medium hover:bg-red-700 transition-colors shadow-sm'
+                                className='w-full flex items-center justify-center gap-2 p-4 rounded-xl bg-red-50 text-red-600 font-medium hover:bg-red-100 transition-colors'
                             >
                                 <LogOut className='h-5 w-5' />
                                 Log Out
