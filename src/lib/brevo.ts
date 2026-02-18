@@ -12,7 +12,7 @@ export const sendBrevoEmail = async ({
     subject,
     htmlContent,
     to,
-    sender = { email: process.env.GMAIL_USER || 'creativecascade@email.com', name: 'Creative Cascade' },
+    sender = { email: process.env.GMAIL_USER || 'techglow881@gmail.com', name: 'Creative Cascade' },
 }: BrevoEmailProps) => {
     console.log('Brevo: Preparing to send email...')
     console.log('Brevo Sender:', sender)
