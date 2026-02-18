@@ -4,6 +4,7 @@ import { trpc } from '@/trpc/client'
 import { useAuth } from '@/hooks/use-auth'
 import { formatPrice } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
+import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
 import Image from 'next/image'
 import { useState, useEffect, useRef } from 'react'
@@ -36,7 +37,6 @@ const NAV_ITEMS: { key: Section; label: string; icon: React.ElementType }[] = [
 ]
 
 // ─── Main Page ──────────────────────────────────────────────────
-// ─── Main Page ──────────────────────────────────────────────────
 export default function AccountPage() {
     const [activeSection, setActiveSection] = useState<Section>('orders')
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -60,11 +60,7 @@ export default function AccountPage() {
 
 
     if (profileLoading) {
-        return (
-            <div className='flex items-center justify-center min-h-screen'>
-                <Loader2 className='h-8 w-8 animate-spin text-blue-600' />
-            </div>
-        )
+        return <AccountPageSkeleton />
     }
 
     return (
@@ -187,6 +183,50 @@ export default function AccountPage() {
 function OrdersSection() {
     const { data: orders, isLoading } = trpc.profile.getMyOrders.useQuery()
 
+    if (isLoading) {
+        return (
+            <div className='space-y-6'>
+                <div>
+                    <Skeleton className='h-8 w-48 mb-2' />
+                    <Skeleton className='h-4 w-64' />
+                </div>
+                <div className='grid gap-6'>
+                    {[1, 2, 3].map((i) => (
+                        <div key={i} className='bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm'>
+                            <div className='bg-gray-50/50 px-6 py-4 flex items-center justify-between border-b border-gray-100'>
+                                <div className='flex items-center gap-4'>
+                                    <Skeleton className='h-4 w-24' />
+                                    <div className='h-8 w-px bg-gray-200 hidden sm:block' />
+                                    <Skeleton className='h-4 w-32' />
+                                </div>
+                                <Skeleton className='h-6 w-20 rounded-full' />
+                            </div>
+                            <div className='p-6 space-y-4'>
+                                <div className='flex gap-4'>
+                                    <Skeleton className='h-20 w-20 rounded-xl' />
+                                    <div className='flex-1'>
+                                        <div className='flex justify-between'>
+                                            <Skeleton className='h-5 w-1/3 mb-2' />
+                                            <Skeleton className='h-5 w-16' />
+                                        </div>
+                                        <Skeleton className='h-4 w-1/4' />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className='bg-gray-50/50 px-6 py-4 border-t border-gray-100 flex justify-between items-center'>
+                                <Skeleton className='h-4 w-24' />
+                                <div className='flex items-center gap-3'>
+                                    <Skeleton className='h-4 w-20' />
+                                    <Skeleton className='h-6 w-16' />
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className='space-y-6'>
             <div>
@@ -194,11 +234,7 @@ function OrdersSection() {
                 <p className='text-sm text-gray-500 mt-1'>View and manage your purchase history</p>
             </div>
 
-            {isLoading ? (
-                <div className='flex justify-center py-16'>
-                    <Loader2 className='h-8 w-8 animate-spin text-blue-600' />
-                </div>
-            ) : !orders || orders.length === 0 ? (
+            {!orders || orders.length === 0 ? (
                 <div className='bg-white rounded-2xl border border-gray-100 p-16 text-center shadow-sm'>
                     <div className='w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4'>
                         <Package className='h-8 w-8 text-gray-300' />
@@ -601,6 +637,42 @@ function SupportSection() {
             <p className='text-sm text-gray-400 mt-8'>
                 Average response time: &lt; 24 hours
             </p>
+        </div>
+    )
+}
+
+function AccountPageSkeleton() {
+    return (
+        <div className='min-h-screen bg-gray-50/50'>
+            <div className='flex flex-col lg:flex-row max-w-7xl mx-auto'>
+                {/* Sidebar Skeleton */}
+                <aside className='w-full lg:w-[280px] lg:min-h-[calc(100vh-4rem)] bg-white lg:border-r border-gray-200 p-6'>
+                    <div className='flex items-center gap-4 mb-8 p-4 bg-gray-50 rounded-2xl border border-gray-100'>
+                        <Skeleton className='h-14 w-14 rounded-full' />
+                        <div className='flex-1 space-y-2'>
+                            <Skeleton className='h-4 w-24' />
+                            <Skeleton className='h-3 w-32' />
+                        </div>
+                    </div>
+                    <div className='space-y-3'>
+                        {[1, 2, 3, 4].map((i) => (
+                            <Skeleton key={i} className='h-10 w-full rounded-xl' />
+                        ))}
+                    </div>
+                </aside>
+                {/* Main Content Skeleton */}
+                <main className='flex-1 p-6 lg:p-10'>
+                    <div className='space-y-6'>
+                        <Skeleton className='h-8 w-48 mb-2' />
+                        <Skeleton className='h-4 w-64' />
+                        <div className='space-y-6'>
+                            {[1, 2].map((i) => (
+                                <Skeleton key={i} className='h-48 w-full rounded-2xl' />
+                            ))}
+                        </div>
+                    </div>
+                </main>
+            </div>
         </div>
     )
 }
