@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/lib/supabase/client'
 import { Loader2 } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -29,7 +29,7 @@ const Page = () => {
     const router = useRouter()
     const searchParams = useSearchParams()
     // Supabase auth helpers handle the hash fragment automatically to set the session
-    const supabase = createClientComponentClient()
+    const supabase = createClient()
     const [isSessionCheckComplete, setIsSessionCheckComplete] = useState(false)
 
     const {
