@@ -64,7 +64,7 @@ const UserAccountNav = ({ user }: { user: User }) => {
         )}
 
         <DropdownMenuItem asChild>
-          <Link href='/account'>Account Settings</Link>
+          <Link href='/account'>My Profile</Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
