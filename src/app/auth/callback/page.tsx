@@ -13,31 +13,44 @@ const AuthCallbackPage = () => {
 
     useEffect(() => {
         const handleAuth = async () => {
-            // This handles both hash fragment (implicit) and code (PKCE) automatically
-            // provided the client is configured correctly.
-            const { data, error } = await supabase.auth.getSession()
+            console.log('Auth Callback: Checking session...')
+
+            // Check if we already have a session
+            const { data: { session }, error } = await supabase.auth.getSession()
 
             if (error) {
-                console.error('Auth Callback Error:', error)
+                console.error('Auth Callback: getSession Error:', error)
                 router.push('/auth/auth-code-error')
                 return
             }
 
-            if (data.session) {
-                console.log('Auth Callback Success: Session found')
+            if (session) {
+                console.log('Auth Callback: Session found immediately, redirecting to', next)
                 router.push(next)
-            } else {
-                // If no session yet, it might be processing the hash. 
-                // Wait for the onAuthStateChange event if needed, but getSession usually checks URL.
-                // Let's verify via listener
-                const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-                    if (event === 'SIGNED_IN' && session) {
-                        router.push(next)
-                    }
-                })
+                return
+            }
 
-                // Fallback catch-all if nothing happens quickly?
-                // For now, reliance on getSession + onAuthStateChange is standard.
+            console.log('Auth Callback: No session yet, setting up listener...')
+
+            // Listen for auth state changes (implicit flow should trigger SIGNED_IN)
+            const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+                console.log('Auth Callback: Auth Event:', event, session?.user?.email)
+                if (event === 'SIGNED_IN' && session) {
+                    console.log('Auth Callback: Signed In event received, redirecting...')
+                    router.push(next)
+                }
+            })
+
+            // Failsafe: If nothing happens in 10 seconds, redirect to sign-in or error
+            const timeoutId = setTimeout(() => {
+                console.warn('Auth Callback: Timeout reached without session.')
+                // Optional: redirect to sign-in or just show a message
+                // router.push('/sign-in') 
+            }, 10000)
+
+            return () => {
+                subscription.unsubscribe()
+                clearTimeout(timeoutId)
             }
         }
 
