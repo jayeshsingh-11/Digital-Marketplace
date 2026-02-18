@@ -301,7 +301,7 @@ function ProfileSection() {
 
     const handleSave = () => {
         updateProfile({
-            name: name || undefined,
+            name: name,
             bio: bio || undefined,
             imageUrl: avatarUrl || undefined,
         })
