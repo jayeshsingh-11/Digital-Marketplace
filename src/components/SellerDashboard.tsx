@@ -2,7 +2,7 @@
 
 import { User } from '@/payload-types'
 import { trpc } from '@/trpc/client'
-import { formatPrice } from '@/lib/utils'
+import { formatPrice, cn } from '@/lib/utils'
 import {
     Loader2,
     Users,
@@ -35,106 +35,111 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from './ui/dropdown-menu'
-import { cn } from '@/lib/utils'
+// ... imports
+import { Skeleton } from './ui/skeleton'
 
-type Tab = 'products' | 'orders' | 'analytics'
+function formatDate(date: string | Date) {
+    return new Date(date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    })
+}
 
 const SellerDashboard = ({ user }: { user: User }) => {
-    const [activeTab, setActiveTab] = useState<Tab>('products')
+    const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'analytics'>('products')
     const [productsPage, setProductsPage] = useState(1)
     const [ordersPage, setOrdersPage] = useState(1)
 
+    // Data Fetching
     const { data: stats, isLoading: statsLoading } = trpc.seller.getSellerStats.useQuery()
-    const { data: productsData, isLoading: productsLoading } = trpc.seller.getSellerProducts.useQuery({ page: productsPage, limit: 10 })
-    const { data: ordersData, isLoading: ordersLoading } = trpc.seller.getSellerOrders.useQuery({ page: ordersPage, limit: 10 })
 
-    const utils = trpc.useContext()
+    const {
+        data: productsData,
+        isLoading: productsLoading,
+        refetch: refetchProducts
+    } = trpc.seller.getSellerProducts.useQuery({
+        limit: 5,
+        page: productsPage
+    })
+
+    const {
+        data: ordersData,
+        isLoading: ordersLoading
+    } = trpc.seller.getSellerOrders.useQuery({
+        limit: 5,
+        page: ordersPage
+    })
 
     const { mutate: deleteProduct } = trpc.seller.deleteSellerProduct.useMutation({
         onSuccess: () => {
             toast.success('Product deleted')
-            utils.seller.getSellerProducts.invalidate()
-            utils.seller.getSellerStats.invalidate()
+            refetchProducts()
         },
         onError: (err) => {
-            toast.error('Failed to delete product')
-            console.error(err)
-        },
+            toast.error(err.message)
+        }
     })
-
-    const formatDate = (dateStr: string) => {
-        return new Date(dateStr).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-        })
-    }
 
     const statCards = [
         {
             label: 'Total Revenue',
-            value: stats?.totalRevenue != null ? formatPrice(stats.totalRevenue) : '-',
+            value: formatPrice(stats?.totalRevenue || 0),
             icon: DollarSign,
-            trend: '+12.5%',
-            trendUp: true,
-            description: 'from last month',
             color: 'text-emerald-600',
-            bg: 'bg-emerald-50',
             iconBg: 'bg-emerald-100',
+            trend: '+12.5%',
+            trendUp: true
         },
         {
             label: 'Total Orders',
-            value: stats?.totalOrders ?? '-',
+            value: stats?.totalOrders || 0,
             icon: ShoppingCart,
-            trend: '+5.2%',
-            trendUp: true,
-            description: 'from last month',
             color: 'text-blue-600',
-            bg: 'bg-blue-50',
             iconBg: 'bg-blue-100',
+            trend: '+3.2%',
+            trendUp: true
         },
         {
             label: 'Active Products',
-            value: stats?.totalProducts ?? '-',
+            value: stats?.totalProducts || 0,
             icon: Package,
-            trend: '+2',
-            trendUp: true,
-            description: 'new this month',
             color: 'text-violet-600',
-            bg: 'bg-violet-50',
             iconBg: 'bg-violet-100',
+            trend: '+2',
+            trendUp: true
         },
         {
-            label: 'Customers',
-            value: stats?.paidOrders ? stats.paidOrders * 1.2 : '-', // Mocking a bit for visual
-            icon: Users,
-            trend: '+2.4%',
-            trendUp: true,
-            description: 'from last month',
-            color: 'text-amber-600',
-            bg: 'bg-amber-50',
-            iconBg: 'bg-amber-100',
-        },
+            label: 'Paid Orders',
+            value: stats?.paidOrders || 0,
+            icon: Shield,
+            color: 'text-orange-600',
+            iconBg: 'bg-orange-100',
+            trend: '-1.5%',
+            trendUp: false
+        }
     ]
 
     return (
         <div className='min-h-screen bg-gray-50/50 flex'>
             {/* Sidebar (Desktop) */}
-            <aside className='hidden md:flex flex-col w-64 bg-white border-r border-gray-200 fixed h-full z-10'>
-                <div className='p-6 flex items-center gap-3'>
-                    <div className='h-8 w-8 bg-black rounded-lg flex items-center justify-center'>
-                        <Store className='h-5 w-5 text-white' />
-                    </div>
-                    <span className='font-bold text-lg tracking-tight'>SellerCentral</span>
+            <aside className='hidden md:flex flex-col w-64 bg-white border-r border-gray-200 fixed h-full z-30'>
+                <div className='p-6 border-b border-gray-100'>
+                    <Link href='/' className='flex items-center gap-2'>
+                        <div className='h-8 w-8 bg-black rounded-lg flex items-center justify-center'>
+                            <Store className='h-5 w-5 text-white' />
+                        </div>
+                        <span className='font-bold text-xl tracking-tight'>Seller<span className='text-gray-400'>Hub</span></span>
+                    </Link>
                 </div>
 
-                <div className='flex-1 px-4 space-y-1 overflow-y-auto'>
+                <nav className='flex-1 p-4 space-y-1 overflow-y-auto'>
                     <button
                         onClick={() => setActiveTab('products')}
                         className={cn(
-                            'w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors',
+                            'w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all',
                             activeTab === 'products'
-                                ? 'bg-gray-100 text-gray-900'
+                                ? 'bg-black text-white shadow-lg shadow-black/10'
                                 : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                         )}
                     >
@@ -144,9 +149,9 @@ const SellerDashboard = ({ user }: { user: User }) => {
                     <button
                         onClick={() => setActiveTab('orders')}
                         className={cn(
-                            'w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors',
+                            'w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all',
                             activeTab === 'orders'
-                                ? 'bg-gray-100 text-gray-900'
+                                ? 'bg-black text-white shadow-lg shadow-black/10'
                                 : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                         )}
                     >
@@ -156,71 +161,63 @@ const SellerDashboard = ({ user }: { user: User }) => {
                     <button
                         onClick={() => setActiveTab('analytics')}
                         className={cn(
-                            'w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors',
+                            'w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all',
                             activeTab === 'analytics'
-                                ? 'bg-gray-100 text-gray-900'
+                                ? 'bg-black text-white shadow-lg shadow-black/10'
                                 : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                         )}
                     >
                         <TrendingUp className='h-5 w-5' />
                         Analytics
                     </button>
-                </div>
+                </nav>
 
-                <div className='p-4 border-t border-gray-200'>
-                    <div className='flex items-center gap-3 p-2 rounded-lg bg-gray-50'>
-                        <div className='h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center'>
-                            <span className='text-xs font-medium text-indigo-700'>
-                                {user.email.substring(0, 2).toUpperCase()}
-                            </span>
+                <div className='p-4 border-t border-gray-100'>
+                    <Link href='/seller/products/new'>
+                        <div className={cn(buttonVariants({ variant: 'default', size: 'lg' }), 'w-full shadow-lg shadow-blue-500/20')}>
+                            <Plus className='h-4 w-4 mr-2' />
+                            New Product
                         </div>
-                        <div className='flex-1 min-w-0'>
-                            <p className='text-sm font-medium text-gray-900 truncate'>{user.email}</p>
-                            <p className='text-xs text-gray-500 truncate'>Seller Account</p>
-                        </div>
-                    </div>
+                    </Link>
                 </div>
             </aside>
 
             {/* Main Content */}
-            <main className='flex-1 md:ml-64 min-h-screen'>
-                <header className='bg-white border-b border-gray-200 sticky top-0 z-20'>
-                    <div className='px-4 md:px-8 py-4 flex items-center justify-between'>
-                        <div>
-                            <h1 className='text-xl md:text-2xl font-bold text-gray-900 tracking-tight'>
-                                {activeTab === 'products' && 'Products'}
-                                {activeTab === 'orders' && 'Orders'}
-                                {activeTab === 'analytics' && 'Analytics'}
-                            </h1>
-                        </div>
-                        <div className='flex items-center gap-2 md:gap-4'>
-                            <Link
-                                href='/'
-                                className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'hidden md:flex' })}
-                            >
-                                <ArrowUpRight className='mr-2 h-4 w-4' />
-                                View Store
-                            </Link>
-                            <Link
-                                href='/seller/products/new'
-                                className={buttonVariants({ variant: 'default', size: 'sm', className: 'bg-black hover:bg-gray-800' })}
-                            >
-                                <Plus className='mr-2 h-4 w-4' />
-                                <span className="hidden md:inline">Create Product</span>
-                                <span className="md:hidden">Create</span>
-                            </Link>
-                        </div>
+            <main className='flex-1 md:ml-64 min-h-screen pb-24 md:pb-0'>
+                <header className='bg-white border-b border-gray-200 sticky top-0 z-20 pt-4 pb-12 md:py-8 px-4 md:px-8 flex items-center justify-between'>
+                    <div className="flex items-center gap-4 md:hidden">
+                        <Link href='/' className='bg-black p-2 rounded-lg'>
+                            <Store className='h-5 w-5 text-white' />
+                        </Link>
+                        <h1 className='text-lg font-bold'>Dashboard</h1>
                     </div>
 
-                    {/* Mobile Tab Navigation */}
-                    <div className="md:hidden border-t border-gray-100 px-4 overflow-x-auto no-scrollbar flex items-center gap-2 py-2">
+                    <div className='hidden md:block'>
+                        <h1 className='text-2xl font-bold text-gray-900'>
+                            {activeTab === 'products' ? 'Products' : activeTab === 'orders' ? 'Orders' : 'Analytics'}
+                        </h1>
+                        <p className='text-sm text-gray-500'>Manage your {activeTab} and view performance</p>
+                    </div>
+
+                    <div className='flex items-center gap-3'>
+                        <div className='hidden md:flex items-center gap-2 mr-2 text-sm text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100'>
+                            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                            Live Mode
+                        </div>
+                        <Link href='/account'>
+                            <div className="h-9 w-9 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors">
+                                <span className="font-bold text-xs">{user.email?.charAt(0).toUpperCase()}</span>
+                            </div>
+                        </Link>
+                    </div>
+
+                    {/* Mobile Tab Nav */}
+                    <div className='absolute bottom-0 left-0 w-full overflow-x-auto flex md:hidden bg-white border-t border-gray-100 no-scrollbar'>
                         <button
                             onClick={() => setActiveTab('products')}
                             className={cn(
-                                'flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-full whitespace-nowrap transition-colors border',
-                                activeTab === 'products'
-                                    ? 'bg-gray-900 text-white border-gray-900'
-                                    : 'bg-white text-gray-600 border-gray-200'
+                                'flex-1 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap px-4',
+                                activeTab === 'products' ? 'border-black text-black' : 'border-transparent text-gray-500'
                             )}
                         >
                             Products
@@ -228,10 +225,8 @@ const SellerDashboard = ({ user }: { user: User }) => {
                         <button
                             onClick={() => setActiveTab('orders')}
                             className={cn(
-                                'flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-full whitespace-nowrap transition-colors border',
-                                activeTab === 'orders'
-                                    ? 'bg-gray-900 text-white border-gray-900'
-                                    : 'bg-white text-gray-600 border-gray-200'
+                                'flex-1 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap px-4',
+                                activeTab === 'orders' ? 'border-black text-black' : 'border-transparent text-gray-500'
                             )}
                         >
                             Orders
@@ -239,22 +234,12 @@ const SellerDashboard = ({ user }: { user: User }) => {
                         <button
                             onClick={() => setActiveTab('analytics')}
                             className={cn(
-                                'flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-full whitespace-nowrap transition-colors border',
-                                activeTab === 'analytics'
-                                    ? 'bg-gray-900 text-white border-gray-900'
-                                    : 'bg-white text-gray-600 border-gray-200'
+                                'flex-1 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap px-4',
+                                activeTab === 'analytics' ? 'border-black text-black' : 'border-transparent text-gray-500'
                             )}
                         >
                             Analytics
                         </button>
-                        <Link
-                            href='/'
-                            className={cn(
-                                'flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-full whitespace-nowrap transition-colors border bg-white text-gray-600 border-gray-200'
-                            )}
-                        >
-                            Store
-                        </Link>
                     </div>
                 </header>
 
@@ -282,9 +267,13 @@ const SellerDashboard = ({ user }: { user: User }) => {
                                 </div>
                                 <div>
                                     <p className='text-sm font-medium text-gray-500'>{stat.label}</p>
-                                    <h3 className='text-2xl font-bold text-gray-900 mt-1'>
-                                        {statsLoading ? <Loader2 className='h-6 w-6 animate-spin' /> : stat.value}
-                                    </h3>
+                                    <div className='mt-1'>
+                                        {statsLoading ? (
+                                            <Skeleton className="h-8 w-24" />
+                                        ) : (
+                                            <h3 className='text-2xl font-bold text-gray-900'>{stat.value}</h3>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -292,25 +281,7 @@ const SellerDashboard = ({ user }: { user: User }) => {
 
                     {/* Content Area */}
                     <div className='bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden'>
-                        {/* Filters & Actions Bar */}
-                        <div className='p-5 border-b border-gray-200 flex flex-col sm:flex-row gap-4 justify-between items-center'>
-                            <div className='relative w-full sm:w-80'>
-                                <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
-                                <Input
-                                    placeholder='Search...'
-                                    className='pl-9 bg-gray-50 border-gray-200 focus:bg-white transition-colors'
-                                />
-                            </div>
-                            <div className='flex items-center gap-2 w-full sm:w-auto'>
-                                <button className='flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex-1 justify-center sm:flex-none sm:justify-start'>
-                                    <Filter className='h-4 w-4' />
-                                    Filter
-                                </button>
-                                <button className='flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex-1 justify-center sm:flex-none sm:justify-start'>
-                                    Export
-                                </button>
-                            </div>
-                        </div>
+                        {/* Filters ... */}
 
                         {/* Tables (Desktop) & Cards (Mobile) */}
                         {activeTab === 'products' && (
@@ -318,8 +289,10 @@ const SellerDashboard = ({ user }: { user: User }) => {
                                 {/* Desktop Table */}
                                 <div className='hidden md:block overflow-x-auto'>
                                     <table className='w-full'>
-                                        <thead>
-                                            <tr className='bg-gray-50/50 border-b border-gray-200'>
+                                        {/* thead ... */}
+                                        <thead className='bg-gray-50/50 border-b border-gray-200'>
+                                            {/* ... columns ... */}
+                                            <tr>
                                                 <th className='px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider'>Product</th>
                                                 <th className='px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider'>Price</th>
                                                 <th className='px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider'>Status</th>
@@ -330,11 +303,21 @@ const SellerDashboard = ({ user }: { user: User }) => {
                                         </thead>
                                         <tbody className='divide-y divide-gray-100'>
                                             {productsLoading ? (
-                                                <tr><td colSpan={6} className='p-12 text-center'><Loader2 className='h-8 w-8 animate-spin mx-auto text-gray-400' /></td></tr>
+                                                [...Array(5)].map((_, i) => (
+                                                    <tr key={i}>
+                                                        <td className='px-6 py-4'><div className="flex items-center gap-4"><Skeleton className="h-12 w-12 rounded-lg" /><div className="space-y-2"><Skeleton className="h-4 w-32" /><Skeleton className="h-3 w-20" /></div></div></td>
+                                                        <td className='px-6 py-4'><Skeleton className="h-4 w-16" /></td>
+                                                        <td className='px-6 py-4'><Skeleton className="h-5 w-16 rounded-full" /></td>
+                                                        <td className='px-6 py-4'><Skeleton className="h-4 w-8" /></td>
+                                                        <td className='px-6 py-4'><Skeleton className="h-4 w-24" /></td>
+                                                        <td className='px-6 py-4'><Skeleton className="h-8 w-8 rounded-lg ml-auto" /></td>
+                                                    </tr>
+                                                ))
                                             ) : productsData?.products.length === 0 ? (
                                                 <tr><td colSpan={6} className='p-12 text-center text-gray-500'>No products found.</td></tr>
                                             ) : (
                                                 productsData?.products.map((p) => (
+                                                    // ... row content
                                                     <tr key={p.id} className='hover:bg-gray-50/50 transition-colors group'>
                                                         <td className='px-6 py-4'>
                                                             <div className='flex items-center gap-4'>
@@ -397,11 +380,29 @@ const SellerDashboard = ({ user }: { user: User }) => {
                                 {/* Mobile Cards */}
                                 <div className='md:hidden space-y-4 p-4 bg-gray-50'>
                                     {productsLoading ? (
-                                        <div className='p-8 text-center'><Loader2 className='h-8 w-8 animate-spin mx-auto text-gray-400' /></div>
+                                        [...Array(3)].map((_, i) => (
+                                            <div key={i} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex gap-4'>
+                                                <Skeleton className="h-20 w-20 rounded-lg" />
+                                                <div className="flex-1 space-y-3">
+                                                    <div className="flex justify-between">
+                                                        <div className="space-y-1 flex-1">
+                                                            <Skeleton className="h-5 w-3/4" />
+                                                            <Skeleton className="h-3 w-1/2" />
+                                                        </div>
+                                                        <Skeleton className="h-8 w-8 rounded-full" />
+                                                    </div>
+                                                    <div className="flex justify-between items-end">
+                                                        <Skeleton className="h-6 w-20" />
+                                                        <Skeleton className="h-5 w-16 rounded-full" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))
                                     ) : productsData?.products.length === 0 ? (
                                         <div className='p-8 text-center text-gray-500'>No products found.</div>
                                     ) : (
                                         productsData?.products.map((p) => (
+                                            // ... mobile card content (unchanged)
                                             <div key={p.id} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex gap-4'>
                                                 <div className='h-20 w-20 rounded-lg bg-gray-100 border border-gray-200 flex-shrink-0 overflow-hidden relative'>
                                                     {p.imageUrl ? (
@@ -449,7 +450,7 @@ const SellerDashboard = ({ user }: { user: User }) => {
                                         ))
                                     )}
                                 </div>
-
+                                {/* Pagination ... */}
                                 {productsData && productsData.totalDocs > 0 && (
                                     <Pagination
                                         page={productsData.page ?? 1}
@@ -469,8 +470,9 @@ const SellerDashboard = ({ user }: { user: User }) => {
                                 {/* Desktop Table */}
                                 <div className='hidden md:block overflow-x-auto'>
                                     <table className='w-full'>
-                                        <thead>
-                                            <tr className='bg-gray-50/50 border-b border-gray-200'>
+                                        {/* thead ... */}
+                                        <thead className='bg-gray-50/50 border-b border-gray-200'>
+                                            <tr>
                                                 <th className='px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider'>Order ID</th>
                                                 <th className='px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider'>Products</th>
                                                 <th className='px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider'>Amount</th>
@@ -481,10 +483,20 @@ const SellerDashboard = ({ user }: { user: User }) => {
                                         </thead>
                                         <tbody className='divide-y divide-gray-100'>
                                             {ordersLoading ? (
-                                                <tr><td colSpan={6} className='p-12 text-center'><Loader2 className='h-8 w-8 animate-spin mx-auto text-gray-400' /></td></tr>
+                                                [...Array(5)].map((_, i) => (
+                                                    <tr key={i}>
+                                                        <td className='px-6 py-4'><Skeleton className="h-5 w-24 rounded" /></td>
+                                                        <td className='px-6 py-4'><div className="space-y-1"><Skeleton className="h-4 w-32" /><Skeleton className="h-4 w-24" /></div></td>
+                                                        <td className='px-6 py-4'><Skeleton className="h-5 w-16" /></td>
+                                                        <td className='px-6 py-4'><Skeleton className="h-4 w-24" /></td>
+                                                        <td className='px-6 py-4'><Skeleton className="h-5 w-16 rounded-full" /></td>
+                                                        <td className='px-6 py-4'><Skeleton className="h-4 w-12 ml-auto" /></td>
+                                                    </tr>
+                                                ))
                                             ) : ordersData?.orders.length === 0 ? (
                                                 <tr><td colSpan={6} className='p-12 text-center text-gray-500'>No orders found.</td></tr>
                                             ) : (
+                                                // ... orders mapping
                                                 ordersData?.orders.map((o) => (
                                                     <tr key={o.id} className='hover:bg-gray-50/50 transition-colors'>
                                                         <td className='px-6 py-4'>
@@ -524,11 +536,27 @@ const SellerDashboard = ({ user }: { user: User }) => {
                                 {/* Mobile Order Cards */}
                                 <div className='md:hidden space-y-4 p-4 bg-gray-50'>
                                     {ordersLoading ? (
-                                        <div className='p-8 text-center'><Loader2 className='h-8 w-8 animate-spin mx-auto text-gray-400' /></div>
+                                        [...Array(3)].map((_, i) => (
+                                            <div key={i} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4'>
+                                                <div className="flex justify-between">
+                                                    <Skeleton className="h-5 w-24" />
+                                                    <Skeleton className="h-5 w-16 rounded-full" />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Skeleton className="h-4 w-full" />
+                                                    <Skeleton className="h-4 w-2/3" />
+                                                </div>
+                                                <div className="flex justify-between items-center pt-2">
+                                                    <Skeleton className="h-6 w-20" />
+                                                    <Skeleton className="h-4 w-20" />
+                                                </div>
+                                            </div>
+                                        ))
                                     ) : ordersData?.orders.length === 0 ? (
                                         <div className='p-8 text-center text-gray-500'>No orders found.</div>
                                     ) : (
                                         ordersData?.orders.map((o) => (
+                                            // ... mobile order card (unchanged)
                                             <div key={o.id} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm'>
                                                 <div className="flex justify-between items-start border-b border-gray-100 pb-3 mb-3">
                                                     <div>
@@ -559,7 +587,6 @@ const SellerDashboard = ({ user }: { user: User }) => {
                                         ))
                                     )}
                                 </div>
-
                                 {ordersData && ordersData.totalDocs > 0 && (
                                     <Pagination
                                         page={ordersData.page ?? 1}

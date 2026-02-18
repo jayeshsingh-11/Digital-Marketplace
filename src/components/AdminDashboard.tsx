@@ -18,6 +18,7 @@ import {
 import { useState } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
+import { Skeleton } from './ui/skeleton'
 
 type Tab = 'users' | 'products' | 'orders'
 
@@ -148,11 +149,11 @@ const AdminDashboard = ({ user }: { user: User }) => {
                                     <stat.icon className={`h-4 w-4 ${stat.iconColor}`} />
                                 </div>
                             </div>
-                            <div className='text-2xl font-bold text-gray-900'>
+                            <div className='mt-2'>
                                 {statsLoading ? (
-                                    <Loader2 className='h-6 w-6 animate-spin text-gray-400' />
+                                    <Skeleton className="h-8 w-24" />
                                 ) : (
-                                    stat.value
+                                    <div className='text-2xl font-bold text-gray-900'>{stat.value}</div>
                                 )}
                             </div>
                         </div>
@@ -162,7 +163,7 @@ const AdminDashboard = ({ user }: { user: User }) => {
                 {/* Tabs */}
                 <div className='bg-white rounded-xl border border-gray-200 overflow-hidden'>
                     <div className='border-b border-gray-200'>
-                        <div className='flex'>
+                        <div className='flex overflow-x-auto no-scrollbar'>
                             {tabs.map((tab) => (
                                 <button
                                     key={tab.key}
@@ -192,7 +193,8 @@ const AdminDashboard = ({ user }: { user: User }) => {
                     {/* Users Table */}
                     {activeTab === 'users' && (
                         <div>
-                            <div className='overflow-x-auto'>
+                            {/* Desktop Table */}
+                            <div className='hidden md:block overflow-x-auto'>
                                 <table className='w-full'>
                                     <thead>
                                         <tr className='bg-gray-50'>
@@ -206,11 +208,16 @@ const AdminDashboard = ({ user }: { user: User }) => {
                                     </thead>
                                     <tbody className='divide-y divide-gray-100'>
                                         {usersLoading ? (
-                                            <tr>
-                                                <td colSpan={6} className='px-6 py-12 text-center'>
-                                                    <Loader2 className='h-6 w-6 animate-spin text-gray-400 mx-auto' />
-                                                </td>
-                                            </tr>
+                                            [...Array(5)].map((_, i) => (
+                                                <tr key={i}>
+                                                    <td className='px-6 py-4'><Skeleton className="h-4 w-48" /></td>
+                                                    <td className='px-6 py-4'><Skeleton className="h-5 w-16 rounded-full" /></td>
+                                                    <td className='px-6 py-4'><Skeleton className="h-4 w-8" /></td>
+                                                    <td className='px-6 py-4'><Skeleton className="h-5 w-12 rounded-full" /></td>
+                                                    <td className='px-6 py-4'><Skeleton className="h-4 w-24" /></td>
+                                                    <td className='px-6 py-4'><Skeleton className="h-8 w-8 rounded-lg" /></td>
+                                                </tr>
+                                            ))
                                         ) : usersData?.users.length === 0 ? (
                                             <tr>
                                                 <td colSpan={6} className='px-6 py-12 text-center text-gray-500'>No users found</td>
@@ -260,6 +267,63 @@ const AdminDashboard = ({ user }: { user: User }) => {
                                     </tbody>
                                 </table>
                             </div>
+
+                            {/* Mobile User Cards */}
+                            <div className='md:hidden space-y-4'>
+                                {usersLoading ? (
+                                    [...Array(3)].map((_, i) => (
+                                        <div key={i} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3'>
+                                            <div className="flex justify-between">
+                                                <Skeleton className="h-5 w-40" />
+                                                <Skeleton className="h-5 w-16 rounded-full" />
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <Skeleton className="h-4 w-20" />
+                                                <Skeleton className="h-4 w-12" />
+                                            </div>
+                                            <Skeleton className="h-4 w-24" />
+                                        </div>
+                                    ))
+                                ) : usersData?.users.length === 0 ? (
+                                    <div className='p-8 text-center text-gray-500'>No users found</div>
+                                ) : (
+                                    usersData?.users.map((u) => (
+                                        <div key={u.id} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm'>
+                                            <div className="flex justify-between items-start mb-2">
+                                                <div>
+                                                    <span className='text-sm font-medium text-gray-900 block mb-1'>{u.email}</span>
+                                                    <span className='text-xs text-gray-500'>{formatDate(u.createdAt)}</span>
+                                                </div>
+                                                <span
+                                                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${u.role === 'admin'
+                                                        ? 'bg-blue-100 text-blue-800'
+                                                        : 'bg-gray-100 text-gray-700'
+                                                        }`}>
+                                                    {u.role}
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between items-center pt-2 border-t border-gray-100 mt-2">
+                                                <div className="flex gap-3 text-xs text-gray-600">
+                                                    <span>{(u as any).productCount} Products</span>
+                                                    <span>{u.verified ? 'Verified' : 'Unverified'}</span>
+                                                </div>
+                                                {u.role !== 'admin' && (
+                                                    <button
+                                                        onClick={() => {
+                                                            if (confirm('Delete this user?')) {
+                                                                deleteUser({ userId: u.id })
+                                                            }
+                                                        }}
+                                                        className='p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors'>
+                                                        <Trash2 className='h-4 w-4' />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+
                             {usersData && (
                                 <Pagination
                                     page={usersData.page}
@@ -277,7 +341,8 @@ const AdminDashboard = ({ user }: { user: User }) => {
                     {/* Products Table */}
                     {activeTab === 'products' && (
                         <div>
-                            <div className='overflow-x-auto'>
+                            {/* Desktop Table */}
+                            <div className='hidden md:block overflow-x-auto'>
                                 <table className='w-full'>
                                     <thead>
                                         <tr className='bg-gray-50'>
@@ -291,11 +356,16 @@ const AdminDashboard = ({ user }: { user: User }) => {
                                     </thead>
                                     <tbody className='divide-y divide-gray-100'>
                                         {productsLoading ? (
-                                            <tr>
-                                                <td colSpan={6} className='px-6 py-12 text-center'>
-                                                    <Loader2 className='h-6 w-6 animate-spin text-gray-400 mx-auto' />
-                                                </td>
-                                            </tr>
+                                            [...Array(5)].map((_, i) => (
+                                                <tr key={i}>
+                                                    <td className='px-6 py-4'><Skeleton className="h-4 w-48" /></td>
+                                                    <td className='px-6 py-4'><Skeleton className="h-4 w-32" /></td>
+                                                    <td className='px-6 py-4'><Skeleton className="h-4 w-16" /></td>
+                                                    <td className='px-6 py-4'><Skeleton className="h-5 w-20 rounded-full" /></td>
+                                                    <td className='px-6 py-4'><Skeleton className="h-4 w-24" /></td>
+                                                    <td className='px-6 py-4'><Skeleton className="h-8 w-8 rounded-lg" /></td>
+                                                </tr>
+                                            ))
                                         ) : productsData?.products.length === 0 ? (
                                             <tr>
                                                 <td colSpan={6} className='px-6 py-12 text-center text-gray-500'>No products found</td>
@@ -331,6 +401,55 @@ const AdminDashboard = ({ user }: { user: User }) => {
                                     </tbody>
                                 </table>
                             </div>
+
+                            {/* Mobile Product Cards */}
+                            <div className='md:hidden space-y-4'>
+                                {productsLoading ? (
+                                    [...Array(3)].map((_, i) => (
+                                        <div key={i} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3'>
+                                            <div className="flex justify-between">
+                                                <Skeleton className="h-5 w-40" />
+                                                <Skeleton className="h-5 w-16" />
+                                            </div>
+                                            <Skeleton className="h-4 w-32" />
+                                            <div className="flex justify-between items-center mt-2">
+                                                <Skeleton className="h-5 w-20 rounded-full" />
+                                                <Skeleton className="h-8 w-8 rounded-lg" />
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : productsData?.products.length === 0 ? (
+                                    <div className='p-8 text-center text-gray-500'>No products found</div>
+                                ) : (
+                                    productsData?.products.map((p) => (
+                                        <div key={p.id} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm'>
+                                            <div className="flex justify-between items-start mb-2">
+                                                <div>
+                                                    <span className='text-sm font-medium text-gray-900 block'>{p.name}</span>
+                                                    <span className='text-xs text-gray-500'>{p.category}</span>
+                                                </div>
+                                                <span className='text-sm font-bold text-gray-900'>{formatPrice(p.price)}</span>
+                                            </div>
+                                            <div className="text-xs text-gray-600 mb-3">
+                                                Seller: {p.sellerEmail}
+                                            </div>
+                                            <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+                                                <span className='text-xs text-gray-400'>{formatDate(p.createdAt)}</span>
+                                                <button
+                                                    onClick={() => {
+                                                        if (confirm('Delete this product?')) {
+                                                            deleteProduct({ productId: p.id })
+                                                        }
+                                                    }}
+                                                    className='p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors'>
+                                                    <Trash2 className='h-4 w-4' />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+
                             {productsData && (
                                 <Pagination
                                     page={productsData.page}
@@ -348,7 +467,8 @@ const AdminDashboard = ({ user }: { user: User }) => {
                     {/* Orders Table */}
                     {activeTab === 'orders' && (
                         <div>
-                            <div className='overflow-x-auto'>
+                            {/* Desktop Table */}
+                            <div className='hidden md:block overflow-x-auto'>
                                 <table className='w-full'>
                                     <thead>
                                         <tr className='bg-gray-50'>
@@ -362,11 +482,16 @@ const AdminDashboard = ({ user }: { user: User }) => {
                                     </thead>
                                     <tbody className='divide-y divide-gray-100'>
                                         {ordersLoading ? (
-                                            <tr>
-                                                <td colSpan={6} className='px-6 py-12 text-center'>
-                                                    <Loader2 className='h-6 w-6 animate-spin text-gray-400 mx-auto' />
-                                                </td>
-                                            </tr>
+                                            [...Array(5)].map((_, i) => (
+                                                <tr key={i}>
+                                                    <td className='px-6 py-4'><Skeleton className="h-4 w-24" /></td>
+                                                    <td className='px-6 py-4'><Skeleton className="h-4 w-32" /></td>
+                                                    <td className='px-6 py-4'><Skeleton className="h-10 w-40" /></td>
+                                                    <td className='px-6 py-4'><Skeleton className="h-4 w-20" /></td>
+                                                    <td className='px-6 py-4'><Skeleton className="h-5 w-16 rounded-full" /></td>
+                                                    <td className='px-6 py-4'><Skeleton className="h-4 w-24" /></td>
+                                                </tr>
+                                            ))
                                         ) : ordersData?.orders.length === 0 ? (
                                             <tr>
                                                 <td colSpan={6} className='px-6 py-12 text-center text-gray-500'>No orders found</td>
@@ -406,6 +531,62 @@ const AdminDashboard = ({ user }: { user: User }) => {
                                     </tbody>
                                 </table>
                             </div>
+
+                            {/* Mobile Order Cards */}
+                            <div className='md:hidden space-y-4'>
+                                {ordersLoading ? (
+                                    [...Array(3)].map((_, i) => (
+                                        <div key={i} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3'>
+                                            <div className="flex justify-between">
+                                                <Skeleton className="h-5 w-24" />
+                                                <Skeleton className="h-5 w-16 rounded-full" />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <Skeleton className="h-4 w-full" />
+                                                <Skeleton className="h-4 w-2/3" />
+                                            </div>
+                                            <div className="flex justify-between items-center pt-2">
+                                                <Skeleton className="h-5 w-24" />
+                                                <Skeleton className="h-4 w-20" />
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : ordersData?.orders.length === 0 ? (
+                                    <div className='p-8 text-center text-gray-500'>No orders found</div>
+                                ) : (
+                                    ordersData?.orders.map((o) => (
+                                        <div key={o.id} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm'>
+                                            <div className="flex justify-between items-start mb-2">
+                                                <div className="flex flex-col">
+                                                    <span className='text-xs font-mono text-gray-500'>#{o.id.slice(0, 8)}</span>
+                                                    <span className='text-sm text-gray-600 mt-1'>{o.buyerEmail}</span>
+                                                </div>
+                                                <span
+                                                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${o.isPaid
+                                                        ? 'bg-green-100 text-green-800'
+                                                        : 'bg-red-100 text-red-800'
+                                                        }`}>
+                                                    {o.isPaid ? 'Paid' : 'Unpaid'}
+                                                </span>
+                                            </div>
+
+                                            <div className="bg-gray-50 p-2 rounded-lg my-3 space-y-1">
+                                                {o.products.map((prod: any, i: number) => (
+                                                    <div key={i} className='text-sm text-gray-900 truncate'>
+                                                        • {prod.name}
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+                                                <span className='text-lg font-bold text-gray-900'>{formatPrice(o.total)}</span>
+                                                <span className='text-xs text-gray-400'>{formatDate(o.createdAt)}</span>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+
                             {ordersData && (
                                 <Pagination
                                     page={ordersData.page}

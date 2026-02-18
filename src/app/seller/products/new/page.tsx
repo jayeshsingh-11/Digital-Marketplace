@@ -215,7 +215,7 @@ const Page = () => {
     }
 
     return (
-        <div className='min-h-screen bg-gray-50/50 py-8 md:py-12'>
+        <div className='min-h-screen bg-gray-50/50 py-8 md:py-12 pb-32'>
             <div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8'>
                 <div className='mb-8'>
                     <h1 className='text-2xl md:text-3xl font-bold text-gray-900 tracking-tight'>Create New Product</h1>
@@ -437,7 +437,7 @@ const Page = () => {
                                 </div>
                             </div>
 
-                            <div className='flex flex-col gap-3 sticky bottom-4 md:static'>
+                            <div className='flex flex-col gap-3 sticky bottom-24 md:static z-10'>
                                 <Button
                                     className='w-full bg-black hover:bg-zinc-900 text-white shadow-lg md:shadow-none h-12 text-base'
                                     size='lg'
