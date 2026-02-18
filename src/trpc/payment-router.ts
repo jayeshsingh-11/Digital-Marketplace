@@ -12,6 +12,7 @@ import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import { resend } from '@/lib/resend'
 import { ReceiptEmailHtml } from '@/components/emails/ReceiptEmail'
+import { sendBrevoEmail } from '@/lib/brevo'
 
 export const paymentRouter = router({
   createSession: privateProcedure
@@ -169,18 +170,20 @@ export const paymentRouter = router({
 
         if (email) {
           try {
-            const data = await resend.emails.send({
-              from: 'Creative Cascade <onboarding@resend.dev>',
-              to: [email],
-              subject: 'Thanks for your order! This includes your download links',
-              html: ReceiptEmailHtml({
-                date: new Date(),
-                email,
-                orderId: dbOrderId,
-                products,
-              }),
+            const htmlContent = await ReceiptEmailHtml({
+              date: new Date(),
+              email,
+              orderId: dbOrderId,
+              products,
             })
-            console.log('Order confirmation email sent successfully. ID:', (data as any)?.id || 'No ID returned')
+
+            const data = await sendBrevoEmail({
+              subject: 'Thanks for your order! This includes your download links',
+              to: [{ email, name: email.split('@')[0] }],
+              htmlContent,
+              sender: { email: 'creativecascade@email.com', name: 'Creative Cascade' }
+            })
+            console.log('Order confirmation email sent successfully. ID:', (data as any)?.messageId || 'No ID returned')
           } catch (error) {
             console.error('Failed to send order email. Error details:', error)
           }

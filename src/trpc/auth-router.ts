@@ -7,6 +7,7 @@ import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { resend } from '@/lib/resend'
 import { ResetPasswordEmailHtml } from '@/components/emails/ResetPasswordEmail'
+import { sendBrevoEmail } from '@/lib/brevo'
 
 export const authRouter = router({
   createUser: publicProcedure
@@ -153,17 +154,19 @@ export const authRouter = router({
       const resetLink = properties.action_link
 
       try {
-        await resend.emails.send({
-          from: 'Creative Cascade <onboarding@resend.dev>',
-          to: email,
+        const htmlContent = await ResetPasswordEmailHtml({
+          resetPasswordLink: resetLink,
+          userFirstname: email.split('@')[0]
+        })
+
+        await sendBrevoEmail({
           subject: 'Reset your password',
-          html: ResetPasswordEmailHtml({
-            resetPasswordLink: resetLink,
-            userFirstname: email.split('@')[0] // Fallback name
-          })
+          to: [{ email, name: email.split('@')[0] }], // Brevo expects array of objects
+          htmlContent,
+          sender: { email: 'creativecascade@email.com', name: 'Creative Cascade' } // Using a placeholder or valid sender
         })
       } catch (err) {
-        console.error('Error sending email:', err)
+        console.error('Error sending email via Brevo:', err)
         throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to send email.' })
       }
 
