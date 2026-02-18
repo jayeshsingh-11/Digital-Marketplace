@@ -35,7 +35,7 @@ export const ResetPasswordEmail = ({
                     <Section style={content}>
                         <Text style={welcomeText}>Hi {userFirstname},</Text>
                         <Text style={text}>
-                            Lost your key to the creative kingdom? No worries, we've got a spare key ready for you.
+                            Lost your key to the creative kingdom? No worries, we&apos;ve got a spare key ready for you.
                         </Text>
                         <Text style={text}>
                             Click the button below to reset your password and get back to creating.
@@ -49,7 +49,7 @@ export const ResetPasswordEmail = ({
                             </Button>
                         </Section>
                         <Text style={text}>
-                            If you didn't request a password reset, you can safely ignore this email.
+                            If you didn&apos;t request a password reset, you can safely ignore this email.
                         </Text>
                     </Section>
                     <Text style={footerText}>
