@@ -163,7 +163,7 @@ export const authRouter = router({
           subject: 'Reset your password',
           to: [{ email, name: email.split('@')[0] }], // Brevo expects array of objects
           htmlContent,
-          sender: { email: 'creativecascade@email.com', name: 'Creative Cascade' } // Using a placeholder or valid sender
+          // sender: { email: 'creativecascade@email.com', name: 'Creative Cascade' } // Removed to use default from brevo.ts
         })
       } catch (err) {
         console.error('Error sending email via Brevo:', err)

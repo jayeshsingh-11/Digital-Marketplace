@@ -181,7 +181,7 @@ export const paymentRouter = router({
               subject: 'Thanks for your order! This includes your download links',
               to: [{ email, name: email.split('@')[0] }],
               htmlContent,
-              sender: { email: 'creativecascade@email.com', name: 'Creative Cascade' }
+              // sender: { email: 'creativecascade@email.com', name: 'Creative Cascade' }
             })
             console.log('Order confirmation email sent successfully. ID:', (data as any)?.messageId || 'No ID returned')
           } catch (error) {

@@ -22,7 +22,7 @@ const runTest = async () => {
             subject: 'SMTP Test',
             htmlContent: '<h1>It Works!</h1><p>This email was sent using Nodemailer and Brevo SMTP.</p>',
             to: [{ email, name: 'Test User' }],
-            sender: { email: 'creativecascade@email.com', name: 'Creative Cascade Test' }
+            sender: { email: process.env.GMAIL_USER || 'techglow881@gmail.com', name: 'Creative Cascade Test' }
         })
         console.log('Test successful')
     } catch (err) {
