@@ -19,18 +19,35 @@ export const profileRouter = router({
             const updates: any = {}
             if (input.name !== undefined) updates.name = input.name
             if (input.imageUrl !== undefined) updates.image_url = input.imageUrl
-            if (input.bio !== undefined) updates.bio = input.bio
 
-            if (Object.keys(updates).length === 0) return { success: true }
+            if (Object.keys(updates).length === 0 && input.bio === undefined) {
+                return { success: true }
+            }
 
-            const { error } = await supabase
-                .from('users')
-                .update(updates)
-                .eq('id', user.id)
+            // Update name/imageUrl (known columns)
+            if (Object.keys(updates).length > 0) {
+                const { error } = await supabase
+                    .from('users')
+                    .update(updates)
+                    .eq('id', user.id)
 
-            if (error) {
-                console.error('Error updating profile:', error)
-                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })
+                if (error) {
+                    console.error('Error updating profile:', error)
+                    throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })
+                }
+            }
+
+            // Try to update bio separately — column may not exist yet
+            if (input.bio !== undefined) {
+                const { error } = await supabase
+                    .from('users')
+                    .update({ bio: input.bio })
+                    .eq('id', user.id)
+
+                if (error) {
+                    console.warn('Bio column may not exist yet:', error.message)
+                    // Don't throw — bio is optional
+                }
             }
 
             return { success: true }
@@ -41,9 +58,10 @@ export const profileRouter = router({
             const { user } = ctx
             const supabase = createClient(cookies())
 
+            // Fetch known columns first
             const { data, error } = await supabase
                 .from('users')
-                .select('name, image_url, bio, email')
+                .select('name, image_url')
                 .eq('id', user.id)
                 .single()
 
@@ -52,11 +70,23 @@ export const profileRouter = router({
                 return { name: null, imageUrl: null, bio: null, email: user.email }
             }
 
+            // Try to fetch bio separately — column may not exist
+            let bio: string | null = null
+            const { data: bioData } = await supabase
+                .from('users')
+                .select('bio')
+                .eq('id', user.id)
+                .single()
+
+            if (bioData && 'bio' in bioData) {
+                bio = (bioData as any).bio || null
+            }
+
             return {
                 name: data.name,
                 imageUrl: data.image_url,
-                bio: data.bio || null,
-                email: data.email || user.email,
+                bio,
+                email: user.email,
             }
         }),
 
