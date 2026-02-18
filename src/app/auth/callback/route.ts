@@ -2,8 +2,13 @@ import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: Request) {
     const { searchParams, origin } = new URL(request.url)
+    console.log('Auth Callback Hit!')
+    console.log('Request URL:', request.url)
+
     const code = searchParams.get('code')
     // if "next" is in param, use it as the redirect URL
     const next = searchParams.get('next') ?? '/'
