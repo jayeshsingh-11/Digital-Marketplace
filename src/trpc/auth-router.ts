@@ -137,11 +137,14 @@ export const authRouter = router({
         }
       )
 
+      const redirectUrl = `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/callback?next=/reset-password-confirm`
+      console.log('AuthRouter: Generated Redirect URL:', redirectUrl)
+
       const { data, error } = await supabaseAdmin.auth.admin.generateLink({
         type: 'recovery',
         email,
         options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/callback?next=/reset-password-confirm`,
+          redirectTo: redirectUrl,
         }
       })
 
