@@ -14,6 +14,15 @@ export const sendBrevoEmail = async ({
     to,
     sender = { email: process.env.GMAIL_USER || 'creativecascade@email.com', name: 'Creative Cascade' },
 }: BrevoEmailProps) => {
+    console.log('Brevo: Preparing to send email...')
+    console.log('Brevo Sender:', sender)
+    console.log('Brevo Recipient:', to)
+    console.log('Brevo SMTP Config:', {
+        user: process.env.SMTP_USER,
+        hasPass: !!process.env.SMTP_PASS,
+        host: process.env.SMTP_HOST
+    })
+
     const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
         port: Number(process.env.SMTP_PORT) || 587,

@@ -159,6 +159,9 @@ export const authRouter = router({
           userFirstname: email.split('@')[0]
         })
 
+        console.log('AuthRouter: Sending reset email to', email)
+        console.log('AuthRouter: Using GMAIL_USER env:', process.env.GMAIL_USER)
+
         await sendBrevoEmail({
           subject: 'Reset your password',
           to: [{ email, name: email.split('@')[0] }], // Brevo expects array of objects
