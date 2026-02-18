@@ -8,6 +8,8 @@ import { Toaster } from 'sonner'
 import './globals.css'
 import Footer from '@/components/Footer'
 import MobileBottomNav from '@/components/MobileBottomNav'
+import { createClient } from '@/lib/supabase/server'
+import { cookies } from 'next/headers'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' })
@@ -15,11 +17,14 @@ const dancingScript = Dancing_Script({ subsets: ['latin'], variable: '--font-cur
 
 export const metadata = constructMetadata()
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const supabase = createClient(cookies())
+  const { data: { user } } = await supabase.auth.getUser()
+
   return (
     <html lang='en' className='h-full'>
       <body
@@ -38,7 +43,7 @@ export default function RootLayout({
               {children}
             </div>
             <Footer />
-            <MobileBottomNav />
+            <MobileBottomNav user={user} />
           </Providers>
         </main>
 

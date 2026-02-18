@@ -5,8 +5,13 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { User as SupabaseUser } from '@supabase/supabase-js'
 
-const MobileBottomNav = () => {
+interface MobileBottomNavProps {
+    user: SupabaseUser | null
+}
+
+const MobileBottomNav = ({ user }: MobileBottomNavProps) => {
     const pathname = usePathname()
     const [isVisible, setIsVisible] = useState(true)
     const lastScrollY = useRef(0)
@@ -53,7 +58,7 @@ const MobileBottomNav = () => {
         {
             label: 'My Profile',
             icon: User,
-            href: '/account',
+            href: user ? '/account' : '/sign-in',
         },
         {
             label: 'Seller',
