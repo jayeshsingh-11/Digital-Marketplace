@@ -123,7 +123,11 @@ export const ReceiptEmail = ({
 
           {products.map((product, index) => {
             const image = product.product_images?.[0]?.media
-            const imageUrl = image?.url
+            let imageUrl = image?.url as string | undefined
+
+            if (imageUrl && imageUrl.startsWith('/')) {
+              imageUrl = `${serverUrl}${imageUrl}`
+            }
 
             return (
               <Section key={product.id || index} style={productRow}>
