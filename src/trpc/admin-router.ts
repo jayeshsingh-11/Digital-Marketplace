@@ -75,7 +75,7 @@ export const adminRouter = router({
             if (error || !authUsers) return { users: [], totalDocs: 0, totalPages: 0, hasNextPage: false, hasPrevPage: false, page }
 
             const userIds = authUsers.map(u => u.id)
-            const supabase = createClient(cookies())
+            const supabase = createAdminClient()
             const { data: profiles } = await supabase.from('users').select('id, role').in('id', userIds)
 
             const users = authUsers.map(u => {
@@ -121,7 +121,8 @@ export const adminRouter = router({
 
             // Fetch seller details
             const userIds = Array.from(new Set(products?.map(p => p.user_id) || []))
-            const { data: sellers } = await supabase
+            const adminSupabase = createAdminClient()
+            const { data: sellers } = await adminSupabase
                 .from('users')
                 .select('id, name')
                 .in('id', userIds)
@@ -170,7 +171,8 @@ export const adminRouter = router({
 
             // Fetch buyer details
             const userIds = Array.from(new Set(orders?.map(o => o.user_id) || []))
-            const { data: buyers } = await supabase
+            const adminSupabase = createAdminClient()
+            const { data: buyers } = await adminSupabase
                 .from('users')
                 .select('id, name')
                 .in('id', userIds)
