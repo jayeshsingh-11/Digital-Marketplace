@@ -411,7 +411,6 @@ const SellerDashboard = ({ user }: { user: User }) => {
                                         <div className='p-8 text-center text-gray-500'>No products found.</div>
                                     ) : (
                                         productsData?.products.map((p) => (
-                                            // ... mobile card content (unchanged)
                                             <div key={p.id} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col gap-4'>
                                                 <div className="flex gap-4">
                                                     <div className='h-24 w-24 rounded-lg bg-gray-100 border border-gray-200 flex-shrink-0 overflow-hidden relative'>
@@ -428,8 +427,12 @@ const SellerDashboard = ({ user }: { user: User }) => {
                                                         <div>
                                                             <div className="flex justify-between items-start gap-2">
                                                                 <div className='min-w-0'>
-                                                                    <h3 className='text-base font-bold text-gray-900 truncate leading-tight'>{p.name}</h3>
-                                                                    <p className='text-xs text-gray-500 mt-1'>{p.category}</p>
+                                                                    <h3 className='text-base font-bold text-gray-900 leading-tight mb-1'>{p.name}</h3>
+                                                                    <div className='flex flex-wrap gap-2 text-xs text-gray-500'>
+                                                                        <span className='bg-gray-100 px-2 py-0.5 rounded'>{p.category}</span>
+                                                                        <span>•</span>
+                                                                        <span>{formatDate(p.createdAt)}</span>
+                                                                    </div>
                                                                 </div>
                                                                 <DropdownMenu>
                                                                     <DropdownMenuTrigger asChild>
@@ -449,9 +452,9 @@ const SellerDashboard = ({ user }: { user: User }) => {
                                                                 </DropdownMenu>
                                                             </div>
                                                         </div>
-                                                        <div className="flex justify-between items-end mt-2">
+                                                        <div className="flex justify-between items-end mt-3">
                                                             <span className='text-lg font-bold text-gray-900'>{formatPrice(p.price)}</span>
-                                                            <span className='inline-flex items-center px-2 py-1 rounded-full text-[10px] font-medium bg-green-50 text-green-700 border border-green-100'>
+                                                            <span className='inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-100'>
                                                                 Available
                                                             </span>
                                                         </div>
@@ -461,7 +464,8 @@ const SellerDashboard = ({ user }: { user: User }) => {
                                         ))
                                     )}
                                 </div>
-                                {/* Pagination ... */}
+
+                                {/* Pagination */}
                                 {productsData && productsData.totalDocs > 0 && (
                                     <Pagination
                                         page={productsData.page ?? 1}
@@ -569,31 +573,32 @@ const SellerDashboard = ({ user }: { user: User }) => {
                                         ordersData?.orders.map((o) => (
                                             // ... mobile order card (unchanged)
                                             <div key={o.id} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col gap-3'>
-                                                <div className="flex justify-between items-start border-b border-gray-50 pb-3">
-                                                    <div className='space-y-1'>
-                                                        <div className='flex items-center gap-2'>
-                                                            <span className='font-mono text-xs font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded'>#{o.id.slice(0, 8)}</span>
-                                                            <span className='text-[10px] text-gray-400'>{formatDate(o.createdAt)}</span>
+                                                <div className="flex flex-col gap-2 border-b border-gray-50 pb-3">
+                                                    <div className="flex justify-between items-start">
+                                                        <div className='space-y-1'>
+                                                            <span className='font-mono text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded break-all select-all'>#{o.id}</span>
+                                                            <p className='text-xs text-gray-500'>{formatDate(o.createdAt)}</p>
                                                         </div>
-                                                        <p className='text-xs text-gray-500'>{o.products.length} item(s)</p>
+                                                        <span className={cn(
+                                                            'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border shrink-0',
+                                                            o.isPaid ? 'bg-green-50 text-green-700 border-green-100' : 'bg-yellow-50 text-yellow-700 border-yellow-100'
+                                                        )}>
+                                                            {o.isPaid ? 'Paid' : 'Pending'}
+                                                        </span>
                                                     </div>
-                                                    <span className={cn(
-                                                        'inline-flex items-center px-2 py-1 rounded-full text-[10px] font-medium border',
-                                                        o.isPaid ? 'bg-green-50 text-green-700 border-green-100' : 'bg-yellow-50 text-yellow-700 border-yellow-100'
-                                                    )}>
-                                                        {o.isPaid ? 'Paid' : 'Pending'}
-                                                    </span>
                                                 </div>
 
-                                                <div className="space-y-2">
+                                                <div className="space-y-1 py-1">
+                                                    <p className='text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2'>Items ({o.products.length})</p>
                                                     {o.products.map((prod: any, i: number) => (
-                                                        <div key={i} className='flex items-center justify-between text-sm'>
-                                                            <span className='text-gray-900 font-medium truncate flex-1 pr-4'>{prod.name}</span>
+                                                        <div key={i} className='flex items-start justify-between text-sm group py-1 border-b border-gray-50 last:border-0'>
+                                                            <span className='text-gray-900 font-medium leading-tight flex-1 mr-4'>{prod.name}</span>
+                                                            <span className='text-gray-600 font-medium whitespace-nowrap'>{formatPrice(prod.price)}</span>
                                                         </div>
                                                     ))}
                                                 </div>
 
-                                                <div className="flex justify-between items-center pt-3 border-t border-gray-50 mt-1">
+                                                <div className="flex justify-between items-center pt-3 border-t border-gray-100 mt-1">
                                                     <div className='flex flex-col'>
                                                         <span className='text-[10px] uppercase tracking-wider text-gray-500 font-semibold'>Total</span>
                                                         <span className='text-lg font-bold text-gray-900'>{formatPrice(o.total)}</span>

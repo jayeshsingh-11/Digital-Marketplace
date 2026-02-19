@@ -305,24 +305,32 @@ const AdminDashboard = ({ user }: { user: User }) => {
                                     <div className='p-8 text-center text-gray-500'>No users found</div>
                                 ) : (
                                     usersData?.users.map((u) => (
-                                        <div key={u.id} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm'>
-                                            <div className="flex justify-between items-start mb-2">
-                                                <div>
-                                                    <span className='text-sm font-medium text-gray-900 block mb-1'>{u.email}</span>
-                                                    <span className='text-xs text-gray-500'>{formatDate(u.createdAt)}</span>
+                                        <div key={u.id} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col gap-3'>
+                                            <div className="flex justify-between items-start">
+                                                <div className='min-w-0 pr-2'>
+                                                    <span className='text-sm font-bold text-gray-900 block break-all leading-tight mb-1'>{u.email}</span>
+                                                    <span className='text-xs text-gray-500'>Joined {formatDate(u.createdAt)}</span>
                                                 </div>
                                                 <span
-                                                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${u.role === 'admin'
+                                                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0 ${u.role === 'admin'
                                                         ? 'bg-blue-100 text-blue-800'
                                                         : 'bg-gray-100 text-gray-700'
                                                         }`}>
                                                     {u.role}
                                                 </span>
                                             </div>
-                                            <div className="flex justify-between items-center pt-2 border-t border-gray-100 mt-2">
-                                                <div className="flex gap-3 text-xs text-gray-600">
-                                                    <span>{(u as any).productCount} Products</span>
-                                                    <span>{u.verified ? 'Verified' : 'Unverified'}</span>
+                                            <div className="flex justify-between items-center pt-2 border-t border-gray-50">
+                                                <div className="flex gap-6">
+                                                    <div className='flex flex-col'>
+                                                        <span className='text-[10px] text-gray-400 uppercase tracking-wider font-semibold'>Products</span>
+                                                        <span className='text-sm font-medium text-gray-900'>{(u as any).productCount}</span>
+                                                    </div>
+                                                    <div className='flex flex-col'>
+                                                        <span className='text-[10px] text-gray-400 uppercase tracking-wider font-semibold'>Verified</span>
+                                                        <span className={cn('text-sm font-medium', u.verified ? 'text-green-600' : 'text-amber-600')}>
+                                                            {u.verified ? 'Yes' : 'No'}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                                 {u.role !== 'admin' && (
                                                     <button
@@ -331,7 +339,7 @@ const AdminDashboard = ({ user }: { user: User }) => {
                                                                 deleteUser({ userId: u.id })
                                                             }
                                                         }}
-                                                        className='p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors'>
+                                                        className='p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors -mr-2'>
                                                         <Trash2 className='h-4 w-4' />
                                                     </button>
                                                 )}
@@ -358,9 +366,10 @@ const AdminDashboard = ({ user }: { user: User }) => {
                     {/* Products Table */}
                     {activeTab === 'products' && (
                         <div>
-                            {/* Desktop Table */}
+                            {/* Desktop Table (unchanged) */}
                             <div className='hidden md:block overflow-x-auto'>
                                 <table className='w-full'>
+                                    {/* ... existing desktop table code ... */}
                                     <thead>
                                         <tr className='bg-gray-50'>
                                             <th className='px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider'>Name</th>
@@ -444,26 +453,34 @@ const AdminDashboard = ({ user }: { user: User }) => {
                                     <div className='p-8 text-center text-gray-500'>No products found</div>
                                 ) : (
                                     productsData?.products.map((p) => (
-                                        <div key={p.id} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm'>
-                                            <div className="flex justify-between items-start mb-2">
-                                                <div>
-                                                    <span className='text-sm font-medium text-gray-900 block'>{p.name}</span>
-                                                    <span className='text-xs text-gray-500'>{p.category}</span>
+                                        <div key={p.id} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col gap-3'>
+                                            <div className="flex justify-between items-start">
+                                                <div className="min-w-0 flex-1 pr-2">
+                                                    <span className='text-base font-bold text-gray-900 block leading-tight mb-1'>{p.name}</span>
+                                                    <span className='inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600'>
+                                                        {p.category}
+                                                    </span>
                                                 </div>
-                                                <span className='text-sm font-bold text-gray-900'>{formatPrice(p.price)}</span>
+                                                <span className='text-lg font-bold text-gray-900 whitespace-nowrap'>{formatPrice(p.price)}</span>
                                             </div>
-                                            <div className="text-xs text-gray-600 mb-3">
-                                                Seller: <span className="font-medium text-gray-900">{p.sellerName}</span>
+
+                                            <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                                <span className='text-[10px] text-gray-400 uppercase tracking-wider font-semibold block mb-1'>Seller</span>
+                                                <div className='flex flex-col'>
+                                                    <span className='text-sm font-medium text-gray-900'>{p.sellerName}</span>
+                                                    <span className='text-xs text-gray-500 break-all'>{p.sellerEmail}</span>
+                                                </div>
                                             </div>
-                                            <div className="flex justify-between items-center pt-2 border-t border-gray-100">
-                                                <span className='text-xs text-gray-400'>{formatDate(p.createdAt)}</span>
+
+                                            <div className="flex justify-between items-center pt-2 border-t border-gray-50">
+                                                <span className='text-xs text-gray-400'>Added {formatDate(p.createdAt)}</span>
                                                 <button
                                                     onClick={() => {
                                                         if (confirm('Delete this product?')) {
                                                             deleteProduct({ productId: p.id })
                                                         }
                                                     }}
-                                                    className='p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors'>
+                                                    className='p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors -mr-2'>
                                                     <Trash2 className='h-4 w-4' />
                                                 </button>
                                             </div>
@@ -489,9 +506,10 @@ const AdminDashboard = ({ user }: { user: User }) => {
                     {/* Orders Table */}
                     {activeTab === 'orders' && (
                         <div>
-                            {/* Desktop Table */}
+                            {/* Desktop Table (unchanged) */}
                             <div className='hidden md:block overflow-x-auto'>
                                 <table className='w-full'>
+                                    {/* ... existing desktop table code ... */}
                                     <thead>
                                         <tr className='bg-gray-50'>
                                             <th className='px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider'>Order ID</th>
@@ -582,15 +600,14 @@ const AdminDashboard = ({ user }: { user: User }) => {
                                     <div className='p-8 text-center text-gray-500'>No orders found</div>
                                 ) : (
                                     ordersData?.orders.map((o) => (
-                                        <div key={o.id} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm'>
-                                            <div className="flex justify-between items-start mb-2">
-                                                <div className="flex flex-col">
-                                                    <span className='text-xs font-mono text-gray-500'>#{o.id.slice(0, 8)}</span>
-                                                    <span className='text-sm font-medium text-gray-900 mt-1'>{o.buyerName}</span>
-                                                    <span className='text-xs text-gray-500'>{o.buyerEmail}</span>
+                                        <div key={o.id} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col gap-3'>
+                                            <div className="flex justify-between items-start border-b border-gray-50 pb-2">
+                                                <div className="flex flex-col gap-1">
+                                                    <span className='font-mono text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded break-all select-all w-fit'>#{o.id}</span>
+                                                    <span className='text-xs text-gray-500'>{formatDate(o.createdAt)}</span>
                                                 </div>
                                                 <span
-                                                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${o.isPaid
+                                                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0 ${o.isPaid
                                                         ? 'bg-green-100 text-green-800'
                                                         : 'bg-red-100 text-red-800'
                                                         }`}>
@@ -598,17 +615,27 @@ const AdminDashboard = ({ user }: { user: User }) => {
                                                 </span>
                                             </div>
 
-                                            <div className="bg-gray-50 p-2 rounded-lg my-3 space-y-1">
+                                            <div className="bg-blue-50/50 p-3 rounded-lg border border-blue-100">
+                                                <span className='text-[10px] text-blue-400 uppercase tracking-wider font-semibold block mb-1'>Buyer</span>
+                                                <div className='flex flex-col'>
+                                                    <span className='text-sm font-bold text-gray-900'>{o.buyerName}</span>
+                                                    <span className='text-xs text-gray-600 break-all'>{o.buyerEmail}</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-1">
+                                                <p className='text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2'>Items ({o.products.length})</p>
                                                 {o.products.map((prod: any, i: number) => (
-                                                    <div key={i} className='text-sm text-gray-900 truncate'>
-                                                        • {prod.name}
+                                                    <div key={i} className='flex items-start justify-between text-sm group py-1 border-b border-gray-50 last:border-0'>
+                                                        <span className='text-gray-900 font-medium leading-tight flex-1 mr-4'>{prod.name}</span>
+                                                        <span className='text-gray-600 font-medium whitespace-nowrap'>{formatPrice(prod.price)}</span>
                                                     </div>
                                                 ))}
                                             </div>
 
-                                            <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+                                            <div className="flex justify-between items-center pt-2 border-t border-gray-50 mt-1">
+                                                <span className='text-[10px] uppercase tracking-wider text-gray-500 font-semibold'>Total</span>
                                                 <span className='text-lg font-bold text-gray-900'>{formatPrice(o.total)}</span>
-                                                <span className='text-xs text-gray-400'>{formatDate(o.createdAt)}</span>
                                             </div>
                                         </div>
                                     ))
