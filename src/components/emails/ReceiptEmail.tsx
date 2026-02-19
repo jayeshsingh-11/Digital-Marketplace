@@ -60,11 +60,8 @@ export const ReceiptEmail = ({
           <Section style={headerSection}>
             <Row>
               <Column>
-                <Text style={logoText}>
-                  <span style={{ color: '#000000', fontWeight: 700, fontSize: '28px', letterSpacing: '-0.5px' }}>Creative</span>
-                  <span style={{ color: '#6366f1', fontWeight: 700, fontSize: '28px', letterSpacing: '-0.5px' }}> Cascade</span>
-                </Text>
-                <Text style={logoTagline}>Your Digital Marketplace</Text>
+                <Text style={logoCreative}>Creative</Text>
+                <Text style={logoCascade}>CASCADE</Text>
               </Column>
               <Column align='right'>
                 <Text style={receiptBadge}>✓ Payment Confirmed</Text>
@@ -215,8 +212,9 @@ export const ReceiptEmail = ({
 
           <Section>
             <Text style={footerBrand}>
-              <span style={{ color: '#000', fontWeight: 600 }}>Creative</span>
-              <span style={{ color: '#6366f1', fontWeight: 600 }}> Cascade</span>
+              <span style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontStyle: 'italic', color: '#000', fontWeight: 600, fontSize: '18px' }}>Creative</span>
+              <br />
+              <span style={{ color: '#374151', fontWeight: 600, fontSize: '10px', letterSpacing: '3px', textTransform: 'uppercase' as const }}>CASCADE</span>
             </Text>
             <Text style={footerLinks}>
               <Link href={`${serverUrl}/account`} style={footerLink}>Account</Link>
@@ -263,17 +261,26 @@ const headerSection = {
   padding: '0 0 16px 0',
 }
 
-const logoText = {
+const logoCreative = {
   margin: '0',
   padding: '0',
-  lineHeight: '1.2',
+  lineHeight: '1.1',
+  fontFamily: 'Georgia, "Times New Roman", serif',
+  fontStyle: 'italic' as const,
+  fontSize: '32px',
+  fontWeight: 700 as const,
+  color: '#000000',
 }
 
-const logoTagline = {
-  margin: '4px 0 0 0',
-  fontSize: '12px',
-  color: '#9ca3af',
-  fontWeight: 400 as const,
+const logoCascade = {
+  margin: '2px 0 0 0',
+  padding: '0',
+  fontSize: '11px',
+  fontWeight: 600 as const,
+  color: '#374151',
+  letterSpacing: '4px',
+  textTransform: 'uppercase' as const,
+  fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
 }
 
 const receiptBadge = {

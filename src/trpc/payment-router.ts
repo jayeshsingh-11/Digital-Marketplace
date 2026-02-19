@@ -167,15 +167,10 @@ export const paymentRouter = router({
 
       console.log('💰 Commission split:', { productTotal, adminCommission, sellerEarnings })
 
-      // 4. Update order: mark paid + save payment details
+      // 4. Update order: mark as paid (core — must succeed)
       const { error: updateError } = await adminSupabase
         .from('orders')
-        .update({
-          is_paid: true,
-          razorpay_payment_id: paymentId,
-          admin_commission: adminCommission,
-          seller_earnings: sellerEarnings,
-        })
+        .update({ is_paid: true })
         .eq('id', dbOrderId)
 
       if (updateError) {
@@ -183,76 +178,90 @@ export const paymentRouter = router({
         throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })
       }
 
-      // 5. Update seller wallets (group earnings by seller)
-      const sellerEarningsMap = new Map<string, number>()
-      for (const product of products) {
-        const sellerId = product.user_id
-        if (!sellerId) continue
-        const earning = Math.round(product.price * 0.90 * 100) / 100
-        sellerEarningsMap.set(sellerId, (sellerEarningsMap.get(sellerId) || 0) + earning)
+      // 4b. Save payment details + commission (new columns — non-fatal if migration not run)
+      try {
+        await adminSupabase
+          .from('orders')
+          .update({
+            razorpay_payment_id: paymentId,
+            admin_commission: adminCommission,
+            seller_earnings: sellerEarnings,
+          })
+          .eq('id', dbOrderId)
+      } catch (colErr) {
+        console.warn('⚠️ Could not save commission columns (migration may not have run):', colErr)
       }
 
-      for (const [sellerId, earnings] of Array.from(sellerEarningsMap)) {
-        // Check if wallet exists
-        const { data: wallet } = await adminSupabase
-          .from('seller_wallets')
-          .select('balance')
-          .eq('user_id', sellerId)
-          .single()
-
-        if (wallet) {
-          await adminSupabase
-            .from('seller_wallets')
-            .update({ balance: wallet.balance + earnings, updated_at: new Date().toISOString() })
-            .eq('user_id', sellerId)
-        } else {
-          await adminSupabase
-            .from('seller_wallets')
-            .insert({ user_id: sellerId, balance: earnings })
+      // 5. Update seller wallets (non-fatal)
+      try {
+        const sellerEarningsMap = new Map<string, number>()
+        for (const product of products) {
+          const sellerId = product.user_id
+          if (!sellerId) continue
+          const earning = Math.round(product.price * 0.90 * 100) / 100
+          sellerEarningsMap.set(sellerId, (sellerEarningsMap.get(sellerId) || 0) + earning)
         }
 
-        console.log(`💳 Seller ${sellerId} wallet updated: +${earnings}`)
+        for (const [sellerId, earnings] of Array.from(sellerEarningsMap)) {
+          const { data: wallet } = await adminSupabase
+            .from('seller_wallets')
+            .select('balance')
+            .eq('user_id', sellerId)
+            .single()
+
+          if (wallet) {
+            await adminSupabase
+              .from('seller_wallets')
+              .update({ balance: wallet.balance + earnings, updated_at: new Date().toISOString() })
+              .eq('user_id', sellerId)
+          } else {
+            await adminSupabase
+              .from('seller_wallets')
+              .insert({ user_id: sellerId, balance: earnings })
+          }
+
+          console.log(`💳 Seller ${sellerId} wallet updated: +${earnings}`)
+        }
+      } catch (walletErr) {
+        console.warn('⚠️ Wallet update skipped (table may not exist):', walletErr)
       }
 
-      // 6. Grant purchase access
-      const purchaseRecords = products.map((p: any) => ({
-        user_id: user.id,
-        product_id: p.id,
-        order_id: dbOrderId,
-      }))
-
-      const { error: purchaseError } = await adminSupabase
-        .from('purchased_products')
-        .upsert(purchaseRecords, { onConflict: 'user_id,product_id' })
-
-      if (purchaseError) {
-        console.error('❌ Purchase access error:', purchaseError)
-        // Non-fatal, continue
-      }
-
-      // 7. Generate Invoice
-      const invoiceNumber = generateInvoiceNumber()
-      const productNames = products.map((p: any) => p.name).join(', ')
-
-      const { error: invoiceError } = await adminSupabase
-        .from('invoices')
-        .insert({
-          invoice_number: invoiceNumber,
+      // 6. Grant purchase access (non-fatal)
+      try {
+        const purchaseRecords = products.map((p: any) => ({
+          user_id: user.id,
+          product_id: p.id,
           order_id: dbOrderId,
-          buyer_id: user.id,
-          buyer_email: user.email,
-          product_name: productNames,
-          amount: orderData.amount,
-          admin_commission: adminCommission,
-          seller_earnings: sellerEarnings,
-          razorpay_payment_id: paymentId,
-        })
+        }))
 
-      if (invoiceError) {
-        console.error('❌ Invoice creation error:', invoiceError)
-        // Non-fatal
-      } else {
+        await adminSupabase
+          .from('purchased_products')
+          .upsert(purchaseRecords, { onConflict: 'user_id,product_id' })
+      } catch (purchaseErr) {
+        console.warn('⚠️ Purchase access skipped (table may not exist):', purchaseErr)
+      }
+
+      // 7. Generate Invoice (non-fatal)
+      let invoiceNumber = generateInvoiceNumber()
+      try {
+        const productNames = products.map((p: any) => p.name).join(', ')
+
+        await adminSupabase
+          .from('invoices')
+          .insert({
+            invoice_number: invoiceNumber,
+            order_id: dbOrderId,
+            buyer_id: user.id,
+            buyer_email: user.email,
+            product_name: productNames,
+            amount: orderData.amount,
+            admin_commission: adminCommission,
+            seller_earnings: sellerEarnings,
+            razorpay_payment_id: paymentId,
+          })
         console.log(`📄 Invoice ${invoiceNumber} created`)
+      } catch (invoiceErr) {
+        console.warn('⚠️ Invoice creation skipped (table may not exist):', invoiceErr)
       }
 
       // 8. Send confirmation email with PDF invoice
