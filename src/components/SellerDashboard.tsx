@@ -200,6 +200,12 @@ const SellerDashboard = ({ user }: { user: User }) => {
                     </div>
 
                     <div className='flex items-center gap-3'>
+                        <Link href='/seller/products/new'>
+                            <div className={cn(buttonVariants({ variant: 'default', size: 'sm' }), 'bg-black hover:bg-zinc-800 shadow-sm')}>
+                                <Plus className='h-4 w-4 mr-1.5' />
+                                New Product
+                            </div>
+                        </Link>
                         <div className='hidden md:flex items-center gap-2 mr-2 text-sm text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100'>
                             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
                             Live Mode
@@ -611,6 +617,13 @@ const SellerDashboard = ({ user }: { user: User }) => {
                     </div>
                 </div>
             </main>
+
+            {/* Mobile FAB - New Product */}
+            <Link href='/seller/products/new' className='md:hidden fixed bottom-6 right-6 z-40'>
+                <div className='h-14 w-14 bg-black text-white rounded-full shadow-lg shadow-black/25 flex items-center justify-center hover:bg-zinc-800 transition-colors active:scale-95'>
+                    <Plus className='h-6 w-6' />
+                </div>
+            </Link>
         </div>
     )
 }
