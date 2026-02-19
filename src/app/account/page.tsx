@@ -4,9 +4,6 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import {
     Package,
     Settings,
@@ -53,13 +50,7 @@ import { AccountPageSkeleton } from '@/components/AccountPageSkeleton' // Assumi
 // I'll check if `src/components/AccountPageSkeleton.tsx` exists?
 // If not, I'll allow `activeUserQuery` active state to show a loader.
 
-// Define Schema for Profile
-const profileSchema = z.object({
-    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-    bio: z.string().optional(),
-})
 
-type ProfileFormValues = z.infer<typeof profileSchema>
 
 const AccountPage = () => {
     const router = useRouter()
@@ -100,22 +91,17 @@ const AccountPage = () => {
         onError: () => toast.error('Failed to delete account. Please try again.')
     })
 
-    // Form
-    const form = useForm<ProfileFormValues>({
-        resolver: zodResolver(profileSchema),
-        defaultValues: {
-            name: '',
-            bio: '',
-        },
-    })
+    // Profile form state (simple useState for reliability)
+    const [formName, setFormName] = useState('')
+    const [formBio, setFormBio] = useState('')
 
-    // Sync Form
+    // Sync form state with server data
     useEffect(() => {
         if (profile) {
-            form.setValue('name', profile.name || '')
-            form.setValue('bio', profile.bio || '')
+            setFormName(profile.name || '')
+            setFormBio(profile.bio || '')
         }
-    }, [profile, form])
+    }, [profile])
 
     // Image Upload
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -141,10 +127,16 @@ const AccountPage = () => {
         }
     }
 
-    const onSubmit = (data: ProfileFormValues) => {
+    const handleSaveProfile = (e: React.FormEvent) => {
+        e.preventDefault()
+        if (formName.trim().length < 2) {
+            toast.error('Name must be at least 2 characters.')
+            return
+        }
+        console.log('📤 Saving profile:', { name: formName, bio: formBio })
         updateProfile({
-            name: data.name,
-            bio: data.bio,
+            name: formName,
+            bio: formBio,
         })
     }
 
@@ -324,7 +316,8 @@ const AccountPage = () => {
         )
     }
 
-    const ProfileContent = () => (
+    // Profile form JSX (inlined to prevent re-mount on re-render)
+    const profileContentJSX = (
         <div className='space-y-8 max-w-2xl'>
             <div>
                 <h2 className='text-2xl font-bold text-gray-900'>Profile</h2>
@@ -358,11 +351,16 @@ const AccountPage = () => {
                     </div>
                 </div>
 
-                <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+                <form onSubmit={handleSaveProfile} className='space-y-6'>
                     <div className="grid gap-2">
                         <Label htmlFor="name">Full Name</Label>
-                        <Input {...form.register('name')} id="name" placeholder="John Doe" className="focus-visible:ring-black" />
-                        {form.formState.errors.name && <p className="text-sm text-red-500">{form.formState.errors.name.message}</p>}
+                        <Input
+                            id="name"
+                            placeholder="John Doe"
+                            className="focus-visible:ring-black"
+                            value={formName}
+                            onChange={(e) => setFormName(e.target.value)}
+                        />
                     </div>
 
                     <div className="grid gap-2">
@@ -373,7 +371,14 @@ const AccountPage = () => {
 
                     <div className="grid gap-2">
                         <Label htmlFor="bio">Bio</Label>
-                        <Textarea {...form.register('bio')} id="bio" placeholder="Tell us a bit about yourself..." className="resize-none min-h-[100px] focus-visible:ring-black" />
+                        <Textarea
+                            id="bio"
+                            placeholder="Tell us a bit about yourself..."
+                            className="resize-none min-h-[100px] focus-visible:ring-black"
+                            value={formBio}
+                            onChange={(e) => setFormBio(e.target.value)}
+                            maxLength={200}
+                        />
                     </div>
 
                     <div className="flex justify-end pt-4">
@@ -422,7 +427,8 @@ const AccountPage = () => {
         </div>
     )
 
-    const SettingsContent = () => (
+    // Settings content (inlined)
+    const settingsContentJSX = (
         <div className="text-center py-20">
             <div className="inline-flex p-4 rounded-full bg-gray-100 mb-4">
                 <Settings className="h-8 w-8 text-gray-400" />
@@ -432,7 +438,8 @@ const AccountPage = () => {
         </div>
     )
 
-    const SupportContent = () => (
+    // Support content (inlined)
+    const supportContentJSX = (
         <div className="text-center py-20">
             <div className="inline-flex p-4 rounded-full bg-gray-100 mb-4">
                 <LifeBuoy className="h-8 w-8 text-gray-400" />
@@ -452,9 +459,9 @@ const AccountPage = () => {
                     <Sidebar />
                     <div className="flex-1 min-w-0">
                         {activeTab === 'orders' && <OrdersContent />}
-                        {activeTab === 'profile' && <ProfileContent />}
-                        {activeTab === 'settings' && <SettingsContent />}
-                        {activeTab === 'support' && <SupportContent />}
+                        {activeTab === 'profile' && profileContentJSX}
+                        {activeTab === 'settings' && settingsContentJSX}
+                        {activeTab === 'support' && supportContentJSX}
                     </div>
                 </div>
 
@@ -497,9 +504,9 @@ const AccountPage = () => {
                             </div>
 
                             {activeTab === 'orders' && <OrdersContent />}
-                            {activeTab === 'profile' && <ProfileContent />}
-                            {activeTab === 'settings' && <SettingsContent />}
-                            {activeTab === 'support' && <SupportContent />}
+                            {activeTab === 'profile' && profileContentJSX}
+                            {activeTab === 'settings' && settingsContentJSX}
+                            {activeTab === 'support' && supportContentJSX}
                         </div>
                     )}
                 </div>

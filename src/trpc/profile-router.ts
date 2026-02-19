@@ -14,42 +14,39 @@ export const profileRouter = router({
         }))
         .mutation(async ({ ctx, input }) => {
             const { user } = ctx
-            const supabase = createClient(cookies())
+            // Use admin client to bypass RLS policies
+            const adminSupabase = createAdminClient()
 
             const updates: any = {}
             if (input.name !== undefined) updates.name = input.name
             if (input.imageUrl !== undefined) updates.image_url = input.imageUrl
+            if (input.bio !== undefined) updates.bio = input.bio
 
-            if (Object.keys(updates).length === 0 && input.bio === undefined) {
+            if (Object.keys(updates).length === 0) {
                 return { success: true }
             }
 
-            // Update name/imageUrl (known columns)
-            if (Object.keys(updates).length > 0) {
-                const { error } = await supabase
-                    .from('users')
-                    .update(updates)
-                    .eq('id', user.id)
+            console.log('📝 Updating profile for user:', user.id, 'with:', updates)
 
-                if (error) {
-                    console.error('Error updating profile:', error)
-                    throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })
-                }
+            const { error } = await adminSupabase
+                .from('users')
+                .update(updates)
+                .eq('id', user.id)
+
+            if (error) {
+                console.error('❌ PROFILE UPDATE ERROR:', {
+                    code: error.code,
+                    message: error.message,
+                    details: error.details,
+                    hint: error.hint
+                })
+                throw new TRPCError({
+                    code: 'INTERNAL_SERVER_ERROR',
+                    message: `Update failed: ${error.message}`
+                })
             }
 
-            // Try to update bio separately — column may not exist yet
-            if (input.bio !== undefined) {
-                const { error } = await supabase
-                    .from('users')
-                    .update({ bio: input.bio })
-                    .eq('id', user.id)
-
-                if (error) {
-                    console.warn('Bio column may not exist yet:', error.message)
-                    // Don't throw — bio is optional
-                }
-            }
-
+            console.log('✅ Profile updated successfully')
             return { success: true }
         }),
 
@@ -58,10 +55,9 @@ export const profileRouter = router({
             const { user } = ctx
             const supabase = createClient(cookies())
 
-            // Fetch known columns first
             const { data, error } = await supabase
                 .from('users')
-                .select('name, image_url')
+                .select('name, image_url, bio')
                 .eq('id', user.id)
                 .single()
 
@@ -70,22 +66,10 @@ export const profileRouter = router({
                 return { name: null, imageUrl: null, bio: null, email: user.email }
             }
 
-            // Try to fetch bio separately — column may not exist
-            let bio: string | null = null
-            const { data: bioData } = await supabase
-                .from('users')
-                .select('bio')
-                .eq('id', user.id)
-                .single()
-
-            if (bioData && 'bio' in bioData) {
-                bio = (bioData as any).bio || null
-            }
-
             return {
                 name: data.name,
                 imageUrl: data.image_url,
-                bio,
+                bio: data.bio,
                 email: user.email,
             }
         }),
