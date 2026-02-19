@@ -9,6 +9,7 @@ import PaymentStatus from '@/components/PaymentStatus'
 import { createClient } from '@/lib/supabase/server'
 import ClearCart from '@/components/ClearCart'
 import { buttonVariants } from '@/components/ui/button'
+import SecureDownloadButton from '@/components/SecureDownloadButton'
 
 interface PageProps {
   searchParams: {
@@ -109,10 +110,6 @@ const ThankYouPage = async ({
               <ul className='mt-6 divide-y divide-gray-200 border-t border-gray-200 text-sm font-medium text-muted-foreground'>
                 {products.map(
                   (product: any) => {
-                    const label = product.category
-
-                    const downloadUrl = product.product_files?.url as string
-
                     const image = product.product_images?.[0]?.media
 
                     return (
@@ -137,17 +134,15 @@ const ThankYouPage = async ({
                             </h3>
 
                             <p className='my-1'>
-                              Category: {label}
+                              Category: {product.category}
                             </p>
                           </div>
 
                           {order.is_paid ? (
-                            <a
-                              href={downloadUrl}
-                              download={product.name}
-                              className='text-blue-600 hover:text-blue-700 hover:underline underline-offset-2 transition-colors'>
-                              Download asset
-                            </a>
+                            <SecureDownloadButton
+                              productId={product.id}
+                              productName={product.name}
+                            />
                           ) : null}
                         </div>
 
