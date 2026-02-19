@@ -17,7 +17,6 @@ import {
     Trash2,
     PackageOpen,
     ArrowLeft,
-    ShoppingBag
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -37,6 +36,7 @@ import {
 } from '@/components/ui/dialog'
 import { trpc } from '@/trpc/client'
 import { cn, formatPrice } from '@/lib/utils'
+import { OrderCard } from '@/components/OrderCard'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import { useAuth } from '@/hooks/use-auth'
 import { createClient } from '@/lib/supabase/client'
@@ -272,55 +272,13 @@ const AccountPage = () => {
                         </Link>
                     </div>
                 ) : (
-                    <div className='space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar'>
+                    <div className='space-y-4 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar'>
                         {orders.map((order) => (
-                            <div key={order.id} className='bg-white border boundary border-gray-100 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow'>
-                                <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 border-b border-gray-100 pb-4'>
-                                    <div>
-                                        <p className='text-xs text-gray-500 uppercase tracking-wide font-medium'>Order ID</p>
-                                        <p className='font-mono text-sm text-gray-900'>#{order.id.slice(-8)}</p>
-                                    </div>
-                                    <div>
-                                        <p className='text-xs text-gray-500 uppercase tracking-wide font-medium'>Date Placed</p>
-                                        <p className='font-medium text-sm text-gray-900'>
-                                            {format(new Date(order.createdAt), 'dd MMM yyyy, hh:mm a')}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p className='text-xs text-gray-500 uppercase tracking-wide font-medium'>Total Amount</p>
-                                        <p className='font-bold text-gray-900'>{formatPrice(order.amount)}</p>
-                                    </div>
-                                    <div className='inline-flex px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium'>
-                                        Paid
-                                    </div>
-                                </div>
-
-                                <div className='space-y-4'>
-                                    {order.products.map((item: any, i: number) => (
-                                        <div key={i} className="flex items-center gap-4">
-                                            <div className="relative h-16 w-16 rounded-lg overflow-hidden bg-gray-100 border border-gray-200 shrink-0">
-                                                {item.imageUrl ? (
-                                                    <Image src={item.imageUrl} fill className="object-cover" alt={item.name} />
-                                                ) : (
-                                                    <div className="flex h-full w-full items-center justify-center text-gray-400"><ShoppingBag className="h-6 w-6" /></div>
-                                                )}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <h4 className="font-medium text-gray-900 truncate">{item.name}</h4>
-                                                <p className="text-sm text-gray-500">{formatPrice(item.price)}</p>
-                                            </div>
-                                            <Button variant="outline" size="sm" asChild>
-                                                <Link href={`/product/${item.id}`}>View</Link>
-                                            </Button>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
+                            <OrderCard key={order.id} order={order} />
                         ))}
                     </div>
-                )
-                }
-            </div >
+                )}
+            </div>
         )
     }
 

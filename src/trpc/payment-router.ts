@@ -438,6 +438,75 @@ export const paymentRouter = router({
       return invoice
     }),
 
+  // Download Invoice PDF
+  downloadInvoice: privateProcedure
+    .input(z.object({ orderId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const { user } = ctx
+      const { orderId } = input
+      const adminSupabase = createAdminClient() // Bypass RLS for order fetching
+
+      // 1. Fetch Invoice
+      const { data: invoice } = await adminSupabase
+        .from('invoices')
+        .select('*')
+        .eq('order_id', orderId)
+        .eq('buyer_id', user.id)
+        .single()
+
+      if (!invoice) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Invoice not found' })
+      }
+
+      // 2. Fetch Order Details (for product breakdown)
+      const { data: order } = await adminSupabase
+        .from('orders')
+        .select(`
+          *,
+          order_products (
+            products (
+              name,
+              price,
+              category
+            )
+          )
+        `)
+        .eq('id', orderId)
+        .single()
+
+      if (!order) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Order not found' })
+      }
+
+      const products = order.order_products.map((op: any) => op.products).filter(Boolean)
+      const productTotal = products.reduce((sum: number, p: any) => sum + (p.price || 0), 0)
+
+      // 3. Generate PDF
+      const pdfBuffer = await generateInvoicePDF({
+        invoiceNumber: invoice.invoice_number,
+        date: new Date(invoice.created_at),
+        buyerEmail: user.email,
+        buyerName: user.email.split('@')[0],
+        orderId: orderId,
+        razorpayPaymentId: invoice.razorpay_payment_id || 'N/A',
+        products: products.map((p: any) => ({
+          name: p.name,
+          category: p.category || 'Digital Asset',
+          price: p.price,
+        })),
+        subtotal: productTotal,
+        fee: 1,
+        total: order.amount,
+        adminCommission: invoice.admin_commission || 0,
+        sellerEarnings: invoice.seller_earnings || 0,
+      })
+
+      return {
+        pdfBase64: pdfBuffer.toString('base64'),
+        filename: `Invoice-${invoice.invoice_number}.pdf`
+      }
+    }),
+
   pollOrderStatus: privateProcedure
     .input(z.object({ orderId: z.string() }))
     .query(async ({ input }) => {
