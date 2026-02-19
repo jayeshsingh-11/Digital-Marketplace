@@ -278,39 +278,44 @@ export const paymentRouter = router({
             razorpayPaymentId: paymentId,
           })
 
-          // Generate PDF invoice
-          const pdfBuffer = await generateInvoicePDF({
-            invoiceNumber,
-            date: new Date(),
-            buyerEmail: user.email,
-            buyerName: user.email.split('@')[0],
-            orderId: dbOrderId,
-            razorpayPaymentId: paymentId,
-            products: products.map((p: any) => ({
-              name: p.name,
-              category: p.category || 'Digital Asset',
-              price: p.price,
-            })),
-            subtotal: productTotal,
-            fee: 1,
-            total: orderData.amount,
-            adminCommission,
-            sellerEarnings,
-          })
-
-          console.log(`📄 PDF invoice generated: ${invoiceNumber} (${pdfBuffer.length} bytes)`)
+          // Try to generate PDF (non-fatal — email sends regardless)
+          let emailAttachments: { filename: string; content: Buffer; contentType: string }[] = []
+          try {
+            const pdfBuffer = await generateInvoicePDF({
+              invoiceNumber,
+              date: new Date(),
+              buyerEmail: user.email,
+              buyerName: user.email.split('@')[0],
+              orderId: dbOrderId,
+              razorpayPaymentId: paymentId,
+              products: products.map((p: any) => ({
+                name: p.name,
+                category: p.category || 'Digital Asset',
+                price: p.price,
+              })),
+              subtotal: productTotal,
+              fee: 1,
+              total: orderData.amount,
+              adminCommission,
+              sellerEarnings,
+            })
+            console.log(`📄 PDF invoice generated: ${invoiceNumber} (${pdfBuffer.length} bytes)`)
+            emailAttachments = [{
+              filename: `Invoice-${invoiceNumber}.pdf`,
+              content: pdfBuffer,
+              contentType: 'application/pdf',
+            }]
+          } catch (pdfErr) {
+            console.warn('⚠️ PDF generation failed, sending email without attachment:', pdfErr)
+          }
 
           await sendBrevoEmail({
             subject: `Order Confirmed! Invoice ${invoiceNumber} — Your downloads are ready`,
             to: [{ email: user.email, name: user.email.split('@')[0] }],
             htmlContent,
-            attachments: [{
-              filename: `Invoice-${invoiceNumber}.pdf`,
-              content: pdfBuffer,
-              contentType: 'application/pdf',
-            }],
+            attachments: emailAttachments.length > 0 ? emailAttachments : undefined,
           })
-          console.log('📧 Confirmation email with PDF sent to', user.email)
+          console.log('📧 Confirmation email sent to', user.email)
         } catch (emailErr) {
           console.error('❌ Email send error:', emailErr)
         }
