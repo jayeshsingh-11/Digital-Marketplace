@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
+import { format } from 'date-fns'
 import {
     Package,
     Settings,
@@ -271,13 +272,19 @@ const AccountPage = () => {
                         </Link>
                     </div>
                 ) : (
-                    <div className='space-y-4'>
+                    <div className='space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar'>
                         {orders.map((order) => (
                             <div key={order.id} className='bg-white border boundary border-gray-100 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow'>
                                 <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 border-b border-gray-100 pb-4'>
                                     <div>
                                         <p className='text-xs text-gray-500 uppercase tracking-wide font-medium'>Order ID</p>
                                         <p className='font-mono text-sm text-gray-900'>#{order.id.slice(-8)}</p>
+                                    </div>
+                                    <div>
+                                        <p className='text-xs text-gray-500 uppercase tracking-wide font-medium'>Date Placed</p>
+                                        <p className='font-medium text-sm text-gray-900'>
+                                            {format(new Date(order.createdAt), 'dd MMM yyyy, hh:mm a')}
+                                        </p>
                                     </div>
                                     <div>
                                         <p className='text-xs text-gray-500 uppercase tracking-wide font-medium'>Total Amount</p>
@@ -311,8 +318,9 @@ const AccountPage = () => {
                             </div>
                         ))}
                     </div>
-                )}
-            </div>
+                )
+                }
+            </div >
         )
     }
 
