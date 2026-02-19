@@ -1,3 +1,5 @@
+import path from 'path'
+
 // @ts-ignore - pdfkit doesn't ship types
 import PDFDocument from 'pdfkit'
 
@@ -42,10 +44,13 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
         const grayColor = '#6b7280'
         const lightGray = '#f3f4f6'
 
+        // Use a font that is guaranteed to exist in Vercel (inside next package)
+        const fontPath = path.join(process.cwd(), 'node_modules', 'next', 'dist', 'compiled', '@vercel', 'og', 'noto-sans-v27-latin-regular.ttf')
+
         // ─── Header ─────────────────────────────────
         doc
             .fontSize(28)
-            .font('Helvetica-Bold')
+            .font(fontPath)
             .fillColor(darkColor)
             .text('Creative', 50, 50, { continued: true })
             .fillColor(accentColor)
@@ -53,20 +58,20 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
 
         doc
             .fontSize(10)
-            .font('Helvetica')
+            .font(fontPath)
             .fillColor(grayColor)
             .text('Your Digital Marketplace', 50, 82)
 
         // Invoice badge (right side)
         doc
             .fontSize(24)
-            .font('Helvetica-Bold')
+            .font(fontPath)
             .fillColor(darkColor)
             .text('INVOICE', 350, 50, { align: 'right' })
 
         doc
             .fontSize(10)
-            .font('Helvetica')
+            .font(fontPath)
             .fillColor(accentColor)
             .text(data.invoiceNumber, 350, 78, { align: 'right' })
 
@@ -82,28 +87,28 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
         let y = 125
 
         // Left column
-        doc.fontSize(9).font('Helvetica-Bold').fillColor(grayColor).text('BILL TO', 50, y)
+        doc.fontSize(9).font(fontPath).fillColor(grayColor).text('BILL TO', 50, y)
         y += 14
-        doc.fontSize(11).font('Helvetica').fillColor(darkColor).text(data.buyerName, 50, y)
+        doc.fontSize(11).font(fontPath).fillColor(darkColor).text(data.buyerName, 50, y)
         y += 15
-        doc.fontSize(10).font('Helvetica').fillColor(grayColor).text(data.buyerEmail, 50, y)
+        doc.fontSize(10).font(fontPath).fillColor(grayColor).text(data.buyerEmail, 50, y)
 
         // Right column
         let ry = 125
-        doc.fontSize(9).font('Helvetica-Bold').fillColor(grayColor).text('INVOICE DATE', 350, ry, { align: 'right' })
+        doc.fontSize(9).font(fontPath).fillColor(grayColor).text('INVOICE DATE', 350, ry, { align: 'right' })
         ry += 14
-        doc.fontSize(10).font('Helvetica').fillColor(darkColor).text(
+        doc.fontSize(10).font(fontPath).fillColor(darkColor).text(
             data.date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
             350, ry, { align: 'right' }
         )
         ry += 20
-        doc.fontSize(9).font('Helvetica-Bold').fillColor(grayColor).text('PAYMENT ID', 350, ry, { align: 'right' })
+        doc.fontSize(9).font(fontPath).fillColor(grayColor).text('PAYMENT ID', 350, ry, { align: 'right' })
         ry += 14
-        doc.fontSize(9).font('Helvetica').fillColor(darkColor).text(data.razorpayPaymentId, 350, ry, { align: 'right' })
+        doc.fontSize(9).font(fontPath).fillColor(darkColor).text(data.razorpayPaymentId, 350, ry, { align: 'right' })
         ry += 20
-        doc.fontSize(9).font('Helvetica-Bold').fillColor(grayColor).text('ORDER ID', 350, ry, { align: 'right' })
+        doc.fontSize(9).font(fontPath).fillColor(grayColor).text('ORDER ID', 350, ry, { align: 'right' })
         ry += 14
-        doc.fontSize(8).font('Helvetica').fillColor(grayColor).text(data.orderId, 300, ry, { align: 'right', width: 245 })
+        doc.fontSize(8).font(fontPath).fillColor(grayColor).text(data.orderId, 300, ry, { align: 'right', width: 245 })
 
         // ─── Products Table ─────────────────────────
         y = 240
@@ -115,7 +120,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
 
         doc
             .fontSize(9)
-            .font('Helvetica-Bold')
+            .font(fontPath)
             .fillColor('#ffffff')
             .text('#', 60, y + 9, { width: 30 })
             .text('PRODUCT', 90, y + 9, { width: 250 })
@@ -133,14 +138,14 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
 
             doc
                 .fontSize(9)
-                .font('Helvetica')
+                .font(fontPath)
                 .fillColor(darkColor)
                 .text(String(index + 1), 60, y + 9, { width: 30 })
                 .text(product.name, 90, y + 9, { width: 250 })
                 .fillColor(grayColor)
                 .text(product.category, 340, y + 9, { width: 100 })
                 .fillColor(darkColor)
-                .font('Helvetica-Bold')
+                .font(fontPath)
                 .text(`₹${product.price.toFixed(2)}`, 440, y + 9, { width: 100, align: 'right' })
 
             y += 28
@@ -150,13 +155,13 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
         y += 16
 
         // Subtotal
-        doc.fontSize(10).font('Helvetica').fillColor(grayColor).text('Subtotal', 340, y)
-        doc.fontSize(10).font('Helvetica').fillColor(darkColor).text(`₹${data.subtotal.toFixed(2)}`, 440, y, { width: 100, align: 'right' })
+        doc.fontSize(10).font(fontPath).fillColor(grayColor).text('Subtotal', 340, y)
+        doc.fontSize(10).font(fontPath).fillColor(darkColor).text(`₹${data.subtotal.toFixed(2)}`, 440, y, { width: 100, align: 'right' })
         y += 20
 
         // Fee
-        doc.fontSize(10).font('Helvetica').fillColor(grayColor).text('Transaction Fee', 340, y)
-        doc.fontSize(10).font('Helvetica').fillColor(darkColor).text(`₹${data.fee.toFixed(2)}`, 440, y, { width: 100, align: 'right' })
+        doc.fontSize(10).font(fontPath).fillColor(grayColor).text('Transaction Fee', 340, y)
+        doc.fontSize(10).font(fontPath).fillColor(darkColor).text(`₹${data.fee.toFixed(2)}`, 440, y, { width: 100, align: 'right' })
         y += 20
 
         // Divider
@@ -164,8 +169,8 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
         y += 10
 
         // Total
-        doc.fontSize(14).font('Helvetica-Bold').fillColor(darkColor).text('Total', 340, y)
-        doc.fontSize(14).font('Helvetica-Bold').fillColor(accentColor).text(`₹${data.total.toFixed(2)}`, 440, y, { width: 100, align: 'right' })
+        doc.fontSize(14).font(fontPath).fillColor(darkColor).text('Total', 340, y)
+        doc.fontSize(14).font(fontPath).fillColor(accentColor).text(`₹${data.total.toFixed(2)}`, 440, y, { width: 100, align: 'right' })
         y += 30
 
         // ─── Commission Breakdown ───────────────────
@@ -173,10 +178,10 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
         doc.rect(50, y, pageWidth, 50).fill('#faf5ff').stroke('#e9d5ff')
         y += 12
 
-        doc.fontSize(8).font('Helvetica-Bold').fillColor('#7c3aed').text('PAYMENT SPLIT', 65, y)
+        doc.fontSize(8).font(fontPath).fillColor('#7c3aed').text('PAYMENT SPLIT', 65, y)
         y += 14
 
-        doc.fontSize(9).font('Helvetica').fillColor(grayColor)
+        doc.fontSize(9).font(fontPath).fillColor(grayColor)
             .text('Platform Fee (10%)', 65, y)
             .text(`₹${data.adminCommission.toFixed(2)}`, 200, y)
             .text('Seller Earnings (90%)', 300, y)
@@ -190,7 +195,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
 
         doc
             .fontSize(9)
-            .font('Helvetica')
+            .font(fontPath)
             .fillColor(grayColor)
             .text('Thank you for your purchase on Creative Cascade!', 50, y, { align: 'center', width: pageWidth })
 
