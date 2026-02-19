@@ -119,16 +119,25 @@ export const adminRouter = router({
             const total = count || 0
             const totalPages = Math.ceil(total / limit)
 
-            const mappedProducts = products?.map(p => ({
-                id: p.id,
-                name: p.name,
-                price: p.price,
-                category: p.category,
-                sellerEmail: 'Unknown', // We would need to fetch user email by user_id from Admin API.
-                // For now, let's leave it 'Unknown' or fetch it if crucial.
-                // We could fetch all unique user_ids from this page of products, then simple batch fetch from auth admin.
-                createdAt: p.created_at
-            })) || []
+            // Fetch seller details
+            const userIds = Array.from(new Set(products?.map(p => p.user_id) || []))
+            const { data: sellers } = await supabase
+                .from('users')
+                .select('id, name')
+                .in('id', userIds)
+
+            const mappedProducts = products?.map(p => {
+                const seller = sellers?.find(s => s.id === p.user_id)
+                return {
+                    id: p.id,
+                    name: p.name,
+                    price: p.price,
+                    category: p.category,
+                    sellerName: seller?.name || 'Unknown',
+                    sellerEmail: 'Unknown', // Keep Unknown or fetch from auth if needed, but name is requested
+                    createdAt: p.created_at
+                }
+            }) || []
 
             return { products: mappedProducts, totalDocs: total, totalPages, hasNextPage: page < totalPages, hasPrevPage: page > 1, page }
         }),
@@ -159,19 +168,28 @@ export const adminRouter = router({
             const total = count || 0
             const totalPages = Math.ceil(total / limit)
 
+            // Fetch buyer details
+            const userIds = Array.from(new Set(orders?.map(o => o.user_id) || []))
+            const { data: buyers } = await supabase
+                .from('users')
+                .select('id, name')
+                .in('id', userIds)
+
             const mappedOrders = orders?.map((order: any) => {
                 const products = order.order_products.map((op: any) => op.products)
                 const total = products.reduce((sum: number, p: any) => sum + (p?.price || 0), 0)
+                const buyer = buyers?.find(b => b.id === order.user_id)
 
                 return {
                     id: order.id,
                     isPaid: order.is_paid,
-                    buyerEmail: 'Unknown', // Again, need Admin API for email
+                    buyerName: buyer?.name || 'Unknown',
+                    buyerEmail: 'Unknown',
                     products: products.map((p: any) => ({
                         name: p?.name || 'Unknown',
                         price: p?.price || 0
                     })),
-                    total: total, // or use order.amount
+                    total: order.amount || total, // Prefer order.amount if available
                     createdAt: order.created_at
                 }
             }) || []

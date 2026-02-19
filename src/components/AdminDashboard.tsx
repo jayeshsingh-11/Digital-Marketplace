@@ -376,7 +376,12 @@ const AdminDashboard = ({ user }: { user: User }) => {
                                                     <td className='px-6 py-4'>
                                                         <span className='text-sm font-medium text-gray-900'>{p.name}</span>
                                                     </td>
-                                                    <td className='px-6 py-4 text-sm text-gray-600'>{p.sellerEmail}</td>
+                                                    <td className='px-6 py-4'>
+                                                        <div className="flex flex-col">
+                                                            <span className='text-sm font-medium text-gray-900'>{p.sellerName}</span>
+                                                            <span className='text-xs text-gray-500'>{p.sellerEmail}</span>
+                                                        </div>
+                                                    </td>
                                                     <td className='px-6 py-4 text-sm font-medium text-gray-900'>{formatPrice(p.price)}</td>
                                                     <td className='px-6 py-4'>
                                                         <span className='inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800'>
@@ -431,7 +436,7 @@ const AdminDashboard = ({ user }: { user: User }) => {
                                                 <span className='text-sm font-bold text-gray-900'>{formatPrice(p.price)}</span>
                                             </div>
                                             <div className="text-xs text-gray-600 mb-3">
-                                                Seller: {p.sellerEmail}
+                                                Seller: <span className="font-medium text-gray-900">{p.sellerName}</span>
                                             </div>
                                             <div className="flex justify-between items-center pt-2 border-t border-gray-100">
                                                 <span className='text-xs text-gray-400'>{formatDate(p.createdAt)}</span>
@@ -504,7 +509,12 @@ const AdminDashboard = ({ user }: { user: User }) => {
                                                             {o.id.slice(0, 8)}...
                                                         </span>
                                                     </td>
-                                                    <td className='px-6 py-4 text-sm text-gray-600'>{o.buyerEmail}</td>
+                                                    <td className='px-6 py-4'>
+                                                        <div className="flex flex-col">
+                                                            <span className='text-sm font-medium text-gray-900'>{o.buyerName}</span>
+                                                            <span className='text-xs text-gray-500'>{o.buyerEmail}</span>
+                                                        </div>
+                                                    </td>
                                                     <td className='px-6 py-4'>
                                                         <div className='flex flex-col gap-0.5'>
                                                             {o.products.map((prod: any, i: number) => (
@@ -559,7 +569,8 @@ const AdminDashboard = ({ user }: { user: User }) => {
                                             <div className="flex justify-between items-start mb-2">
                                                 <div className="flex flex-col">
                                                     <span className='text-xs font-mono text-gray-500'>#{o.id.slice(0, 8)}</span>
-                                                    <span className='text-sm text-gray-600 mt-1'>{o.buyerEmail}</span>
+                                                    <span className='text-sm font-medium text-gray-900 mt-1'>{o.buyerName}</span>
+                                                    <span className='text-xs text-gray-500'>{o.buyerEmail}</span>
                                                 </div>
                                                 <span
                                                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${o.isPaid
