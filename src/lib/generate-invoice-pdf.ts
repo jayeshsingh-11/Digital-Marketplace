@@ -157,7 +157,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
                 .fillColor(grayColor)
                 .text(product.category, 340, y + 9, { width: 100 })
                 .fillColor(darkColor)
-                .text(`₹${product.price.toFixed(2)}`, 440, y + 9, { width: 100, align: 'right' })
+                .text(new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(product.price), 440, y + 9, { width: 100, align: 'right' })
 
             y += 28
         })
@@ -167,12 +167,12 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
 
         // Subtotal
         doc.fontSize(10).font('Sans').fillColor(grayColor).text('Subtotal', 340, y)
-        doc.fontSize(10).font('Sans').fillColor(darkColor).text(`₹${data.subtotal.toFixed(2)}`, 440, y, { width: 100, align: 'right' })
+        doc.fontSize(10).font('Sans').fillColor(darkColor).text(new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(data.subtotal), 440, y, { width: 100, align: 'right' })
         y += 20
 
         // Fee
         doc.fontSize(10).font('Sans').fillColor(grayColor).text('Transaction Fee', 340, y)
-        doc.fontSize(10).font('Sans').fillColor(darkColor).text(`₹${data.fee.toFixed(2)}`, 440, y, { width: 100, align: 'right' })
+        doc.fontSize(10).font('Sans').fillColor(darkColor).text(new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(data.fee), 440, y, { width: 100, align: 'right' })
         y += 20
 
         // Divider
@@ -181,7 +181,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
 
         // Total
         doc.fontSize(14).font('Sans').fillColor(darkColor).text('Total', 340, y)
-        doc.fontSize(14).font('Sans').fillColor(accentColor).text(`₹${data.total.toFixed(2)}`, 440, y, { width: 100, align: 'right' })
+        doc.fontSize(14).font('Sans').fillColor(accentColor).text(new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(data.total), 440, y, { width: 100, align: 'right' })
         y += 30
 
         // ─── Commission Breakdown ───────────────────
@@ -194,9 +194,9 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
 
         doc.fontSize(9).font('Sans').fillColor(grayColor)
             .text('Platform Fee (10%)', 65, y)
-            .text(`₹${data.adminCommission.toFixed(2)}`, 200, y)
+            .text(new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(data.adminCommission), 200, y)
             .text('Seller Earnings (90%)', 300, y)
-            .text(`₹${data.sellerEarnings.toFixed(2)}`, 440, y)
+            .text(new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(data.sellerEarnings), 440, y)
 
         // ─── Footer ─────────────────────────────────
         y = doc.page.height - 100
