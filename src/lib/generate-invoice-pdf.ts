@@ -27,6 +27,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
         const doc = new PDFDocument({
             size: 'A4',
             margin: 50,
+            font: null as any, // Prevent loading default Helvetica font (which causes ENOENT)
             info: {
                 Title: `Invoice ${data.invoiceNumber}`,
                 Author: 'Creative Cascade',
