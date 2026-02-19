@@ -2,7 +2,7 @@
 
 import { User } from '@/payload-types'
 import { trpc } from '@/trpc/client'
-import { formatPrice } from '@/lib/utils'
+import { formatPrice, cn } from '@/lib/utils'
 import {
     Loader2,
     Users,
@@ -136,9 +136,26 @@ const AdminDashboard = ({ user }: { user: User }) => {
                 </div>
             </div>
 
-            <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+            {/* Mobile Bottom Nav */}
+            <div className='fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 flex md:hidden z-50 pb-safe'>
+                {tabs.map((tab) => (
+                    <button
+                        key={tab.key}
+                        onClick={() => setActiveTab(tab.key)}
+                        className={cn(
+                            'flex-1 py-3 flex flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors',
+                            activeTab === tab.key ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600'
+                        )}
+                    >
+                        <tab.icon className={cn("h-6 w-6", activeTab === tab.key ? "fill-blue-600/10" : "")} />
+                        {tab.label}
+                    </button>
+                ))}
+            </div>
+
+            <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8 pb-24 md:pb-8'>
                 {/* Stats Cards */}
-                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8'>
+                <div className='grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5 mb-6 md:mb-8'>
                     {statCards.map((stat) => (
                         <div
                             key={stat.label}
@@ -160,8 +177,8 @@ const AdminDashboard = ({ user }: { user: User }) => {
                     ))}
                 </div>
 
-                {/* Tabs */}
-                <div className='bg-white rounded-xl border border-gray-200 overflow-hidden'>
+                {/* Tabs (Desktop Only) */}
+                <div className='hidden md:block bg-white rounded-xl border border-gray-200 overflow-hidden mb-6'>
                     <div className='border-b border-gray-200'>
                         <div className='flex overflow-x-auto no-scrollbar'>
                             {tabs.map((tab) => (
@@ -613,7 +630,7 @@ const AdminDashboard = ({ user }: { user: User }) => {
                     )}
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
 

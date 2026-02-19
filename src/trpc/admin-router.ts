@@ -121,11 +121,15 @@ export const adminRouter = router({
 
             // Fetch seller details
             const userIds = Array.from(new Set(products?.map(p => p.user_id) || []))
+            console.log('getProducts: userIds', userIds)
             const adminSupabase = createAdminClient()
-            const { data: sellers } = await adminSupabase
+            const { data: sellers, error: sellerError } = await adminSupabase
                 .from('users')
                 .select('id, name')
                 .in('id', userIds)
+
+            if (sellerError) console.error('getProducts: sellerError', sellerError)
+            console.log('getProducts: sellers found', sellers?.length, sellers)
 
             const mappedProducts = products?.map(p => {
                 const seller = sellers?.find(s => s.id === p.user_id)
@@ -139,6 +143,7 @@ export const adminRouter = router({
                     createdAt: p.created_at
                 }
             }) || []
+            console.log('getProducts: mapped[0]', mappedProducts[0])
 
             return { products: mappedProducts, totalDocs: total, totalPages, hasNextPage: page < totalPages, hasPrevPage: page > 1, page }
         }),
@@ -171,11 +176,15 @@ export const adminRouter = router({
 
             // Fetch buyer details
             const userIds = Array.from(new Set(orders?.map(o => o.user_id) || []))
+            console.log('getOrders: userIds', userIds)
             const adminSupabase = createAdminClient()
-            const { data: buyers } = await adminSupabase
+            const { data: buyers, error: buyerError } = await adminSupabase
                 .from('users')
                 .select('id, name')
                 .in('id', userIds)
+
+            if (buyerError) console.error('getOrders: buyerError', buyerError)
+            console.log('getOrders: buyers found', buyers?.length, buyers)
 
             const mappedOrders = orders?.map((order: any) => {
                 const products = order.order_products.map((op: any) => op.products)
@@ -195,6 +204,7 @@ export const adminRouter = router({
                     createdAt: order.created_at
                 }
             }) || []
+            console.log('getOrders: mapped[0]', mappedOrders[0])
 
             return { orders: mappedOrders, totalDocs: total, totalPages, hasNextPage: page < totalPages, hasPrevPage: page > 1, page }
         }),

@@ -137,9 +137,9 @@ const SellerDashboard = ({ user }: { user: User }) => {
                     <button
                         onClick={() => setActiveTab('products')}
                         className={cn(
-                            'w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all',
+                            'w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200',
                             activeTab === 'products'
-                                ? 'bg-black text-white shadow-lg shadow-black/10'
+                                ? 'bg-black text-white shadow-md shadow-black/10'
                                 : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                         )}
                     >
@@ -200,7 +200,7 @@ const SellerDashboard = ({ user }: { user: User }) => {
                     </div>
 
                     <div className='flex items-center gap-3'>
-                        <Link href='/seller/products/new'>
+                        <Link href='/seller/products/new' className="hidden md:block">
                             <div className={cn(buttonVariants({ variant: 'default', size: 'sm' }), 'bg-black hover:bg-zinc-800 shadow-sm')}>
                                 <Plus className='h-4 w-4 mr-1.5' />
                                 New Product
@@ -217,49 +217,52 @@ const SellerDashboard = ({ user }: { user: User }) => {
                         </Link>
                     </div>
 
-                    {/* Mobile Tab Nav */}
-                    <div className='absolute bottom-0 left-0 w-full overflow-x-auto flex md:hidden bg-white border-t border-gray-100 no-scrollbar'>
+                    {/* Mobile Tab Nav - Fixed Bottom */}
+                    <div className='fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 flex md:hidden z-50 pb-safe'>
                         <button
                             onClick={() => setActiveTab('products')}
                             className={cn(
-                                'flex-1 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap px-4',
-                                activeTab === 'products' ? 'border-black text-black' : 'border-transparent text-gray-500'
+                                'flex-1 py-3 flex flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors',
+                                activeTab === 'products' ? 'text-black' : 'text-gray-400 hover:text-gray-600'
                             )}
                         >
+                            <Package className={cn("h-6 w-6", activeTab === 'products' ? "fill-black/10" : "")} />
                             Products
                         </button>
                         <button
                             onClick={() => setActiveTab('orders')}
                             className={cn(
-                                'flex-1 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap px-4',
-                                activeTab === 'orders' ? 'border-black text-black' : 'border-transparent text-gray-500'
+                                'flex-1 py-3 flex flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors',
+                                activeTab === 'orders' ? 'text-black' : 'text-gray-400 hover:text-gray-600'
                             )}
                         >
+                            <ShoppingCart className={cn("h-6 w-6", activeTab === 'orders' ? "fill-black/10" : "")} />
                             Orders
                         </button>
                         <button
                             onClick={() => setActiveTab('analytics')}
                             className={cn(
-                                'flex-1 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap px-4',
-                                activeTab === 'analytics' ? 'border-black text-black' : 'border-transparent text-gray-500'
+                                'flex-1 py-3 flex flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors',
+                                activeTab === 'analytics' ? 'text-black' : 'text-gray-400 hover:text-gray-600'
                             )}
                         >
+                            <TrendingUp className={cn("h-6 w-6", activeTab === 'analytics' ? "fill-black/10" : "")} />
                             Analytics
                         </button>
                     </div>
                 </header>
 
-                <div className='p-4 md:p-8 space-y-6 md:space-y-8'>
+                <div className='p-4 md:p-8 space-y-6 md:space-y-8 max-w-7xl mx-auto'>
                     {/* Stats Grid */}
-                    <div className='grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6'>
+                    <div className='grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6'>
                         {statCards.map((stat) => (
                             <div
                                 key={stat.label}
                                 className='bg-white rounded-xl border border-gray-200 p-4 md:p-6 shadow-sm hover:shadow-md transition-shadow'
                             >
                                 <div className='flex items-center justify-between mb-4'>
-                                    <div className={`p-2.5 rounded-lg ${stat.iconBg}`}>
-                                        <stat.icon className={`h-5 w-5 ${stat.color}`} />
+                                    <div className={`p-2 rounded-lg ${stat.iconBg}`}>
+                                        <stat.icon className={`h-4 w-4 md:h-5 md:w-5 ${stat.color}`} />
                                     </div>
                                     {stat.trend && (
                                         <span className={cn(
@@ -272,12 +275,12 @@ const SellerDashboard = ({ user }: { user: User }) => {
                                     )}
                                 </div>
                                 <div>
-                                    <p className='text-sm font-medium text-gray-500'>{stat.label}</p>
+                                    <p className='text-xs md:text-sm font-medium text-gray-500'>{stat.label}</p>
                                     <div className='mt-1'>
                                         {statsLoading ? (
-                                            <Skeleton className="h-8 w-24" />
+                                            <Skeleton className="h-6 w-20 md:h-8 md:w-24" />
                                         ) : (
-                                            <h3 className='text-2xl font-bold text-gray-900'>{stat.value}</h3>
+                                            <h3 className='text-xl md:text-2xl font-bold text-gray-900 tracking-tight'>{stat.value}</h3>
                                         )}
                                     </div>
                                 </div>
@@ -409,47 +412,49 @@ const SellerDashboard = ({ user }: { user: User }) => {
                                     ) : (
                                         productsData?.products.map((p) => (
                                             // ... mobile card content (unchanged)
-                                            <div key={p.id} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex gap-4'>
-                                                <div className='h-20 w-20 rounded-lg bg-gray-100 border border-gray-200 flex-shrink-0 overflow-hidden relative'>
-                                                    {p.imageUrl ? (
-                                                        // eslint-disable-next-line @next/next/no-img-element
-                                                        <img src={p.imageUrl} alt={p.name} className='h-full w-full object-cover' />
-                                                    ) : (
-                                                        <div className='h-full w-full flex items-center justify-center'>
-                                                            <Package className='h-5 w-5 text-gray-400' />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <div className="flex-1 min-w-0 flex flex-col justify-between">
-                                                    <div>
-                                                        <div className="flex justify-between items-start">
-                                                            <div>
-                                                                <h3 className='text-base font-semibold text-gray-900 truncate pr-2'>{p.name}</h3>
-                                                                <p className='text-xs text-gray-500'>{p.category}</p>
+                                            <div key={p.id} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col gap-4'>
+                                                <div className="flex gap-4">
+                                                    <div className='h-24 w-24 rounded-lg bg-gray-100 border border-gray-200 flex-shrink-0 overflow-hidden relative'>
+                                                        {p.imageUrl ? (
+                                                            // eslint-disable-next-line @next/next/no-img-element
+                                                            <img src={p.imageUrl} alt={p.name} className='h-full w-full object-cover' />
+                                                        ) : (
+                                                            <div className='h-full w-full flex items-center justify-center'>
+                                                                <Package className='h-6 w-6 text-gray-400' />
                                                             </div>
-                                                            <DropdownMenu>
-                                                                <DropdownMenuTrigger asChild>
-                                                                    <button className='p-1 -mr-2 text-gray-400 hover:text-gray-600'>
-                                                                        <MoreHorizontal className='h-5 w-5' />
-                                                                    </button>
-                                                                </DropdownMenuTrigger>
-                                                                <DropdownMenuContent align="end">
-                                                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                                    <DropdownMenuItem>Edit</DropdownMenuItem>
-                                                                    <DropdownMenuItem>Details</DropdownMenuItem>
-                                                                    <DropdownMenuSeparator />
-                                                                    <DropdownMenuItem className="text-red-600" onClick={() => deleteProduct({ id: p.id })}>
-                                                                        Delete
-                                                                    </DropdownMenuItem>
-                                                                </DropdownMenuContent>
-                                                            </DropdownMenu>
-                                                        </div>
+                                                        )}
                                                     </div>
-                                                    <div className="flex justify-between items-end mt-2">
-                                                        <span className='font-bold text-gray-900'>{formatPrice(p.price)}</span>
-                                                        <span className='inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-100 text-green-800 border border-green-200'>
-                                                            Active
-                                                        </span>
+                                                    <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                                                        <div>
+                                                            <div className="flex justify-between items-start gap-2">
+                                                                <div className='min-w-0'>
+                                                                    <h3 className='text-base font-bold text-gray-900 truncate leading-tight'>{p.name}</h3>
+                                                                    <p className='text-xs text-gray-500 mt-1'>{p.category}</p>
+                                                                </div>
+                                                                <DropdownMenu>
+                                                                    <DropdownMenuTrigger asChild>
+                                                                        <button className='p-1.5 -mr-2 -mt-2 text-gray-400 hover:text-gray-600 active:bg-gray-100 rounded-full transition-colors'>
+                                                                            <MoreHorizontal className='h-5 w-5' />
+                                                                        </button>
+                                                                    </DropdownMenuTrigger>
+                                                                    <DropdownMenuContent align="end">
+                                                                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                                        <DropdownMenuItem>Edit</DropdownMenuItem>
+                                                                        <DropdownMenuItem>Details</DropdownMenuItem>
+                                                                        <DropdownMenuSeparator />
+                                                                        <DropdownMenuItem className="text-red-600" onClick={() => deleteProduct({ id: p.id })}>
+                                                                            Delete
+                                                                        </DropdownMenuItem>
+                                                                    </DropdownMenuContent>
+                                                                </DropdownMenu>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex justify-between items-end mt-2">
+                                                            <span className='text-lg font-bold text-gray-900'>{formatPrice(p.price)}</span>
+                                                            <span className='inline-flex items-center px-2 py-1 rounded-full text-[10px] font-medium bg-green-50 text-green-700 border border-green-100'>
+                                                                Available
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -563,30 +568,38 @@ const SellerDashboard = ({ user }: { user: User }) => {
                                     ) : (
                                         ordersData?.orders.map((o) => (
                                             // ... mobile order card (unchanged)
-                                            <div key={o.id} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm'>
-                                                <div className="flex justify-between items-start border-b border-gray-100 pb-3 mb-3">
-                                                    <div>
-                                                        <span className='font-mono text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded block w-fit mb-1'>#{o.id.slice(0, 8)}</span>
-                                                        <span className='text-xs text-gray-400'>{formatDate(o.createdAt)}</span>
+                                            <div key={o.id} className='bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col gap-3'>
+                                                <div className="flex justify-between items-start border-b border-gray-50 pb-3">
+                                                    <div className='space-y-1'>
+                                                        <div className='flex items-center gap-2'>
+                                                            <span className='font-mono text-xs font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded'>#{o.id.slice(0, 8)}</span>
+                                                            <span className='text-[10px] text-gray-400'>{formatDate(o.createdAt)}</span>
+                                                        </div>
+                                                        <p className='text-xs text-gray-500'>{o.products.length} item(s)</p>
                                                     </div>
                                                     <span className={cn(
-                                                        'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border',
-                                                        o.isPaid ? 'bg-green-100 text-green-800 border-green-200' : 'bg-yellow-100 text-yellow-800 border-yellow-200'
+                                                        'inline-flex items-center px-2 py-1 rounded-full text-[10px] font-medium border',
+                                                        o.isPaid ? 'bg-green-50 text-green-700 border-green-100' : 'bg-yellow-50 text-yellow-700 border-yellow-100'
                                                     )}>
                                                         {o.isPaid ? 'Paid' : 'Pending'}
                                                     </span>
                                                 </div>
-                                                <div className="space-y-2 mb-3">
+
+                                                <div className="space-y-2">
                                                     {o.products.map((prod: any, i: number) => (
-                                                        <div key={i} className='text-sm text-gray-900 font-medium truncate'>
-                                                            {prod.name}
+                                                        <div key={i} className='flex items-center justify-between text-sm'>
+                                                            <span className='text-gray-900 font-medium truncate flex-1 pr-4'>{prod.name}</span>
                                                         </div>
                                                     ))}
                                                 </div>
-                                                <div className="flex justify-between items-center pt-2">
-                                                    <span className='text-lg font-bold text-gray-900'>{formatPrice(o.total)}</span>
-                                                    <button className='text-sm font-medium text-indigo-600 hover:text-indigo-900'>
-                                                        View Order
+
+                                                <div className="flex justify-between items-center pt-3 border-t border-gray-50 mt-1">
+                                                    <div className='flex flex-col'>
+                                                        <span className='text-[10px] uppercase tracking-wider text-gray-500 font-semibold'>Total</span>
+                                                        <span className='text-lg font-bold text-gray-900'>{formatPrice(o.total)}</span>
+                                                    </div>
+                                                    <button className='px-4 py-2 text-sm font-medium text-white bg-black rounded-lg hover:bg-zinc-800 transition-colors shadow-sm'>
+                                                        View Details
                                                     </button>
                                                 </div>
                                             </div>
@@ -616,15 +629,15 @@ const SellerDashboard = ({ user }: { user: User }) => {
                         )}
                     </div>
                 </div>
-            </main>
+            </main >
 
             {/* Mobile FAB - New Product */}
-            <Link href='/seller/products/new' className='md:hidden fixed bottom-6 right-6 z-40'>
-                <div className='h-14 w-14 bg-black text-white rounded-full shadow-lg shadow-black/25 flex items-center justify-center hover:bg-zinc-800 transition-colors active:scale-95'>
+            < Link href='/seller/products/new' className='md:hidden fixed bottom-20 right-4 z-40' >
+                <div className='h-12 w-12 bg-black text-white rounded-full shadow-lg shadow-black/25 flex items-center justify-center hover:bg-zinc-800 transition-colors active:scale-95'>
                     <Plus className='h-6 w-6' />
                 </div>
-            </Link>
-        </div>
+            </Link >
+        </div >
     )
 }
 
