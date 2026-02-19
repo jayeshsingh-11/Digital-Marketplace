@@ -6,6 +6,7 @@ interface BrevoEmailProps {
     htmlContent: string
     to: { email: string; name?: string }[]
     sender?: { email: string; name: string }
+    attachments?: { filename: string; content: Buffer; contentType?: string }[]
 }
 
 export const sendBrevoEmail = async ({
@@ -13,6 +14,7 @@ export const sendBrevoEmail = async ({
     htmlContent,
     to,
     sender = { email: process.env.GMAIL_USER || 'techglow881@gmail.com', name: 'Creative Cascade' },
+    attachments,
 }: BrevoEmailProps) => {
     console.log('Brevo: Preparing to send email...')
     console.log('Brevo Sender:', sender)
@@ -39,6 +41,11 @@ export const sendBrevoEmail = async ({
             to: to.map(t => t.name ? `"${t.name}" <${t.email}>` : t.email).join(', '),
             subject,
             html: htmlContent,
+            attachments: attachments?.map(a => ({
+                filename: a.filename,
+                content: a.content,
+                contentType: a.contentType || 'application/pdf',
+            })),
         })
 
         console.log('Message sent: %s', info.messageId)

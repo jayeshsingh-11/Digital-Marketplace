@@ -12,6 +12,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { cookies } from 'next/headers'
 import { sendBrevoEmail } from '@/lib/brevo'
 import { ReceiptEmailHtml } from '@/components/emails/ReceiptEmail'
+import { generateInvoicePDF } from '@/lib/generate-invoice-pdf'
 
 // Helper: generate invoice number like INV-20260219-0001
 function generateInvoiceNumber(): string {
@@ -254,7 +255,7 @@ export const paymentRouter = router({
         console.log(`📄 Invoice ${invoiceNumber} created`)
       }
 
-      // 8. Send confirmation email
+      // 8. Send confirmation email with PDF invoice
       if (user.email) {
         try {
           const htmlContent = await ReceiptEmailHtml({
@@ -268,12 +269,39 @@ export const paymentRouter = router({
             razorpayPaymentId: paymentId,
           })
 
+          // Generate PDF invoice
+          const pdfBuffer = await generateInvoicePDF({
+            invoiceNumber,
+            date: new Date(),
+            buyerEmail: user.email,
+            buyerName: user.email.split('@')[0],
+            orderId: dbOrderId,
+            razorpayPaymentId: paymentId,
+            products: products.map((p: any) => ({
+              name: p.name,
+              category: p.category || 'Digital Asset',
+              price: p.price,
+            })),
+            subtotal: productTotal,
+            fee: 1,
+            total: orderData.amount,
+            adminCommission,
+            sellerEarnings,
+          })
+
+          console.log(`📄 PDF invoice generated: ${invoiceNumber} (${pdfBuffer.length} bytes)`)
+
           await sendBrevoEmail({
             subject: `Order Confirmed! Invoice ${invoiceNumber} — Your downloads are ready`,
             to: [{ email: user.email, name: user.email.split('@')[0] }],
             htmlContent,
+            attachments: [{
+              filename: `Invoice-${invoiceNumber}.pdf`,
+              content: pdfBuffer,
+              contentType: 'application/pdf',
+            }],
           })
-          console.log('📧 Confirmation email sent to', user.email)
+          console.log('📧 Confirmation email with PDF sent to', user.email)
         } catch (emailErr) {
           console.error('❌ Email send error:', emailErr)
         }
