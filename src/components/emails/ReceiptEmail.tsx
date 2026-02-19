@@ -1,5 +1,4 @@
 import { formatPrice } from '../../lib/utils'
-import { Product } from '../../payload-types'
 
 import {
   Body,
@@ -8,7 +7,6 @@ import {
   Head,
   Hr,
   Html,
-  Img,
   Link,
   Preview,
   Row,
@@ -18,14 +16,17 @@ import {
 } from '@react-email/components'
 
 import * as React from 'react'
-
 import { format } from 'date-fns'
 
 interface ReceiptEmailProps {
   email: string
   date: Date
   orderId: string
-  products: Product[]
+  products: any[]
+  invoiceNumber?: string
+  adminCommission?: number
+  sellerEarnings?: number
+  razorpayPaymentId?: string
 }
 
 export const ReceiptEmail = ({
@@ -33,330 +34,491 @@ export const ReceiptEmail = ({
   date,
   orderId,
   products,
+  invoiceNumber,
+  adminCommission,
+  sellerEarnings,
+  razorpayPaymentId,
 }: ReceiptEmailProps) => {
-  const total =
-    products.reduce((acc, curr) => acc + curr.price, 0) + 1
+  const subtotal = products.reduce((acc, curr) => acc + (curr.price || 0), 0)
+  const fee = 1
+  const total = subtotal + fee
+  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 
   return (
     <Html>
-      <Head />
-      <Preview>Your DigitalHippo Receipt</Preview>
+      <Head>
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        `}</style>
+      </Head>
+      <Preview>Your Creative Cascade order is confirmed! {invoiceNumber ? `Invoice ${invoiceNumber}` : ''}</Preview>
 
       <Body style={main}>
         <Container style={container}>
-          <Section>
-            <Column>
-              <Img
-                src={`${process.env.NEXT_PUBLIC_SERVER_URL}/hippo-email-sent.png`}
-                width='100'
-                height='100'
-                alt='DigitalHippo'
-              />
-            </Column>
 
-            <Column align='right' style={tableCell}>
-              <Text style={heading}>Receipt</Text>
-            </Column>
-          </Section>
-          <Section style={informationTable}>
-            <Row style={informationTableRow}>
-              <Column style={informationTableColumn}>
-                <Text style={informationTableLabel}>
-                  EMAIL
+          {/* Header with Logo */}
+          <Section style={headerSection}>
+            <Row>
+              <Column>
+                <Text style={logoText}>
+                  <span style={{ color: '#000000', fontWeight: 700, fontSize: '28px', letterSpacing: '-0.5px' }}>Creative</span>
+                  <span style={{ color: '#6366f1', fontWeight: 700, fontSize: '28px', letterSpacing: '-0.5px' }}> Cascade</span>
                 </Text>
-                <Link
-                  style={{
-                    ...informationTableValue,
-                  }}>
-                  {email}
-                </Link>
+                <Text style={logoTagline}>Your Digital Marketplace</Text>
               </Column>
-
-              <Column style={informationTableColumn}>
-                <Text style={informationTableLabel}>
-                  INVOICE DATE
-                </Text>
-                <Text style={informationTableValue}>
-                  {format(date, 'dd MMM yyyy')}
-                </Text>
-              </Column>
-
-              <Column style={informationTableColumn}>
-                <Text style={informationTableLabel}>
-                  ORDER ID
-                </Text>
-                <Link
-                  style={{
-                    ...informationTableValue,
-                  }}>
-                  {orderId}
-                </Link>
+              <Column align='right'>
+                <Text style={receiptBadge}>✓ Payment Confirmed</Text>
               </Column>
             </Row>
           </Section>
-          <Section style={productTitleTable}>
-            <Text style={productsTitle}>Order Summary</Text>
+
+          <Hr style={mainDivider} />
+
+          {/* Greeting */}
+          <Section style={{ padding: '20px 0 10px 0' }}>
+            <Text style={greetingText}>
+              Hi {email.split('@')[0]},
+            </Text>
+            <Text style={subText}>
+              Thank you for your purchase! Your payment has been verified and your digital assets are ready for download.
+            </Text>
           </Section>
-          {products.map((product) => {
-            const { image } = product.images[0]
+
+          {/* Invoice Details Card */}
+          <Section style={infoCard}>
+            <Text style={infoCardTitle}>Order Details</Text>
+            <Row style={infoRow}>
+              <Column style={infoLabelCol}>
+                <Text style={infoLabel}>Invoice Number</Text>
+                <Text style={infoValue}>{invoiceNumber || '—'}</Text>
+              </Column>
+              <Column style={infoLabelCol}>
+                <Text style={infoLabel}>Order Date</Text>
+                <Text style={infoValue}>{format(date, 'dd MMM yyyy, hh:mm a')}</Text>
+              </Column>
+            </Row>
+            <Row style={infoRow}>
+              <Column style={infoLabelCol}>
+                <Text style={infoLabel}>Order ID</Text>
+                <Text style={{ ...infoValue, fontSize: '11px', wordBreak: 'break-all' as const }}>{orderId}</Text>
+              </Column>
+              <Column style={infoLabelCol}>
+                <Text style={infoLabel}>Payment ID</Text>
+                <Text style={{ ...infoValue, fontSize: '11px', wordBreak: 'break-all' as const }}>{razorpayPaymentId || '—'}</Text>
+              </Column>
+            </Row>
+            <Row>
+              <Column style={infoLabelCol}>
+                <Text style={infoLabel}>Email</Text>
+                <Text style={infoValue}>{email}</Text>
+              </Column>
+              <Column style={infoLabelCol}>
+                <Text style={infoLabel}>Payment Method</Text>
+                <Text style={infoValue}>Razorpay</Text>
+              </Column>
+            </Row>
+          </Section>
+
+          {/* Products */}
+          <Section style={{ marginTop: '24px' }}>
+            <Text style={sectionTitle}>Items Purchased</Text>
+          </Section>
+
+          {products.map((product, index) => {
+            const image = product.product_images?.[0]?.media
+            const imageUrl = image?.url
 
             return (
-              <Section key={product.id}>
-                <Column style={{ width: '64px' }}>
-                  {typeof image !== 'string' &&
-                    image.url ? (
-                    <Img
-                      src={image.url}
-                      width='64'
-                      height='64'
-                      alt='Product Image'
-                      style={productIcon}
-                    />
-                  ) : null}
-                </Column>
-                <Column style={{ paddingLeft: '22px' }}>
-                  <Text style={productTitle}>
-                    {product.name}
-                  </Text>
-                  {product.description ? (
-                    <Text style={productDescription}>
-                      {product.description.length > 50
-                        ? product.description?.slice(
-                          0,
-                          50
-                        ) + '...'
-                        : product.description}
-                    </Text>
-                  ) : null}
-                  <Link
-                    href={`${process.env.NEXT_PUBLIC_SERVER_URL}/thank-you?orderId=${orderId}`}
-                    style={productLink}>
-                    Download Asset
-                  </Link>
-                </Column>
-
-                <Column
-                  style={productPriceWrapper}
-                  align='right'>
-                  <Text style={productPrice}>
-                    {formatPrice(product.price)}
-                  </Text>
-                </Column>
+              <Section key={product.id || index} style={productRow}>
+                <Row>
+                  <Column style={{ width: '56px', verticalAlign: 'top' }}>
+                    {imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        width='48'
+                        height='48'
+                        alt={product.name}
+                        style={productImg}
+                      />
+                    ) : (
+                      <div style={productImgPlaceholder}>📦</div>
+                    )}
+                  </Column>
+                  <Column style={{ paddingLeft: '12px', verticalAlign: 'top' }}>
+                    <Text style={productName}>{product.name}</Text>
+                    <Text style={productCategory}>{product.category}</Text>
+                  </Column>
+                  <Column align='right' style={{ verticalAlign: 'top', width: '100px' }}>
+                    <Text style={productPriceText}>{formatPrice(product.price)}</Text>
+                  </Column>
+                </Row>
               </Section>
             )
           })}
 
+          {/* Price Breakdown */}
+          <Hr style={{ borderColor: '#e5e7eb', margin: '20px 0 16px 0' }} />
+
           <Section>
-            <Column style={{ width: '64px' }}></Column>
-            <Column
-              style={{
-                paddingLeft: '40px',
-                paddingTop: 20,
-              }}>
-              <Text style={productTitle}>
-                Transaction Fee
-              </Text>
-            </Column>
-
-            <Column
-              style={productPriceWrapper}
-              align='right'>
-              <Text style={productPrice}>
-                {formatPrice(1)}
-              </Text>
-            </Column>
+            <Row>
+              <Column><Text style={priceLabel}>Subtotal</Text></Column>
+              <Column align='right'><Text style={priceValue}>{formatPrice(subtotal)}</Text></Column>
+            </Row>
+            <Row>
+              <Column><Text style={priceLabel}>Transaction Fee</Text></Column>
+              <Column align='right'><Text style={priceValue}>{formatPrice(fee)}</Text></Column>
+            </Row>
           </Section>
 
-          <Hr style={productPriceLine} />
-          <Section align='right'>
-            <Column style={tableCell} align='right'>
-              <Text style={productPriceTotal}>TOTAL</Text>
-            </Column>
-            <Column
-              style={productPriceVerticalLine}></Column>
-            <Column style={productPriceLargeWrapper}>
-              <Text style={productPriceLarge}>
-                {formatPrice(total)}
-              </Text>
-            </Column>
-          </Section>
-          <Hr style={productPriceLineBottom} />
+          <Hr style={{ borderColor: '#111827', margin: '12px 0', borderWidth: '2px' }} />
 
-          <Text style={footerLinksWrapper}>
-            <Link href='#'>Account Settings</Link> •{' '}
-            <Link href='#'>Terms of Sale</Link> •{' '}
-            <Link href='#'>Privacy Policy </Link>
-          </Text>
-          <Text style={footerCopyright}>
-            Copyright © 2023 Creative Cascade Inc. <br />{' '}
-            <Link href='#'>All rights reserved</Link>
-          </Text>
+          <Section>
+            <Row>
+              <Column><Text style={totalLabel}>Total Paid</Text></Column>
+              <Column align='right'><Text style={totalValue}>{formatPrice(total)}</Text></Column>
+            </Row>
+          </Section>
+
+          {/* Commission Breakdown (subtle) */}
+          {(adminCommission !== undefined && sellerEarnings !== undefined) && (
+            <Section style={commissionCard}>
+              <Text style={commissionTitle}>Payment Split</Text>
+              <Row>
+                <Column><Text style={commissionLabel}>Platform Fee (10%)</Text></Column>
+                <Column align='right'><Text style={commissionValue}>{formatPrice(adminCommission)}</Text></Column>
+              </Row>
+              <Row>
+                <Column><Text style={commissionLabel}>Seller Earnings (90%)</Text></Column>
+                <Column align='right'><Text style={commissionValue}>{formatPrice(sellerEarnings)}</Text></Column>
+              </Row>
+            </Section>
+          )}
+
+          {/* Download CTA */}
+          <Section style={ctaSection}>
+            <Text style={ctaTitle}>🎉 Your downloads are ready!</Text>
+            <Text style={ctaSubtext}>
+              Access your purchased assets from your orders page. Download links are secured and only available to you.
+            </Text>
+            <Section style={{ textAlign: 'center' as const, marginTop: '16px' }}>
+              <Link
+                href={`${serverUrl}/thank-you?orderId=${orderId}`}
+                style={ctaButton}
+              >
+                Download Your Assets →
+              </Link>
+            </Section>
+          </Section>
+
+          {/* Footer */}
+          <Hr style={{ borderColor: '#e5e7eb', margin: '32px 0 20px 0' }} />
+
+          <Section>
+            <Text style={footerBrand}>
+              <span style={{ color: '#000', fontWeight: 600 }}>Creative</span>
+              <span style={{ color: '#6366f1', fontWeight: 600 }}> Cascade</span>
+            </Text>
+            <Text style={footerLinks}>
+              <Link href={`${serverUrl}/account`} style={footerLink}>Account</Link>
+              {' • '}
+              <Link href={`${serverUrl}/products`} style={footerLink}>Browse Products</Link>
+              {' • '}
+              <Link href='#' style={footerLink}>Help Center</Link>
+            </Text>
+            <Text style={footerCopy}>
+              © {new Date().getFullYear()} Creative Cascade. All rights reserved.
+            </Text>
+            <Text style={footerNote}>
+              This email was sent to {email} because you made a purchase on Creative Cascade.
+              If you did not make this purchase, please contact our support immediately.
+            </Text>
+          </Section>
+
         </Container>
       </Body>
     </Html>
   )
 }
 
-export const ReceiptEmailHtml = (
-  props: ReceiptEmailProps
-) =>
-  render(<ReceiptEmail {...props} />, {
-    pretty: true,
-  })
+export const ReceiptEmailHtml = (props: ReceiptEmailProps) =>
+  render(<ReceiptEmail {...props} />, { pretty: true })
+
+// ─── Styles ──────────────────────────────────────────
 
 const main = {
-  fontFamily: '"Helvetica Neue",Helvetica,Arial,sans-serif',
-  backgroundColor: '#ffffff',
-}
-
-const resetText = {
-  margin: '0',
-  padding: '0',
-  lineHeight: 1.4,
+  fontFamily: '"Inter", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  backgroundColor: '#f9fafb',
 }
 
 const container = {
   margin: '0 auto',
-  padding: '20px 0 48px',
-  width: '660px',
+  padding: '40px 24px',
+  maxWidth: '600px',
+  backgroundColor: '#ffffff',
+  borderRadius: '12px',
+  border: '1px solid #e5e7eb',
 }
 
-const tableCell = { display: 'table-cell' }
-
-const heading = {
-  fontSize: '28px',
-  fontWeight: '300',
-  color: '#888888',
+const headerSection = {
+  padding: '0 0 16px 0',
 }
 
-const informationTable = {
-  borderCollapse: 'collapse' as const,
-  borderSpacing: '0px',
-  color: 'rgb(51,51,51)',
-  backgroundColor: 'rgb(250,250,250)',
-  borderRadius: '3px',
-  fontSize: '12px',
-  marginTop: '12px',
-}
-
-const informationTableRow = {
-  height: '46px',
-}
-
-const informationTableColumn = {
-  paddingLeft: '20px',
-  borderStyle: 'solid',
-  borderColor: 'white',
-  borderWidth: '0px 1px 1px 0px',
-  height: '44px',
-}
-
-const informationTableLabel = {
-  ...resetText,
-  color: 'rgb(102,102,102)',
-  fontSize: '10px',
-}
-
-const informationTableValue = {
-  fontSize: '12px',
+const logoText = {
   margin: '0',
   padding: '0',
-  lineHeight: 1.4,
+  lineHeight: '1.2',
 }
 
-const productTitleTable = {
-  ...informationTable,
-  margin: '30px 0 15px 0',
-  height: '24px',
+const logoTagline = {
+  margin: '4px 0 0 0',
+  fontSize: '12px',
+  color: '#9ca3af',
+  fontWeight: 400 as const,
 }
 
-const productsTitle = {
-  background: '#fafafa',
-  paddingLeft: '10px',
-  fontSize: '14px',
-  fontWeight: '500',
+const receiptBadge = {
+  margin: '0',
+  padding: '6px 14px',
+  backgroundColor: '#ecfdf5',
+  color: '#059669',
+  fontSize: '13px',
+  fontWeight: 600 as const,
+  borderRadius: '20px',
+  display: 'inline-block' as const,
+}
+
+const mainDivider = {
+  borderColor: '#e5e7eb',
   margin: '0',
 }
 
-const productIcon = {
-  margin: '0 0 0 20px',
-  borderRadius: '14px',
-  border: '1px solid rgba(128,128,128,0.2)',
+const greetingText = {
+  fontSize: '18px',
+  fontWeight: 600 as const,
+  color: '#111827',
+  margin: '0 0 8px 0',
 }
 
-const productTitle = {
-  fontSize: '12px',
-  fontWeight: '600',
-  ...resetText,
+const subText = {
+  fontSize: '14px',
+  color: '#6b7280',
+  margin: '0',
+  lineHeight: '1.6',
 }
 
-const productDescription = {
-  fontSize: '12px',
-  color: 'rgb(102,102,102)',
-  ...resetText,
+const infoCard = {
+  backgroundColor: '#f9fafb',
+  borderRadius: '8px',
+  padding: '20px',
+  marginTop: '20px',
+  border: '1px solid #f3f4f6',
 }
 
-const productLink = {
+const infoCardTitle = {
+  fontSize: '14px',
+  fontWeight: 600 as const,
+  color: '#111827',
+  margin: '0 0 16px 0',
+  textTransform: 'uppercase' as const,
+  letterSpacing: '0.5px',
+}
+
+const infoRow = {
+  marginBottom: '12px',
+}
+
+const infoLabelCol = {
+  padding: '0 8px 0 0',
+}
+
+const infoLabel = {
+  fontSize: '11px',
+  color: '#9ca3af',
+  margin: '0',
+  textTransform: 'uppercase' as const,
+  letterSpacing: '0.3px',
+  fontWeight: 500 as const,
+}
+
+const infoValue = {
+  fontSize: '13px',
+  color: '#111827',
+  margin: '2px 0 8px 0',
+  fontWeight: 500 as const,
+}
+
+const sectionTitle = {
+  fontSize: '14px',
+  fontWeight: 600 as const,
+  color: '#111827',
+  margin: '0 0 12px 0',
+  textTransform: 'uppercase' as const,
+  letterSpacing: '0.5px',
+}
+
+const productRow = {
+  padding: '12px 0',
+  borderBottom: '1px solid #f3f4f6',
+}
+
+const productImg = {
+  borderRadius: '8px',
+  border: '1px solid #e5e7eb',
+  objectFit: 'cover' as const,
+}
+
+const productImgPlaceholder = {
+  width: '48px',
+  height: '48px',
+  borderRadius: '8px',
+  backgroundColor: '#f3f4f6',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: '20px',
+}
+
+const productName = {
+  fontSize: '14px',
+  fontWeight: 600 as const,
+  color: '#111827',
+  margin: '0 0 2px 0',
+}
+
+const productCategory = {
   fontSize: '12px',
-  color: 'rgb(0,112,201)',
+  color: '#9ca3af',
+  margin: '0',
+  textTransform: 'capitalize' as const,
+}
+
+const productPriceText = {
+  fontSize: '14px',
+  fontWeight: 600 as const,
+  color: '#111827',
+  margin: '0',
+}
+
+const priceLabel = {
+  fontSize: '13px',
+  color: '#6b7280',
+  margin: '4px 0',
+}
+
+const priceValue = {
+  fontSize: '13px',
+  color: '#111827',
+  fontWeight: 500 as const,
+  margin: '4px 0',
+}
+
+const totalLabel = {
+  fontSize: '16px',
+  fontWeight: 700 as const,
+  color: '#111827',
+  margin: '4px 0',
+}
+
+const totalValue = {
+  fontSize: '16px',
+  fontWeight: 700 as const,
+  color: '#111827',
+  margin: '4px 0',
+}
+
+const commissionCard = {
+  backgroundColor: '#faf5ff',
+  borderRadius: '8px',
+  padding: '14px 16px',
+  marginTop: '16px',
+  border: '1px solid #f3e8ff',
+}
+
+const commissionTitle = {
+  fontSize: '11px',
+  fontWeight: 600 as const,
+  color: '#7c3aed',
+  margin: '0 0 8px 0',
+  textTransform: 'uppercase' as const,
+  letterSpacing: '0.5px',
+}
+
+const commissionLabel = {
+  fontSize: '12px',
+  color: '#6b7280',
+  margin: '2px 0',
+}
+
+const commissionValue = {
+  fontSize: '12px',
+  color: '#374151',
+  fontWeight: 500 as const,
+  margin: '2px 0',
+}
+
+const ctaSection = {
+  backgroundColor: '#111827',
+  borderRadius: '12px',
+  padding: '28px 24px',
+  marginTop: '28px',
+  textAlign: 'center' as const,
+}
+
+const ctaTitle = {
+  fontSize: '18px',
+  fontWeight: 700 as const,
+  color: '#ffffff',
+  margin: '0 0 8px 0',
+}
+
+const ctaSubtext = {
+  fontSize: '13px',
+  color: '#9ca3af',
+  margin: '0',
+  lineHeight: '1.5',
+}
+
+const ctaButton = {
+  display: 'inline-block' as const,
+  backgroundColor: '#6366f1',
+  color: '#ffffff',
+  padding: '12px 32px',
+  borderRadius: '8px',
+  fontSize: '14px',
+  fontWeight: 600 as const,
+  textDecoration: 'none',
+  textAlign: 'center' as const,
+}
+
+const footerBrand = {
+  fontSize: '16px',
+  textAlign: 'center' as const,
+  margin: '0 0 12px 0',
+}
+
+const footerLinks = {
+  fontSize: '12px',
+  color: '#9ca3af',
+  textAlign: 'center' as const,
+  margin: '0 0 12px 0',
+}
+
+const footerLink = {
+  color: '#6b7280',
   textDecoration: 'none',
 }
 
-const productPriceTotal = {
-  margin: '0',
-  color: 'rgb(102,102,102)',
-  fontSize: '10px',
-  fontWeight: '600',
-  padding: '0px 30px 0px 0px',
-  textAlign: 'right' as const,
-}
-
-const productPrice = {
-  fontSize: '12px',
-  fontWeight: '600',
-  margin: '0',
-}
-
-const productPriceLarge = {
-  margin: '0px 20px 0px 0px',
-  fontSize: '16px',
-  fontWeight: '600',
-  whiteSpace: 'nowrap' as const,
-  textAlign: 'right' as const,
-}
-
-const productPriceWrapper = {
-  display: 'table-cell',
-  padding: '0px 20px 0px 0px',
-  width: '100px',
-  verticalAlign: 'top',
-}
-
-const productPriceLine = { margin: '30px 0 0 0' }
-
-const productPriceVerticalLine = {
-  height: '48px',
-  borderLeft: '1px solid',
-  borderColor: 'rgb(238,238,238)',
-}
-
-const productPriceLargeWrapper = {
-  display: 'table-cell',
-  width: '90px',
-}
-
-const productPriceLineBottom = { margin: '0 0 75px 0' }
-
-const footerLinksWrapper = {
-  margin: '8px 0 0 0',
+const footerCopy = {
+  fontSize: '11px',
+  color: '#d1d5db',
   textAlign: 'center' as const,
-  fontSize: '12px',
-  color: 'rgb(102,102,102)',
+  margin: '0 0 8px 0',
 }
 
-const footerCopyright = {
-  margin: '25px 0 0 0',
+const footerNote = {
+  fontSize: '11px',
+  color: '#d1d5db',
   textAlign: 'center' as const,
-  fontSize: '12px',
-  color: 'rgb(102,102,102)',
+  margin: '0',
+  lineHeight: '1.5',
 }

@@ -262,6 +262,10 @@ export const paymentRouter = router({
             email: user.email,
             orderId: dbOrderId,
             products,
+            invoiceNumber,
+            adminCommission,
+            sellerEarnings,
+            razorpayPaymentId: paymentId,
           })
 
           await sendBrevoEmail({
