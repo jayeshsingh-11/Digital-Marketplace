@@ -40,25 +40,50 @@ export const OrderCard = ({ order }: OrderCardProps) => {
             {/* Collapsed Header (Front) */}
             <div
                 onClick={() => setIsOpen(!isOpen)}
-                className='p-6 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white hover:bg-gray-50/50 transition-colors'
+                className='p-6 cursor-pointer bg-white hover:bg-gray-50/50 transition-colors'
             >
-                <div className="flex items-center gap-8">
-                    <div>
-                        <p className='text-xs text-gray-500 uppercase tracking-wide font-medium mb-1'>Date Placed</p>
-                        <p className='font-medium text-gray-900'>
-                            {format(new Date(order.createdAt), 'dd MMM yyyy, hh:mm a')}
-                        </p>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                    <div className="flex items-center gap-8">
+                        <div>
+                            <p className='text-xs text-gray-500 uppercase tracking-wide font-medium mb-1'>Date Placed</p>
+                            <p className='font-medium text-gray-900'>
+                                {format(new Date(order.createdAt), 'dd MMM yyyy, hh:mm a')}
+                            </p>
+                        </div>
+                        <div>
+                            <p className='text-xs text-gray-500 uppercase tracking-wide font-medium mb-1'>Total Amount</p>
+                            <p className='font-bold text-gray-900'>{formatPrice(order.amount)}</p>
+                        </div>
                     </div>
-                    <div>
-                        <p className='text-xs text-gray-500 uppercase tracking-wide font-medium mb-1'>Total Amount</p>
-                        <p className='font-bold text-gray-900'>{formatPrice(order.amount)}</p>
+                    <div className="flex items-center gap-4">
+                        <div className='inline-flex px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium'>
+                            Paid
+                        </div>
+                        <ChevronRight className={cn("h-5 w-5 text-gray-400 transition-transform duration-200", isOpen && "rotate-90")} />
                     </div>
                 </div>
-                <div className="flex items-center gap-4">
-                    <div className='inline-flex px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium'>
-                        Paid
+
+                {/* Product Preview (Visible in collapsed state) */}
+                <div className="flex items-center gap-4 pt-4 border-t border-gray-100">
+                    <div className="flex -space-x-2 overflow-hidden">
+                        {order.products.slice(0, 3).map((product: any, i: number) => (
+                            <div key={i} className="relative h-10 w-10 rounded-full border-2 border-white overflow-hidden bg-gray-100 ring-1 ring-gray-100">
+                                {product.imageUrl ? (
+                                    <Image src={product.imageUrl} fill className="object-cover" alt={product.name} />
+                                ) : (
+                                    <div className="flex h-full w-full items-center justify-center text-gray-400"><ShoppingBag className="h-4 w-4" /></div>
+                                )}
+                            </div>
+                        ))}
                     </div>
-                    <ChevronRight className={cn("h-5 w-5 text-gray-400 transition-transform duration-200", isOpen && "rotate-90")} />
+                    <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                            {order.products.map((p: any) => p.name).join(', ')}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                            {order.products.length} {order.products.length === 1 ? 'item' : 'items'}
+                        </p>
+                    </div>
                 </div>
             </div>
 
