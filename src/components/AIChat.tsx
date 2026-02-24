@@ -4,6 +4,7 @@ import { useChat } from 'ai/react';
 import { useState, useRef, useEffect } from 'react';
 import { Bot, X, MessageCircle, Loader2, Send } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { formatPrice } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 
@@ -89,7 +90,7 @@ export default function AIChat() {
                       if (items.length === 0) {
                         return (
                           <div key={toolCallId} className="mt-2 text-sm text-gray-500 italic bg-white p-2 rounded-lg border">
-                            No products found for "{args.query}".
+                            No products found for &quot;{args.query}&quot;.
                           </div>
                         );
                       }
@@ -107,10 +108,11 @@ export default function AIChat() {
                               >
                                 <div className="relative aspect-video bg-gray-100 overflow-hidden">
                                   {item.imageUrl ? (
-                                    <img
+                                    <Image
+                                      fill
                                       src={item.imageUrl}
                                       alt={item.name}
-                                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                                      className="object-cover group-hover:scale-105 transition-transform duration-300"
                                     />
                                   ) : (
                                     <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -132,7 +134,7 @@ export default function AIChat() {
                       return (
                         <div key={toolCallId} className="flex items-center space-x-2 text-sm text-zinc-900 bg-zinc-100 py-2 px-3 rounded-lg animate-pulse w-fit mt-2">
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Searching for "{args.query}"...</span>
+                          <span>Searching for &quot;{args.query}&quot;...</span>
                         </div>
                       );
                     }

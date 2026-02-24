@@ -7,6 +7,7 @@ import {
   Head,
   Hr,
   Html,
+  Img,
   Link,
   Preview,
   Row,
@@ -134,7 +135,7 @@ export const ReceiptEmail = ({
                 <Row>
                   <Column style={{ width: '56px', verticalAlign: 'top' }}>
                     {imageUrl ? (
-                      <img
+                      <Img
                         src={imageUrl}
                         width='48'
                         height='48'
