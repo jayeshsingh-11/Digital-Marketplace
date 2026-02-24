@@ -7,9 +7,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { formatPrice } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
+import { usePathname } from 'next/navigation';
 
 export default function AIChat() {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
   // @ts-ignore
   const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
     api: '/api/chat',
@@ -39,6 +41,10 @@ export default function AIChat() {
       ]);
     }
   }, [isOpen, messages.length, setMessages]);
+
+  if (pathname === '/sign-in' || pathname === '/sign-up') {
+    return null;
+  }
 
   return (
     <div className="fixed bottom-20 md:bottom-4 right-4 z-50 flex flex-col items-end">
