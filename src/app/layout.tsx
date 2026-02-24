@@ -10,6 +10,7 @@ import Footer from '@/components/Footer'
 import MobileBottomNav from '@/components/MobileBottomNav'
 import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
+import AIChat from '@/components/AIChat'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' })
@@ -44,6 +45,7 @@ export default async function RootLayout({
             </div>
             <Footer />
             <MobileBottomNav user={user} />
+            <AIChat />
           </Providers>
         </main>
 
