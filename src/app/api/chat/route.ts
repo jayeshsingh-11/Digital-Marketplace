@@ -28,19 +28,26 @@ export async function POST(req: Request) {
             messages,
             tools: {
                 searchProducts: tool({
-                    description: 'Search the marketplace database for products based on a text query. Returns matching products with their prices and categories.',
+                    description: 'Search the marketplace database for products based on a text query. Returns matching products with their prices and categories. Optionally filter by a maximum price.',
                     parameters: z.object({
                         query: z.string().describe('The search terms, e.g., "UI kit", "template", "dashboard"'),
+                        maxPrice: z.number().optional().describe('The maximum price the user is willing to pay. If they say "under 50", this is 50.'),
                     }),
-                    execute: async ({ query }) => {
+                    execute: async ({ query, maxPrice }) => {
                         const supabase = createClient(cookies());
 
-                        const { data, error } = await supabase
+                        let queryBuilder = supabase
                             .from('products')
                             .select('id, name, price, category, product_images(image_id, media:image_id(url))')
                             .eq('approved', true)
                             .ilike('name', `%${query}%`)
                             .limit(5);
+
+                        if (maxPrice !== undefined) {
+                            queryBuilder = queryBuilder.lte('price', maxPrice);
+                        }
+
+                        const { data, error } = await queryBuilder;
 
                         if (error) {
                             console.error('Search error:', error);
@@ -67,44 +74,49 @@ export async function POST(req: Request) {
                     description: "Fetch the currently logged-in user's profile information, including their name, email, and their recent order history/invoices.",
                     parameters: z.object({}),
                     execute: async () => {
-                        const supabase = createClient(cookies());
+                        try {
+                            const supabase = createClient(cookies());
 
-                        // Check if user is logged in
-                        const { data: { user }, error: authError } = await supabase.auth.getUser();
-                        if (authError || !user) {
-                            return { error: 'You are not logged in. Please sign in to view your profile and orders.' };
+                            // Check if user is logged in
+                            const { data: { user }, error: authError } = await supabase.auth.getUser();
+                            if (authError || !user) {
+                                return { error: 'Please sign in to view your account details! Use the Sign In button at the top of the page.' };
+                            }
+
+                            // Fetch user profile
+                            const { data: profile } = await supabase
+                                .from('users')
+                                .select('name, role, created_at')
+                                .eq('id', user.id)
+                                .single();
+
+                            // Fetch user orders with product details
+                            const { data: orders } = await supabase
+                                .from('orders')
+                                .select('id, amount, is_paid, created_at, order_products(products(name, price))')
+                                .eq('user_id', user.id)
+                                .order('created_at', { ascending: false })
+                                .limit(5);
+
+                            return {
+                                user: {
+                                    email: user.email,
+                                    name: profile?.name || 'User',
+                                    role: profile?.role || 'user',
+                                    memberSince: profile?.created_at,
+                                },
+                                recentOrders: orders?.map(order => ({
+                                    orderId: order.id,
+                                    amount: order.amount,
+                                    status: order.is_paid ? 'Paid' : 'Pending',
+                                    date: order.created_at,
+                                    items: order.order_products?.map((op: any) => op.products?.name).filter(Boolean)
+                                })) || []
+                            };
+                        } catch (e: any) {
+                            console.error('Failed to get user profile', e);
+                            return { error: 'Failed to authenticate your session. Please try logging in again.' };
                         }
-
-                        // Fetch user profile
-                        const { data: profile } = await supabase
-                            .from('users')
-                            .select('name, role, created_at')
-                            .eq('id', user.id)
-                            .single();
-
-                        // Fetch user orders with product details
-                        const { data: orders } = await supabase
-                            .from('orders')
-                            .select('id, amount, is_paid, created_at, order_products(products(name, price))')
-                            .eq('user_id', user.id)
-                            .order('created_at', { ascending: false })
-                            .limit(5);
-
-                        return {
-                            user: {
-                                email: user.email,
-                                name: profile?.name || 'Unknown',
-                                role: profile?.role || 'user',
-                                memberSince: profile?.created_at,
-                            },
-                            recentOrders: orders?.map(order => ({
-                                orderId: order.id,
-                                amount: order.amount,
-                                status: order.is_paid ? 'Paid' : 'Pending',
-                                date: order.created_at,
-                                items: order.order_products?.map((op: any) => op.products?.name).filter(Boolean)
-                            })) || []
-                        };
                     }
                 })
             },
