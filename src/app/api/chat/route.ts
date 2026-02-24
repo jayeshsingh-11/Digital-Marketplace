@@ -19,32 +19,47 @@ export async function POST(req: Request) {
             model: nvidia('meta/llama-3.1-70b-instruct'),
             system: `You are a helpful, professional AI assistant for "Creative Cascade", a premium digital marketplace for digital assets like UI kits, software tools, e-books, and design templates.
         Your goal is to help users find what they are looking for by searching the database and answering questions about the website.
-        Always use the searchProducts tool if a user asks for templates, ui kits, or any kind of products we might sell.
+        
+        You have three tools available:
+        1. searchProducts: Use this to search for products (e.g., templates, UI kits, specific items) by query, category, and/or max price (e.g., "under 1000").
+        2. getMarketplaceStats: Use this if the user asks broad questions like "how many products do you have?" or "what categories of products do you sell?".
+        3. getUserProfile: Use this if the user asks "who am I?", "what is my name?", or wants to see their order history.
         
         CRITICAL RULES FOR RESPONDING:
-        1. Read the user's text carefully. If they are just talking, asking a general question, or need advice, respond naturally and conversationally based exactly on what they asked.
-        2. If a user says "hello" or greets you, ONLY reply with a greeting back (e.g., "Hello! How can I assist you today?").
+        1. Start by considering if a tool is needed based on the user's input.
+        2. If the user greets you (e.g., "hello"), ONLY reply with a greeting back (e.g., "Hello! How can I assist you today?").
         3. DO NOT output any inner thoughts, explanations of whether you need to search a database, or preambles like "No function call is necessary".
-        4. Never break character. You are the assistant speaking directly to the user.
+        4. When a tool returns data, summarize it naturally and concisely for the user.
+        5. Never break character. You are the assistant speaking directly to the user.
         
         Keep your answers structured, visually appealing, and concise.`,
             messages,
             tools: {
                 searchProducts: tool({
-                    description: 'Search the marketplace database for products based on a text query. Returns matching products with their prices and categories. Optionally filter by a maximum price.',
+                    description: 'Search the marketplace database for products. Returns matching products with their prices and categories. You can search by text query, specific category, and/or maximum price.',
                     parameters: z.object({
-                        query: z.string().describe('The search terms, e.g., "UI kit", "template", "dashboard"'),
-                        maxPrice: z.number().optional().describe('The maximum price the user is willing to pay. If they say "under 50", this is 50.'),
+                        query: z.string().optional().describe('The search terms, e.g., "UI kit", "template", "dashboard". Omit if just asking for a category or price range.'),
+                        category: z.string().optional().describe('The category of products, e.g., "ui_kits", "icons".'),
+                        maxPrice: z.number().optional().describe('The maximum price the user is willing to pay. If they say "under 1000", this is 1000.'),
                     }),
-                    execute: async ({ query, maxPrice }) => {
+                    execute: async ({ query, category, maxPrice }) => {
                         const supabase = createClient(cookies());
 
                         let queryBuilder = supabase
                             .from('products')
                             .select('id, name, price, category, product_images(image_id, media:image_id(url))')
-                            .eq('approved', true)
-                            .ilike('name', `%${query}%`)
-                            .limit(5);
+                            .eq('approved', true);
+
+                        if (query) {
+                            queryBuilder = queryBuilder.ilike('name', `%${query}%`);
+                        }
+
+                        if (category) {
+                            const formattedCategory = category.replace(' ', '_');
+                            queryBuilder = queryBuilder.ilike('category', `%${formattedCategory}%`);
+                        }
+
+                        queryBuilder = queryBuilder.limit(10);
 
                         if (maxPrice !== undefined) {
                             queryBuilder = queryBuilder.lte('price', maxPrice);
@@ -72,6 +87,37 @@ export async function POST(req: Request) {
 
                         return { items };
                     },
+                }),
+                getMarketplaceStats: tool({
+                    description: 'Get general statistics about the marketplace, such as the total number of products available and the different categories being sold.',
+                    parameters: z.object({}),
+                    execute: async () => {
+                        const supabase = createClient(cookies());
+
+                        // Get total count
+                        const { count, error: countError } = await supabase
+                            .from('products')
+                            .select('*', { count: 'exact', head: true })
+                            .eq('approved', true);
+
+                        // Get unique categories (Group by isn't directly supported in simple JS client without RPC, so we'll fetch a small set and extract categories, or just use a known list if it's small)
+                        // A quick hack for categories since we don't have an RPC is just fetching the category column
+                        const { data: catData, error: catError } = await supabase
+                            .from('products')
+                            .select('category')
+                            .eq('approved', true);
+
+                        const uniqueCategories = catData ? Array.from(new Set(catData.map(c => c.category))) : [];
+
+                        if (countError || catError) {
+                            return { error: 'Could not fetch marketplace statistics at this time.' };
+                        }
+
+                        return {
+                            totalProducts: count || 0,
+                            categories: uniqueCategories,
+                        };
+                    }
                 }),
                 getUserProfile: tool({
                     description: "Fetch the currently logged-in user's profile information, including their name, email, and their recent order history/invoices.",

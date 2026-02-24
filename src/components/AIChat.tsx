@@ -87,9 +87,10 @@ export default function AIChat() {
                       const { items } = toolInvocation.result as any;
 
                       if (items.length === 0) {
+                        const searchTerms = [args.query, args.category, args.maxPrice ? `under $${args.maxPrice}` : null].filter(Boolean).join(', ');
                         return (
                           <div key={toolCallId} className="mt-2 text-sm text-gray-500 italic bg-white p-2 rounded-lg border">
-                            No products found for &quot;{args.query}&quot;.
+                            No products found for {searchTerms ? `"${searchTerms}"` : 'your search'}.
                           </div>
                         );
                       }
@@ -130,10 +131,55 @@ export default function AIChat() {
                         </div>
                       );
                     } else {
+                      const searchTerms = [args.query, args.category, args.maxPrice ? `under $${args.maxPrice}` : 'products'].filter(Boolean).join(', ');
                       return (
                         <div key={toolCallId} className="flex items-center space-x-2 text-sm text-zinc-900 bg-zinc-100 py-2 px-3 rounded-lg animate-pulse w-fit mt-2">
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Searching for &quot;{args.query}&quot;...</span>
+                          <span>Searching for &quot;{searchTerms}&quot;...</span>
+                        </div>
+                      );
+                    }
+                  } else if (toolName === 'getMarketplaceStats') {
+                    if (state === 'result') {
+                      const { totalProducts, categories, error } = toolInvocation.result as any;
+
+                      if (error) {
+                        return (
+                          <div key={toolCallId} className="mt-2 text-sm text-gray-500 italic bg-white p-2 rounded-lg border">
+                            {error}
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div key={toolCallId} className="mt-2 w-full">
+                          <div className="bg-zinc-900 border border-zinc-700 text-white rounded-xl p-4 shadow-sm">
+                            <h4 className="font-semibold text-base mb-3 flex items-center gap-2">
+                              <Bot className="w-5 h-5 text-zinc-400" />
+                              Marketplace Overview
+                            </h4>
+                            <div className="grid grid-cols-2 gap-3 mb-3">
+                              <div className="bg-zinc-800 p-3 rounded-lg flex flex-col items-center justify-center">
+                                <span className="text-2xl font-bold text-white mb-1">{totalProducts}+</span>
+                                <span className="text-xs text-zinc-400 uppercase tracking-wider">Total Assets</span>
+                              </div>
+                              <div className="bg-zinc-800 p-3 rounded-lg flex flex-col items-center justify-center">
+                                <span className="text-2xl font-bold text-white mb-1">{categories.length}</span>
+                                <span className="text-xs text-zinc-400 uppercase tracking-wider">Categories</span>
+                              </div>
+                            </div>
+                            <div className="text-sm text-zinc-300">
+                              <span className="font-medium text-white">Available categories: </span>
+                              {categories.join(', ')}.
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div key={toolCallId} className="flex items-center space-x-2 text-sm text-zinc-900 bg-zinc-100 py-2 px-3 rounded-lg animate-pulse w-fit mt-2">
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Calculating library size...</span>
                         </div>
                       );
                     }
